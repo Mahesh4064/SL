@@ -1,0 +1,332 @@
+login as: oracle
+oracle@192.168.15.5's password:
+    ┌──────────────────────────────────────────────────────────────────────┐
+    │                 • MobaXterm Personal Edition v24.1 •                 │
+    │               (SSH client, X server and network tools)               │
+    │                                                                      │
+    │ ⮞ SSH session to oracle@192.168.15.5                                 │
+    │   • Direct SSH      :  ✓                                             │
+    │   • SSH compression :  ✓                                             │
+    │   • SSH-browser     :  ✓                                             │
+    │   • X11-forwarding  :  ✓  (remote display is forwarded through SSH)  │
+    │                                                                      │
+    │ ⮞ For more info, ctrl+click on help or visit our website.            │
+    └──────────────────────────────────────────────────────────────────────┘
+
+Last login: Wed Jul 17 14:52:58 2024 from 192.168.0.105
+[oracle@db1 ~]$ . oraenv
+ORACLE_SID = [oracle] ? orcl
+The Oracle base has been set to /u01/app/oracle
+[oracle@db1 ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Jul 18 14:34:48 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1543500144 bytes
+Fixed Size                  8896880 bytes
+Variable Size             905969664 bytes
+Database Buffers          620756992 bytes
+Redo Buffers                7876608 bytes
+Database mounted.
+
+
+
+Database opened.
+SQL> SQL> SQL> SQL> conn user1/user
+Connected.
+SQL> select * from tab;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+EMP
+TABLE
+
+
+SQL> select * from emp;
+
+        ID NAME
+---------- --------------------------------------------------
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+         1 mahesh
+
+        ID NAME
+---------- --------------------------------------------------
+         1 mahesh
+
+12 rows selected.
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@db1 ~]$
+[oracle@db1 ~]$
+[oracle@db1 ~]$
+[oracle@db1 ~]$
+[oracle@db1 ~]$ vi exp.par
+[oracle@db1 ~]$ ls -lrt
+total 4
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Templates
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Public
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Downloads
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Desktop
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Videos
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Pictures
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Music
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Documents
+-rw-r--r--. 1 oracle oinstall 63 Jul 18 14:40 exp.par
+[oracle@db1 ~]$ chmod 775 exp.par
+[oracle@db1 ~]$ ls -lrt
+total 4
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Templates
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Public
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Downloads
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Desktop
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Videos
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Pictures
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Music
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Documents
+-rwxrwxr-x. 1 oracle oinstall 63 Jul 18 14:40 exp.par
+[oracle@db1 ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Jul 18 14:40:38 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@db1 ~]$ dls -lrt
+bash: dls: command not found...
+[oracle@db1 ~]$ ls -lrt
+total 4
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Templates
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Public
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Downloads
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Desktop
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Videos
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Pictures
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Music
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Documents
+-rwxrwxr-x. 1 oracle oinstall 63 Jul 18 14:40 exp.par
+[oracle@db1 ~]$ pwd
+/home/oracle
+[oracle@db1 ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Jul 18 14:42:08 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> create directory emp1111 as '/home/oracle' ;
+
+Directory created.
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@db1 ~]$ ls -lrt
+total 4
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Templates
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Public
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Downloads
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Desktop
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Videos
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Pictures
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Music
+drwxr-xr-x. 2 oracle oinstall  6 Jul 12 15:49 Documents
+-rwxrwxr-x. 1 oracle oinstall 63 Jul 18 14:40 exp.par
+[oracle@db1 ~]$ vi exp.par
+[oracle@db1 ~]$ vi exp.par
+[oracle@db1 ~]$ expdp / as sysdba parfile=exp.par
+LRM-00108: invalid positional parameter value 'sysdba'
+
+[oracle@db1 ~]$ expdp / parfile=exp.par
+
+Export: Release 19.0.0.0.0 - Production on Thu Jul 18 14:44:59 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+Password:
+
+UDE-01017: operation generated ORACLE error 1017
+ORA-01017: invalid username/password; logon denied
+
+Username: sys
+Password:
+
+UDE-28009: operation generated ORACLE error 28009
+ORA-28009: connection as SYS should be as SYSDBA or SYSOPER
+
+Username: sys
+Password:
+
+UDE-28009: operation generated ORACLE error 28009
+ORA-28009: connection as SYS should be as SYSDBA or SYSOPER
+UDE-00003: all allowable logon attempts failed
+
+[oracle@db1 ~]$ expdp / as sysdba parfile=exp.par
+LRM-00108: invalid positional parameter value 'sysdba'
+
+[oracle@db1 ~]$ expdp sys parfile=exp.par
+
+Export: Release 19.0.0.0.0 - Production on Thu Jul 18 14:45:51 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+Password:
+
+UDE-28009: operation generated ORACLE error 28009
+ORA-28009: connection as SYS should be as SYSDBA or SYSOPER
+
+Username: / as sysdba
+Password:
+
+Connected to: Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Starting "SYS"."SYS_EXPORT_TABLE_01":  /******** AS SYSDBA parfile=exp.par
+ORA-39166: Object SYS.EMP was not found or could not be exported or imported.
+ORA-31655: no data or metadata objects selected for job
+Job "SYS"."SYS_EXPORT_TABLE_01" completed with 2 error(s) at Thu Jul 18 14:46:24 2024 elapsed 0 00:00:07
+
+[oracle@db1 ~]$ vi exp.par
+[oracle@db1 ~]$ expdp / parfile=exp.par
+
+Export: Release 19.0.0.0.0 - Production on Thu Jul 18 14:47:53 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+Password:
+
+UDE-01017: operation generated ORACLE error 1017
+ORA-01017: invalid username/password; logon denied
+
+Username: / as sysdba
+Password:
+
+Connected to: Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Starting "SYS"."SYS_EXPORT_SCHEMA_01":  /******** AS SYSDBA parfile=exp.par
+Processing object type SCHEMA_EXPORT/TABLE/TABLE_DATA
+Processing object type SCHEMA_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Processing object type SCHEMA_EXPORT/STATISTICS/MARKER
+Processing object type SCHEMA_EXPORT/USER
+Processing object type SCHEMA_EXPORT/SYSTEM_GRANT
+Processing object type SCHEMA_EXPORT/DEFAULT_ROLE
+Processing object type SCHEMA_EXPORT/TABLESPACE_QUOTA
+Processing object type SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
+Processing object type SCHEMA_EXPORT/TABLE/TABLE
+. . exported "USER1"."EMP"                               5.671 KB      12 rows
+Master table "SYS"."SYS_EXPORT_SCHEMA_01" successfully loaded/unloaded
+******************************************************************************
+Dump file set for SYS.SYS_EXPORT_SCHEMA_01 is:
+  /home/oracle/emp1.dmp
+Job "SYS"."SYS_EXPORT_SCHEMA_01" successfully completed at Thu Jul 18 14:48:39 2024 elapsed 0 00:00:30
+
+[oracle@db1 ~]$ ls -lrt
+total 352
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Templates
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Public
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Downloads
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Desktop
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Videos
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Pictures
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Music
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Documents
+-rwxrwxr-x. 1 oracle oinstall     72 Jul 18 14:47 exp.par
+-rw-r-----. 1 oracle oinstall 352256 Jul 18 14:48 emp1.dmp
+-rw-r--r--. 1 oracle oinstall   1537 Jul 18 14:48 emp.log
+[oracle@db1 ~]$ df -h
+Filesystem           Size  Used Avail Use% Mounted on
+devtmpfs             1.8G     0  1.8G   0% /dev
+tmpfs                1.8G  880M  944M  49% /dev/shm
+tmpfs                1.8G  9.7M  1.8G   1% /run
+tmpfs                1.8G     0  1.8G   0% /sys/fs/cgroup
+/dev/mapper/ol-root   17G   12G  5.6G  67% /
+/dev/mapper/ol-u01    38G   13G   25G  34% /u01
+/dev/mapper/ol-temp  4.7G   33M  4.7G   1% /temp
+/dev/sda1            2.8G  234M  2.6G   9% /boot
+/dev/mapper/ol-home  3.8G   39M  3.7G   2% /home
+tmpfs                365M   36K  365M   1% /run/user/0
+tmpfs                365M     0  365M   0% /run/user/54321
+[oracle@db1 ~]$ cd /u01
+[oracle@db1 u01]$ expdp / parfile=exp.par
+LRM-00109: could not open parameter file 'exp.par'
+LRM-00113: error when processing file 'exp.par'
+
+[oracle@db1 u01]$ cd ..
+[oracle@db1 /]$ ls -lrt
+total 40
+drwxr-xr-x.   2 root   root         6 Apr 11  2018 srv
+drwxr-xr-x.   2 root   root         6 Apr 11  2018 mnt
+drwxr-xr-x.   2 root   root         6 Apr 11  2018 media
+drwxr-xr-x.   2 root   root         6 Jul 10 10:33 temp
+lrwxrwxrwx.   1 root   root         7 Jul 10 10:35 bin -> usr/bin
+lrwxrwxrwx.   1 root   root         9 Jul 10 10:35 lib64 -> usr/lib64
+lrwxrwxrwx.   1 root   root         7 Jul 10 10:35 lib -> usr/lib
+lrwxrwxrwx.   1 root   root         8 Jul 10 10:35 sbin -> usr/sbin
+drwxr-xr-x.  13 root   root      4096 Jul 10 10:35 usr
+drwxr-xr-x.  24 root   root      4096 Jul 10 11:06 var
+dr-xr-xr-x.   5 root   root      4096 Jul 10 16:39 boot
+drwxr-xr-x.   4 root   root        33 Jul 10 16:53 home
+drwxrwxrwx.   3 oracle oinstall    17 Jul 10 17:08 u01
+drwxr-xr-x.   5 root   root        65 Jul 10 17:25 opt
+-rwxrwxrwx.   1 root   root        18 Jul 12 17:59 text.txt
+dr-xr-xr-x.  13 root   root         0 Jul 18 14:30 sys
+dr-xr-xr-x. 333 root   root         0 Jul 18 14:31 proc
+drwxr-xr-x.  20 root   root      3400 Jul 18 14:31 dev
+drwxr-xr-x. 178 root   root     12288 Jul 18 14:31 etc
+dr-xr-x---.  17 root   root      4096 Jul 18 14:32 root
+drwxr-xr-x.  56 root   root      1640 Jul 18 14:38 run
+drwxrwxrwt.  23 root   root      4096 Jul 18 14:40 tmp
+[oracle@db1 /]$ cd home/
+[oracle@db1 home]$ ls -lrt
+total 4
+drwx------.  3 admin  admin      78 Jul 10 10:36 admin
+drwx------. 19 oracle oinstall 4096 Jul 18 14:48 oracle
+[oracle@db1 home]$ cd oracle/
+[oracle@db1 ~]$ ls -=lrt
+ls: invalid option -- '='
+Try 'ls --help' for more information.
+[oracle@db1 ~]$ ls -lrt
+total 352
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Templates
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Public
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Downloads
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Desktop
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Videos
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Pictures
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Music
+drwxr-xr-x. 2 oracle oinstall      6 Jul 12 15:49 Documents
+-rwxrwxr-x. 1 oracle oinstall     72 Jul 18 14:47 exp.par
+-rw-r-----. 1 oracle oinstall 352256 Jul 18 14:48 emp1.dmp
+-rw-r--r--. 1 oracle oinstall   1537 Jul 18 14:48 emp.log
+[oracle@db1 ~]$ pwd
+/home/oracle
+[oracle@db1 ~]$

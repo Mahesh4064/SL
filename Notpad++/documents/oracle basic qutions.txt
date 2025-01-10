@@ -1,0 +1,353 @@
+
+Oracle DBA Interview Questions & Answers
+Explain about data and how do you store data?
+
+Data is any value which we store for future reference. There are different types of data tools which we can use to store data. The simplest data storage tools are notepad, MS-Excel, MS-Access etc.
+
+How data storage is different from data representation?
+
+Data storage can be done by using any data tools. Data storage defines how data is stored. On the other hand, data representation is how data is displayed to a user. For example, we can store data in the form of table but represent it in the form of charts!
+
+As a DBA, explain what is a database?
+
+Database is a software which allows applications to store and retrieve data faster. It allows companies to create a three tier system where first tier is users, second is application and third tier is database.
+
+Can you differentiate Instance and Database?
+
+In Oracle, Instance and database are two separate components but work together. Instance resides on RAM and it is the way users speak to database. The user data resides inside data files which reside on Hard Disks. Users connect to database instance and ultimately instance speaks with database.
+
+Instance can also be defined as combination of memory structures and background processes.
+
+How LRU algorithm impacts database instance?
+
+RAM works on LRU algorithm. As the database instance resides on RAM, it has to follow same rules as RAM. Hence, Oracle instance also follow LRU algorithm.
+
+What is database client?
+
+A database client is a small software which must be installed on application server so that application can connect to database server. For any client to connect oracle database, oracle client must be installed.
+
+Explain how user connectivity happens in database.
+
+All new user connections lands on listener. Listener hands over the incoming connections to PMON. The user credentials are then verified with base tables. If details are correct, server process is created on server side by allocating PGA memory.
+
+There are 100 users connected to database and listener goes down. What will happen?
+
+Nothing will happen to existing users. The problem will be only with new database connections. Listener only comes into pictures when there is a new database connection.
+
+What are base tables?
+
+Base tables are binary tables inside database which contains encrypted data. These are also called as metadata because it stores data regarding other data inside database. Base tables are copied only to data dictionary area under instance and flushed out. Base tables are also known as dictionary tables. Any modifications to base tables will corrupt the database. Only oracle background process can modify these tables. Base tables reside under system tablespace.
+
+Explain about optimizer?
+
+When we travel from point A to point B, we tend to take the shortest route even though we have multiple options. Same way, optimizer generates different plans or ways in which a SQL can be executed. These plans are known as execution plans. Optimizer then chooses the best plan based on CPU cost and resources. The job of optimizer is to generate execution plans and choose the best one.
+
+What is PGA or Private Global Area? How it is different from SGA?
+
+Any work inside a system or server is done through background processes. These processes need some memory to store basic information. On database server, we have one server process created for every user connection. These server process also takes some memory. This memory is known as PGA.
+
+SGA is shared global area. Anything placed in SGA is shared with all the users.
+
+What do you understand by In-Memory sort?
+
+All the small data filtering happens in PGA. This is known as In-Memory sort. If the data is big, sorting is done under temp tablespace.
+
+Can you explain how update statement is executed in database?
+
+In a update statement, we need to old value as user might rollback the transaction. Hence, undo tablespace comes into picture. The user data and a free undo block is copied into LRU list. These block are then copied to PGA where data swapping happens. Redo entries are generated and the dirty blocks are placed in write list. LGWR writes redo entries and then DBWR writes dirty blocks to database.
+
+Why LGWR writes before DBWR writes?
+
+In general, transaction recording is more important than transaction execution. Lets take, if we have redo entries on disk and suddenly power failure happens (the dirty blocks are not yet written to disk). Then oracle can still recover the transactions by reading the redologs on disk. This way first redo logs are made permanent and then dirty blocks are written to disk.
+
+Can we have multiple DBWR processes in database?
+
+We can have between 1 to 36 DBWR in 11g.
+
+Explain about SCN and checkpoint number.
+
+SCN is unique transaction number assigned to set of redo logs generated. This identify that OK, these all redo entries are part of one transaction.
+
+A checkpoint is a database event, which synchronize the database blocks in memory with the datafiles on disk. It has two main purposes – To establish a data consistency and enable faster database Recovery.
+
+I would like to perform 100 database installations. How will you do it?
+
+For such big number of installations, we can go with silent mode installation using response file.
+
+What are oinstall and dba groups? Why we assign these groups to oracle user?
+
+oinstall group provides oracle software installation permissions to all users in the group.
+
+dba group provides oracle administration permissions to all users in the group.
+
+Is it compulsory that we need to give group names as oinstall and dba? Or can we give any other name?
+
+We can give any name, but those are oracle standards.
+
+What are kernel parameters and why to set them?
+
+They will define the memory allocation from physical memory to Oracle database.
+
+What is Oracle inventory?
+
+It is a location which provides the oracle product information which are installed on a server.
+
+Why to run orainstRoot.sh and root.sh scripts at the end of installation?
+
+orainstRoot.sh will change the permissions for oraInventory and
+
+root.sh will create oratab fil.
+
+Explain oracle installation pre-requisite steps.
+
+Create oinstall& dba groups, modify kernel parameters, check disk space for installation, create oracle user and provide permissions on installation location to oracle user.
+
+I am not able to connect sqlplus utility. What could be the issue?
+
+The environment variables are not set properly OR
+
+.bash_profile is not executed immediately after making changes to it.
+
+Can we set environment variables in a different file apart from .bash_profile?
+
+Yes we can do that but still we need to set ORACLE_HOME and PATH variables in .bash_profile.
+
+I made changes to .bash_profile but still variables are not set.
+
+When you make changes to .bash_profile, you must execute it at least once using # . .bash_profile.
+
+How can I check environment variables are set properly?
+
+Using env | grep ORA.
+
+Using echo command like echo $ORACLE_HOME.
+
+What is the difference between /etc/oratab file and ps -ef|greppmon output?
+
+ps -ef | grep pmon gives output of running database instances on a server.
+
+/etc/oratab file lists all the databases created on a server, weather they are running or shutdown is a different case.
+
+How many databases can I create?
+
+Unlimited, as much as CPU and memory is supported.
+
+How many databases are there in your environment?
+
+Say any value between 150 to 200 and tell them 40 are prod and rest all are dev, test and QA.
+
+Which is the biggest databases in your environment?
+
+Say any value between 700 DB to 1.5 TB.
+
+How many servers are there in your environment?
+
+You can say 70 to 80 servers with Linux, AIX and windows flavors.
+
+Can we change database block size after creation?
+
+No, we cannot change block size.
+
+What are main steps after database creation manually?
+
+Execute catalog.sql and catproc.sql.
+
+Update /etc/oratab file.
+
+Application team requested you to delete a database. What will you do?
+
+These kind of requests must be checked with database architect. If we still have to do so, we can stop the listener for 1 week, Next shutdown the database and take DB cold backup. If application team does not come back after 1 month, then we can drop database.
+
+Base tables are in encrypted format, how can you check data from it?
+
+There are Data dictionary views and dynamic performance views created on base tables. We can query these views as they have data in human readable format.
+
+How data dictionary views and dynamic performance views are created?
+
+The catalog.sql and catproc.sql scripts created necessary views and procedures.
+
+When are base tables created? what will happen if we do not run catalog.sql and catproc.sql
+
+Base tables are created when you create a database.
+
+If you do not run those scripts, we will not be able to query any data dictionary view or dynamic performance view.
+
+Why we do not run catalog.sql and catproc.sql when we create database using DBCA?
+
+DBCA will run those scripts internally. We must run those scripts only when we create database manually.
+
+I would like to know current user details in database. How to find this information?
+
+You can query V$SESSION view to see the user connection details.
+
+What is the difference between pfile and spfile?
+
+Pfile is human readable file and spfile is binary file. We can start database instance with either of the files but first preference is given to spfile.
+
+Both reside under $ORACLE_HOME/dbs location and are used to allocate instance memory.
+
+I only have spfile, how can I create pfile?
+
+You can create it by CREATE PFILE FROM SPFILE query.
+
+Why we need temp tablespace when there is In-Memory soft in PGA?
+
+When the data is big, database needs more space. It uses temp tablespace in such cases to perform sorting.
+
+How can you find data files related to a tablespace?
+
+We can query DBA_DATA_FILES to check this information.
+
+What do you understand by log switch?
+
+LGWR switching from one redo log file to another is known as log switch.
+
+Can we create different size of redo files inside one group?
+
+No, all the members inside a group must have same size.
+
+What is FAST_START_MTTR_TARGET parameters?
+
+This parameter specifies the checkpoint frequency. By default it is set to 3 seconds.
+
+What happens in mount stage?
+
+In mount stage, only control file is read but its contents are not physically validated. Oracle will not check the physical existence of data files.
+
+What happens in open stage?
+
+The contents of control file is validated against physical files. Oracle will physically check data files and redo log files on disk. The data file headers and redo log files are matched with the SCN number in control file. Once validation is done, database will be open.
+
+I have 4 multiplexed copies of control files under /u01. Do you suggest to keep more copies or 4 are enough?
+
+We must have minimum 2 multiplexed copies but they must be on different physical disks. You have kept all 4 files under /u01. If we loose /u01 mount point, we loose all multiplexed copies.
+
+I lost control file under /u01 but I have multiplexed copy in /u02. How do you recover database?
+
+We can simply copy control file from /u02 using cp command and make a copy under /u01 with same name as lost control file. Once we have both control files, we can start the database.
+
+What is scope parameter?
+
+When we use spfile, there are some parameters which can be modified dynamically. That is the biggest benefit of spfile when compared to pfile. All the parameters that you modify while database is up and running can take three scope values: spfile, memory, both. Spfile scope will make changes from next reboot, memory scope will make changes immediately but will revert back after reboot and both will make changes immediately.
+
+What happens if archive log destination is full?
+
+The database will hang. We must have archive log backup scripts to take archive log backup and delete to release space.
+
+What is the difference between redo logs and archive logs?
+
+Redo logs are overwritten by LGWR in cyclic order.
+
+Archive logs are backup or copy of redo logs in a separate location.
+
+How to resize the redolog files?
+
+Not possible, we can create a new group with big size and drop the existing one.
+
+If archive destination is full, what will you do?
+
+We will first try to take backup of archives if possible. If not, we will move some archives to another location OR we can even change the archive destination inside database to a location which has more space.
+
+How do you monitor tablespaces in your environment?
+
+We have tablespace utilization scripts scheduled on each server. The script triggers email whenever a tablespace utilization crosses above 80%. Depending on the alert and space on server, we add space to tablespaces.
+
+Can we take SYSTEM and SYSAUX tablespace offline?
+
+We can take SYSAUX offline but not SYSTEM.
+
+A query is executing and temp tablespace is full. You added 20GB but again temp is full. What will you do next?
+
+We need to check the query and if possible tune the query. We can even speak with application team and allocate more temp space and reclaim space once their activity is done.
+
+How can you identify which data file is modified today?
+
+We can check the data file timestamp at OS level.
+
+You are trying to add data file to tablespace but getting error. What could be the issue?
+
+Control file has MAXDATAFILES parameter. If this number is exceeded, you cannot add more data files.
+
+Explain OMF? Have you worked on OMF?
+
+Oracle Manged Files enables us to create tablespaces without providing file names and locations. But the problem is the naming convention of the files. No, my environment does not use OMF feature.
+
+How to check database SCN?
+
+select current_scn from v$database.
+
+What will happen if we do not specify user default tablespace?
+
+The DATABASE DEFAULT TABLESPACE will become user default tablespace.
+
+After creating a new user, what all privileges you assign?
+
+We must grant CONNECT role so that user can connect to database. We must also grant other privileges as per environment.
+
+Do you suggest to grant RESOURCE role to a user?
+
+No, this will grant unlimited quota on user default tablespace.
+
+How to create new user and grant permission is a single command?
+
+SQL> grant create session to user_a identified by <pwd>;
+
+What happens to the objects if we change default tablespace?
+
+Nothing will happen, things will continue normally.
+
+How do you implement password policies?
+
+Using PROFILES MANAGEMENT.
+
+What are SNIPPED sessions in database?
+
+The sessions which exceed idle time are marked as snipped. The oracle level processes are cleared when user exceed idle time but OS level processes will still exist. This is overhead on server.
+
+IDLE_TIME is set to 15 min but even after 20 min, user session is not getting disconnected. What is the issue?
+
+RESOURCE_LIMIT parameter is not set to TRUE.
+
+How to check which users are granted sysdba role?
+
+We can query v$syspw_file view.
+
+What you will check first before downloading Oracle client?
+
+The server operating system where we are installing Oracle client as we need to download as per client server, not as per database server OS.
+
+What all can you do with Oracle client software?
+
+We can only use oracle client software to connect a database server. We cannot create a local database using oracle client.
+
+Can a single listener handle multiple database services?
+
+Yes, but the problem is if the listener is down, all new connections to multiple DB will not be accepted. It is suggested to have different listeners for each database. If we bring down one listener for one database, other listeners will not be affected.
+
+Can we configure listener on Oracle client?
+
+No, listener must be configured only on database server which can accept incoming connections.
+
+Tnsping is not working, everything is fine on listener.ora and tnsnames.ora file. What could be the issue?
+
+The default port 1521 or if you specified any other port is not enabled on servers. We can ask network team to enable those ports.
+
+I would like to select database from a table which is in different database. How can I do it?
+
+You can create DB LINK and query from the remote table on remote database.
+
+How to check listener status at OS level?
+
+ps -ef | grep tns.
+
+What troubleshooting steps you will follow when user complaints about connectivity issue?
+
+Check lsitener and tnsentries.
+
+Perform tnsping from client machine.
+
+Based on above results we troubleshoot accordingly
+
+There are 20 databases created from one single oracle home. How many listeners will you configure?
+
+One is enough but it is recommended to have separate listeners for each database.

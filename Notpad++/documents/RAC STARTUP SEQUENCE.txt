@@ -1,0 +1,87 @@
+ORACLE RAC STARTUP SEQUENCE
+---------------------------
+1) INIT:-  INIT daemon is very first daemon to be start  at the time of the operating system boot, we can say it  is system and service manager for the 
+oracle linuxor any linux flavor. This services are start and stop through script which is stored in the /etc/init.d directory .
+
+2)OHASD:- Oracle High Availability Daemon   is the introduced in oracle 11g which is manage all clusterware resources , 
+it is  responsible to start and monitor all local oracle clusterware daemon. We can say it is anchor for the all the process 
+
+3) OHASD orarootagent:-
+ This process is responsible for starting the following process
+ 1)      Osysmond :-  The system monitor service (osysmond)  monitoring and operating system metric collection service that sends the data to the cluster logger service. Service run on all node in the cluster. This process send the  all metric data to the cluster logger service  (ologgerd)
+ 2)      ologgerd :- Cluster logger service  receives the os metric collection  information from all the nodes and kept it in the Cluster  Health Monitor (CHM) repository , which received from  the osysmond  service.  These is only one cluster logger service (loggerd) run on entire cluster  any other node is selected as standby for the  master logger service.  Master process manage the OS metrics data which is in CHM repository and manage the replica of the metrics information on the standby.
+ 3)      Crsd:-  Cluster Ready service (process)  is primary  program for  managing high availability operation in the clusterware .  The CRS daemon (crsd) manage cluster resource based on the configuration information stored in the OCR for each resource. Is responsiblefor the start,stop  monitor and failover of resource it maintain OCR and also restart the resource when the failover occurs , this applicable for RAC system . For standalone configuration OHASD is  used
+ 4)      Diskmon :- Disk monitor  daemon continuously run when  ocssd starts.  And it monitors and performs I/O  fencing for Exadata storage server (This server is called as cell as per Exadata). This process will run since the ocssd starts because exadata cell can beaded any cluster at any time.
+ 5)      Ctssd :- The cluster time synchronization service process provides time synchronization for the cluster in the absence in the ntpd . if ntpd is configured , ctssd will run in observer mode.
+
+4)OHASD oraagent :-
+   Oraagent process is started by OHASD this process is responsible to start the following process.
+  1) Gipcd:- The Grid interprocess ommunication (GIPC) is support process that start enables redundant interconnect usage ,  redundant interconnect enables load balancing and load balancing across multiple private network(upto 4) . grid/bin/gipcd.bin os level it start.
+  2) Mdnsd:-   Used by Grid Plug and Play to locate profiles in the cluster, as well as by GNS to perform name resolution. The mDNS process is a background process on Linux and UNIX and on Windows.
+  3) Evmd:- This process distributes and  communicate some cluster events to all of the cluster members so that they aware of the cluster changes. This will start the emvlogger.bin reads the configuration files and determines what event to subscribe to from EVMD and it runs user defined action for those event.
+  4) ASM:- Provides disk management for oracle clusterware  and oracle database.
+  5) gpnpd:- Provides access to the Grid Plug and Play profile, and coordinates updates to the profile among the nodes of the cluster to ensure that all of the nodes have the most recent profile
+
+
+5)  CRSD orarootagent :-
+ The crsd process start another orarootagent process and another  oraagent process, the new orarootagent process is responsible to start the following process.
+
+1)  Node vip :- Node vip is node application that is nodeapp it is responsible for eliminating response delay that is TCP timeouts to client program requesting connection to the database.  Each node vip is assigned an unused IP address. It is done via DHCP but can be assigned manually. There is one node vip per cluster startup, when cluster node is unreachable the surviving node vip is get fail and connection will be redirect to the surviving node  from unreachable node.
+
+2) Scan vip :- Single Client Access Name (SCAN) is a new Oracle Real Application Clusters (RAC) 11g Release 2 feature,
+SCAN eliminates the dependencies on the static cluster node names
+The benefit is clients using SCAN do not need to change if you add or remove nodes in the cluster.
+that provides a single name for clients connection to access an Oracle Database running in a cluster.
+Three SCAN IP are started on the member nodes by using IP address assigned by DHCP server.
+
+3)  Network resource :- whatever  network resource  required  to cluster those will get started
+
+4)  Gns vip:- The GNS virtual IP address is a static IP address configured in the DNS.
+GNS is used to resolved client request for the cluster The DNS delegates queries to the GNS virtual IP address, and the GNS daemon responds  to incoming name resolution requests at that address. Within the subdomain,  the GNS uses multicast Domain Name Service (mDNS), included with Oracle Clusterware, to enable the cluster to map host names and IP addresses dynamically as nodes are added and removed from the cluster,
+Without requiring additional host configuration in the DNS.
+
+
+6)      CRSD oraagent :-
+      The new oraagent process  is responsible to start following resources.
+
+1) ONS:- Oracle notification service publish the notification for Fast Application Notification(FAN) events.
+
+2)  ASM Instance:- One instance is started for on cluster provide disk management for cluster.
+3) SCAN Listener:-
+4) Node Listener:-
+5) Database Instance
+
+
+What is GPNP profile?
+                 The GPnP profile is a small XML file located n  GRID_HOME/gpnp/<hostname>/profiles/peer under the name profile.xml. 
+				 It is used to establish the correct global personality of a node. Each node maintains a local copy of the GPnP Profile and is maintanied by 
+				 the GPnP Deamon (GPnPD.  GPnP Profile  is used to store necessary information required for the startup of Oracle Clusterware like 
+				 SPFILE location,ASM DiskString  etc.It contains various attributes defining node personality.
+Cluster name
+Network classifications (Public/Private)
+Storage to be used for ASM : SPFILE location,ASM DiskString  etc
+Digital signature information : The profile is security sensitive. It might identify the storage to be used as the root partition of a machine.
+Hence, it contains digital signature information of the provisioning authority.
+
+
+
+
+
+
+
+init->OHASD
+
+
+OHASD
+-CSSD AGENT-->CSSD
+-ORAROOT AGENT
+-ORAAGENT 
+-CSSD MONITOR
+
+ORAROOT AGENT->CRSD,CTSSD,DISKMONE
+Oraagent ->ASM,MDNSD,GPnPD,Evmd
+
+CRSD -> ORAROOT AGENT,ORAAGENT
+
+ORAROOT AGENT->NETWORK SOURCES,SCANIP,NODE VIP
+Oraagent->ASM instance,diskgroup,scan Listener,Listener 

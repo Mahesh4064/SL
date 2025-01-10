@@ -1,0 +1,573 @@
+
+/usr/bin/xauth:  file /root/.Xauthority does not exist
+[root@prod ~]# nano /etc/hosts
+[root@prod ~]# yum install oracle* --skip-broken
+
+[root@prod ~]# mkdir -p /u01/app/oracle/product/19c/dbhome
+[root@prod ~]# mkdir -p /u01/app/19c/grid
+[root@prod ~]# chmod -R 777 /u01
+[root@prod ~]# chown -R oracle:oinstall /u01
+
+[root@prod ~]# cd /dev --->data,reco,cro
+[root@prod dev]# fdisk -l
+
+Disk /dev/sdc: 21.5 GB, 21474836480 bytes, 41943040 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/sdd: 10.7 GB, 10737418240 bytes, 20971520 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/sdb: 1073 MB, 1073741824 bytes, 2097152 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/sda: 53.7 GB, 53687091200 bytes, 104857600 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0x00025f94
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     5861375     2929664   83  Linux
+/dev/sda2         5861376   104857599    49498112   8e  Linux LVM
+
+Disk /dev/mapper/ol-root: 41.7 GB, 41674604544 bytes, 81395712 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/mapper/ol-swap: 4001 MB, 4001366016 bytes, 7815168 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/mapper/ol-temp: 2000 MB, 2000683008 bytes, 3907584 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+Disk /dev/mapper/ol-home: 3003 MB, 3003121664 bytes, 5865472 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+[root@prod dev]# ll sd*
+brw-rw----. 1 root disk 8,  0 May 25 21:53 sda
+brw-rw----. 1 root disk 8,  1 May 25 21:53 sda1
+brw-rw----. 1 root disk 8,  2 May 25 21:53 sda2
+brw-rw----. 1 root disk 8, 16 May 25 21:53 sdb
+brw-rw----. 1 root disk 8, 32 May 25 21:53 sdc
+brw-rw----. 1 root disk 8, 48 May 25 21:53 sdd
+[root@prod dev]# passwd oracle
+Changing password for user oracle.
+New password:
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password:
+passwd: all authentication tokens updated successfully.
+[root@prod dev]# fdisk /dev/sdb
+Welcome to fdisk (util-linux 2.23.2).
+
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table
+Building a new DOS disklabel with disk identifier 0xd85ecde9.
+
+Command (m for help): n
+Partition type:
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended
+Select (default p):
+Using default response p
+Partition number (1-4, default 1):
+First sector (2048-2097151, default 2048):
+Using default value 2048
+Last sector, +sectors or +size{K,M,G} (2048-2097151, default 2097151):
+Using default value 2097151
+Partition 1 of type Linux and of size 1023 MiB is set
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+[root@prod dev]# fdisk /dev/sdc
+Welcome to fdisk (util-linux 2.23.2).
+
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table
+Building a new DOS disklabel with disk identifier 0x9e9e5d8a.
+
+Command (m for help):
+Command (m for help): n
+Partition type:
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended
+Select (default p):
+Using default response p
+Partition number (1-4, default 1):
+First sector (2048-41943039, default 2048):
+Using default value 2048
+Last sector, +sectors or +size{K,M,G} (2048-41943039, default 41943039):
+Using default value 41943039
+Partition 1 of type Linux and of size 20 GiB is set
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+[root@prod dev]# fdisk /dev/sdd
+Welcome to fdisk (util-linux 2.23.2).
+
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table
+Building a new DOS disklabel with disk identifier 0xb8aad25e.
+
+Command (m for help): n
+Partition type:
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended
+Select (default p):
+Using default response p
+Partition number (1-4, default 1):
+First sector (2048-20971519, default 2048):
+Using default value 2048
+Last sector, +sectors or +size{K,M,G} (2048-20971519, default 20971519):
+Using default value 20971519
+Partition 1 of type Linux and of size 10 GiB is set
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+[root@prod dev]# oracleasm -init
+oracleasm: '-int' is not an oracleasm command
+Usage: oracleasm [--exec-path=<exec_path>] <command> [ <args> ]
+       oracleasm --exec-path
+       oracleasm -h
+       oracleasm -V
+
+The basic oracleasm commands are:
+    configure        Configure the Oracle Linux ASMLib driver
+    init             Load and initialize the ASMLib driver
+    exit             Stop the ASMLib driver
+    scandisks        Scan the system for Oracle ASMLib disks
+    status           Display the status of the Oracle ASMLib driver
+    listdisks        List known Oracle ASMLib disks
+    listiids         List the iid files
+    deleteiids       Delete the unused iid files
+    querydisk        Determine if a disk belongs to Oracle ASMlib
+    createdisk       Allocate a device for Oracle ASMLib use
+    deletedisk       Return a device to the operating system
+    renamedisk       Change the label of an Oracle ASMlib disk
+    update-driver    Download the latest ASMLib driver
+[root@prod dev]# oracleasm configure -i
+Configuring the Oracle ASM library driver.
+
+This will configure the on-boot properties of the Oracle ASM library
+driver.  The following questions will determine whether the driver is
+loaded on boot and what permissions it will have.  The current values
+will be shown in brackets ('[]').  Hitting <ENTER> without typing an
+answer will keep that current value.  Ctrl-C will abort.
+
+Default user to own the driver interface []: oracle
+Default group to own the driver interface []: oinstall
+Start Oracle ASM library driver on boot (y/n) [n]: y
+Scan for Oracle ASM disks on boot (y/n) [y]: y
+Writing Oracle ASM library driver configuration: done
+
+[root@prod dev]# oracleasm init
+Creating /dev/oracleasm mount point: /dev/oracleasm
+Loading module "oracleasm": oracleasm
+Configuring "oracleasm" to use device physical block size
+Mounting ASMlib driver filesystem: /dev/oracleasm
+[root@prod dev]# cd /dev/oracleasm
+[root@prod oracleasm]# ls
+disks  iid
+[root@prod oracleasm]# cd disks/
+[root@prod disks]# ll
+total 0
+[root@prod disks]# ls
+[root@prod disks]# oracleasm createdisk DISK1 /dev/sdb1
+Writing disk header: done
+Instantiating disk: done
+[root@prod disks]# oracleasm createdisk DISK2 /dev/sdc1
+Writing disk header: done
+Instantiating disk: done
+[root@prod disks]# oracleasm createdisk DISK3 /dev/sdd1
+Writing disk header: done
+Instantiating disk: done
+[root@prod disks]# oracleasm listdisks
+DISK1
+DISK2
+DISK3
+[root@prod disks]# ll
+total 0
+brw-rw----. 1 oracle oinstall 8, 17 May 25 22:48 DISK1
+brw-rw----. 1 oracle oinstall 8, 33 May 25 22:48 DISK2
+brw-rw----. 1 oracle oinstall 8, 49 May 25 22:48 DISK3
+[root@prod disks]# cd
+[root@prod ~]# ps -ef |grep smon
+oracle    4574     1  0 23:17 ?        00:00:00 asm_smon_+ASM
+root     21032 12198  0 23:50 pts/2    00:00:00 grep --color=auto smon
+[root@prod ~]# crsctl stat res -t
+--------------------------------------------------------------------------------
+Name           Target  State        Server                   State details
+--------------------------------------------------------------------------------
+Local Resources
+--------------------------------------------------------------------------------
+ora.OCR.dg
+               ONLINE  ONLINE       prod                     STABLE
+ora.asm
+               ONLINE  ONLINE       prod                     Started,STABLE
+ora.ons
+               OFFLINE OFFLINE      prod                     STABLE
+--------------------------------------------------------------------------------
+Cluster Resources
+--------------------------------------------------------------------------------
+ora.cssd
+      1        ONLINE  ONLINE       prod                     STABLE
+ora.diskmon
+      1        OFFLINE OFFLINE                               STABLE
+ora.evmd
+      1        ONLINE  ONLINE       prod                     STABLE
+--
+
+
+[oracle@prod grid]$ . oraenv
+ORACLE_SID = [oracle] ? +ASM
+The Oracle base has been set to /u01/app/oracle
+[oracle@prod grid]$ env |grep ORA
+ORACLE_SID=+ASM
+ORACLE_BASE=/u01/app/oracle
+ORACLE_HOME=/u01/app/19.0.0.0/grid
+[oracle@prod grid]$ sqlplus / as sysasm
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sat May 25 23:22:11 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> selecet instance_name,status from v$instance;
+SP2-0734: unknown command beginning "selecet in..." - rest of line ignored.
+SQL> select  instance_name,status from v$instance;
+
+INSTANCE_NAME    STATUS
+---------------- ------------
++ASM             STARTED
+
+
+[oracle@prod grid]$ cd bin
+[oracle@prod bin]$ ll asmca*
+-rwxr-x---. 1 root oinstall 7912 May 25 23:09 asmca
+[oracle@prod bin]$ ./asmca
+[oracle@prod bin]$
+NOTE --> WE SET ALL DISKS(DATA,RECO) BEFORE GOING DBCA
+
+[root@prod ~]# ls
+anaconda-ks.cfg  initial-setup-ks.cfg  LINUX.X64_193000_db_home.zip.filepart  V982068-01.zip
+[root@prod ~]# unzip V982068-01.zip -d /u01/app/19.0.0.0/grid
+
+
+[oracle@prod bin]$ cd /u01/app/oracle/product/19.0.0.0/dbhome_1/bin
+[oracle@prod bin]$ ./dbca
+[oracle@prod bin]$ ./dbca
+
+login as: oracle
+oracle@192.168.0.104's password:
+    ┌──────────────────────────────────────────────────────────────────────┐
+    │                 • MobaXterm Personal Edition v24.1 •                 │
+    │               (SSH client, X server and network tools)               │
+    │                                                                      │
+    │ ⮞ SSH session to oracle@192.168.0.104                                │
+    │   • Direct SSH      :  ✓                                             │
+    │   • SSH compression :  ✓                                             │
+    │   • SSH-browser     :  ✓                                             │
+    │   • X11-forwarding  :  ✓  (remote display is forwarded through SSH)  │
+    │                                                                      │
+    │ ⮞ For more info, ctrl+click on help or visit our website.            │
+    └──────────────────────────────────────────────────────────────────────┘
+
+/usr/bin/xauth:  file /home/oracle/.Xauthority does not exist
+[oracle@prod ~]$ cd /u01/app/19.0.0.0/grid
+[oracle@prod grid]$ ./gridSetup.sh
+Launching Oracle Grid Infrastructure Setup Wizard...
+
+The response file for this session can be found at:
+ /u01/app/19.0.0.0/grid/install/response/grid_2024-05-25_11-00-15PM.rsp
+
+You can find the log of this install session at:
+ /tmp/GridSetupActions2024-05-25_11-00-15PM/gridSetupActions2024-05-25_11-00-15PM.log
+You can find the log of this install session at:
+ /u01/app/oraInventory/logs/UpdateNodeList2024-05-25_11-00-15PM.log
+Moved the install session logs to:
+ /u01/app/oraInventory/logs/GridSetupActions2024-05-25_11-00-15PM
+[oracle@prod grid]$ . oraenv
+ORACLE_SID = [oracle] ? +ASM
+The Oracle base has been set to /u01/app/oracle
+[oracle@prod grid]$ env |grep ORA
+ORACLE_SID=+ASM
+ORACLE_BASE=/u01/app/oracle
+ORACLE_HOME=/u01/app/19.0.0.0/grid
+[oracle@prod grid]$ sqlplus / as sysasm
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sat May 25 23:22:11 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> selecet instance_name,status from v$instance;
+SP2-0734: unknown command beginning "selecet in..." - rest of line ignored.
+SQL> select  instance_name,status from v$instance;
+
+INSTANCE_NAME    STATUS
+---------------- ------------
++ASM             STARTED
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@prod grid]$ crctl stas res -t
+bash: crctl: command not found...
+[oracle@prod grid]$ crsctl stas res -t
+Usage: crsctl <command> <object> [<options>]
+    command: add|check|config|create|debug|delete|disable|discover|enable|eval|export|get|getperm|lsmodules|modify|pin|query|release|relocate|replace|request|set|setperm|start|status|stop|unpin|unset
+For complete usage, use:
+    crsctl [-h | --help]
+For detailed help on each command and object and its options use:
+    crsctl <command> <object> -h  e.g. crsctl relocate resource -h
+[oracle@prod grid]$ cd bin
+[oracle@prod bin]$ ll asmca*
+-rwxr-x---. 1 root oinstall 7912 May 25 23:09 asmca
+[oracle@prod bin]$ ./asmca
+[oracle@prod bin]$ . oraenv
+ORACLE_SID = [+ASM] ? +ASM
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@prod bin]$ crsctl stat res -t
+--------------------------------------------------------------------------------
+Name           Target  State        Server                   State details
+--------------------------------------------------------------------------------
+Local Resources
+--------------------------------------------------------------------------------
+ora.DATA.dg
+               ONLINE  ONLINE       prod                     STABLE
+ora.OCR.dg
+               ONLINE  ONLINE       prod                     STABLE
+ora.RECO.dg
+               ONLINE  ONLINE       prod                     STABLE
+ora.asm
+               ONLINE  ONLINE       prod                     Started,STABLE
+ora.ons
+               OFFLINE OFFLINE      prod                     STABLE
+--------------------------------------------------------------------------------
+Cluster Resources
+--------------------------------------------------------------------------------
+ora.cssd
+      1        ONLINE  ONLINE       prod                     STABLE
+ora.diskmon
+      1        OFFLINE OFFLINE                               STABLE
+ora.evmd
+      1        ONLINE  ONLINE       prod                     STABLE
+ora.testcdb.db
+      1        ONLINE  ONLINE       prod                     Open,HOME=/u01/app/o
+                                                             racle/product/19.0.0
+                                                             .0/dbhome_1,STABLE
+--------------------------------------------------------------------------------
+[oracle@prod bin]$ ps -ef|grep smon
+oracle    4574     1  0 May25 ?        00:00:00 asm_smon_+ASM
+oracle   11942     1  0 01:06 ?        00:00:00 ora_smon_TESTCDB
+oracle   13443  6360  0 01:10 pts/3    00:00:00 grep --color=auto smon
+[oracle@prod bin]$ . oraenv
+ORACLE_SID = [+ASM] ? TESTCDB
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@prod bin]$ env |grep ORA
+ORACLE_SID=TESTCDB
+ORACLE_BASE=/u01/app/oracle
+ORACLE_HOME=/u01/app/oracle/product/19.0.0.0/dbhome_1
+[oracle@prod bin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun May 26 01:11:16 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         2 PDB$SEED                       READ ONLY  NO
+         3 TESTPDB                        READ WRITE NO
+SQL> select name,open_mode rom v$database;
+select name,open_mode rom v$database
+                          *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select name,open_mode from v$database;
+
+NAME      OPEN_MODE
+--------- --------------------
+TESTCDB   READ WRITE
+
+SQL> select instance_name,status from v$instance;
+
+INSTANCE_NAME    STATUS
+---------------- ------------
+TESTCDB          OPEN
+
+SQL> show parameter spfile
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+spfile                               string      +DATA/TESTCDB/PARAMETERFILE/sp
+                                                 file.269.1169944785
+SQL> show parameter controlfile
+SQL> show parameter control
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+control_file_record_keep_time        integer     7
+control_files                        string      +DATA/TESTCDB/CONTROLFILE/curr
+                                                 ent.260.1169942895, +RECO/TEST
+                                                 CDB/CONTROLFILE/current.256.11
+                                                 69942895
+control_management_pack_access       string      DIAGNOSTIC+TUNING
+SQL> select member from v&logfile;
+Enter value for logfile: 3
+old   1: select member from v&logfile
+new   1: select member from v3
+select member from v3
+                   *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select member from v$logfile
+  2  ;
+
+MEMBER
+--------------------------------------------------------------------------------
++DATA/TESTCDB/ONLINELOG/group_3.263.1169942901
++RECO/TESTCDB/ONLINELOG/group_3.257.1169942909
++DATA/TESTCDB/ONLINELOG/group_2.261.1169942901
++RECO/TESTCDB/ONLINELOG/group_2.259.1169942909
++DATA/TESTCDB/ONLINELOG/group_1.262.1169942901
++RECO/TESTCDB/ONLINELOG/group_1.258.1169942909
+
+6 rows selected.
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@prod bin]$ . oraenv
+ORACLE_SID = [TESTCDB] ? +ASM
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@prod bin]$ env |grep ORA
+ORACLE_SID=+ASM
+ORACLE_BASE=/u01/app/oracle
+ORACLE_HOME=/u01/app/19.0.0.0/grid
+[oracle@prod bin]$ asmcmd -p
+ASMCMD [+] > lsdg
+State    Type    Rebal  Sector  Logical_Sector  Block       AU  Total_MB  Free_MB  Req_mir_free_MB  Usable_file_MB  Offline_disks  Voting_files  Name
+MOUNTED  EXTERN  N         512             512   4096  4194304     20476    16456                0           16456              0             N  DATA/
+MOUNTED  EXTERN  N         512             512   4096  4194304      1020      920                0             920              0             N  OCR/
+MOUNTED  EXTERN  N         512             512   4096  4194304     10236     9328                0            9328              0             N  RECO/
+ASMCMD [+] > cd DATA
+ASMCMD [+DATA] > ls
+TESTCDB/
+ASMCMD [+DATA] > cd TESTCDB
+ASMCMD [+DATA/TESTCDB] > ls
+194CCD33BD847AF8E0636800A8C09D4F/
+194D68BF98CE307CE0636800A8C0B4A5/
+86B637B62FE07A65E053F706E80A27CA/
+CONTROLFILE/
+DATAFILE/
+ONLINELOG/
+PARAMETERFILE/
+TEMPFILE/
+ASMCMD [+DATA/TESTCDB] > ls -l
+Type  Redund  Striped  Time  Sys  Name
+                             Y    194CCD33BD847AF8E0636800A8C09D4F/
+                             Y    194D68BF98CE307CE0636800A8C0B4A5/
+                             Y    86B637B62FE07A65E053F706E80A27CA/
+                             Y    CONTROLFILE/
+                             Y    DATAFILE/
+                             Y    ONLINELOG/
+                             Y    PARAMETERFILE/
+                             Y    TEMPFILE/
+ASMCMD [+DATA/TESTCDB] > cd DATAFILE/
+ASMCMD [+DATA/TESTCDB/DATAFILE] > ls
+SYSAUX.257.1169942793
+SYSTEM.256.1169942759
+UNDOTBS1.258.1169942819
+USERS.259.1169942823
+ASMCMD [+DATA/TESTCDB/DATAFILE] > exit
+[oracle@prod bin]$ ps -ef|grep smon
+oracle    4574     1  0 May25 ?        00:00:00 asm_smon_+ASM
+oracle   11942     1  0 01:06 ?        00:00:00 ora_smon_TESTCDB
+oracle   15093  6360  0 01:17 pts/3    00:00:00 grep --color=auto smon
+[oracle@prod bin]$ . oraenv
+ORACLE_SID = [+ASM] ? TESTCDB
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@prod bin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun May 26 01:17:22 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         2 PDB$SEED                       READ ONLY  NO
+         3 TESTPDB                        READ WRITE NO
+SQL> alter session set container=TESTPDB;
+
+Session altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         3 TESTPDB                        READ WRITE NO
+SQL>

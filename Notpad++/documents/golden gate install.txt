@@ -1,0 +1,185 @@
+1. Prepare the Source and Target Databases
+Ensure that both the source and target databases are properly configured to support GoldenGate.
+
+On the Source Database:
+Enable Archive Logging:
+
+sql
+Copy code
+ALTER DATABASE ARCHIVELOG;
+Enable Supplemental Logging:
+
+sql
+Copy code
+ALTER DATABASE ADD SUPPLEMENTAL LOG DATA;
+Grant Necessary Privileges:
+
+sql
+Copy code
+CREATE USER ggs_admin IDENTIFIED BY ggs_admin;
+GRANT DBA TO ggs_admin;
+GRANT SELECT ANY DICTIONARY TO ggs_admin;
+On the Target Database:
+Grant Necessary Privileges:
+sql
+Copy code
+CREATE USER ggs_admin IDENTIFIED BY ggs_admin;
+GRANT DBA TO ggs_admin;
+2. Install Oracle GoldenGate Software
+On Both Source and Target Systems:
+Download and Unzip the GoldenGate Software:
+
+bash
+Copy code
+unzip fbo_ggs_Linux_x64_shiphome.zip
+Run the Installer:
+
+bash
+Copy code
+./runInstaller
+Follow the Installation Steps:
+
+Select the Oracle home directory.
+Choose the appropriate options for your environment.
+3. Configure the Manager Process
+On Both Source and Target Systems:
+Edit the Manager Parameter File (mgr.prm):
+
+plaintext
+Copy code
+PORT 7809
+Start the Manager Process:
+
+bash
+Copy code
+./ggsci
+GGSCI> EDIT PARAMS MGR
+GGSCI> START MANAGER
+GGSCI> INFO MANAGER
+4. Set Up the Extract Process on the Source System
+Add the Extract Process:
+
+bash
+Copy code
+./ggsci
+GGSCI> ADD EXTRACT ext, TRANLOG, BEGIN NOW
+GGSCI> ADD EXTTRAIL ./dirdat/lt, EXTRACT ext
+Edit the Extract Parameter File (ext.prm):
+
+plaintext
+Copy code
+EXTRACT ext
+USERID ggs_admin, PASSWORD password
+EXTTRAIL ./dirdat/lt
+TABLE hr.employees;
+Start the Extract Process:
+
+bash
+Copy code
+./ggsci
+GGSCI> START EXTRACT ext
+GGSCI> INFO EXTRACT ext
+5. Set Up the Replicate Process on the Target System
+Add the Replicate Process:
+
+bash
+Copy code
+./ggsci
+GGSCI> ADD REPLICAT rep, EXTTRAIL ./dirdat/lt
+Edit the Replicate Parameter File (rep.prm):
+
+plaintext
+Copy code
+REPLICAT rep
+USERID ggs_admin, PASSWORD password
+ASSUMETARGETDEFS
+MAP hr.employees, TARGET hr.employees;
+Start the Replicate Process:
+
+bash
+Copy code
+./ggsci
+GGSCI> START REPLICAT rep
+GGSCI> INFO REPLICAT rep
+6. Verify the Configuration
+Check the Status of Extract and Replicate Processes:
+
+bash
+Copy code
+./ggsci
+GGSCI> INFO EXTRACT ext
+GGSCI> INFO REPLICAT rep
+Monitor the GoldenGate Processes:
+
+bash
+Copy code
+./ggsci
+GGSCI> INFO ALL
+Summary of Commands:
+Enable archive logging and supplemental logging on the source database.
+Create users and grant privileges on both source and target databases.
+Install GoldenGate software on both source and target systems.
+Configure and start the manager process on both systems.
+Set up and start the extract process on the source system.
+Set up and start the replicate process on the target system.
+Verify the status of GoldenGate processes.
+By following these steps and commands, you should be able to configure Oracle GoldenGate for database replication successfully.
+
+
+
+
+GRANT SELECT ANY TABLE TO ggs_admin;
+GRANT EXECUTE ON DBMS_CAPTURE_ADM TO ggs_admin;
+GRANT EXECUTE ON DBMS_APPLY_ADM TO ggs_admin;
+
+
+--------------
+GGSCI (prod.localdomain) 3> exit
+ export GG_HOME=/u01/gghome
+ export PATH=$GG_HOME:$PATH
+ 
+$ ls -l $GG_HOME/mgr
+-rwxrwxr-x. 1 oracle oinstall 6775328 Oct 17  2019 /u01/gghome/mgr
+[oracle@prod ~]$ chmod +x $GG_HOME/mgr
+[oracle@prod ~]$ cd $GG_HOME
+[oracle@prod gghome]$ ./ggsci
+
+
+GGSCI (prod.localdomain) 1> START MANAGER
+Manager started.               STOP MANAGER
+
+
+----------------------
+REPLICATE 
+========================
+GGSCI (prod.localdomain) 1>  STOP REPLICAT rep1
+ERROR: REPLICAT REP1 does not exist.
+
+
+GGSCI (prod.localdomain) 2> cat $GG_HOME/dirprm/rep1.prm
+ERROR: Invalid command.
+
+GGSCI (prod.localdomain) 3> exit
+[oracle@prod dirdat]$ cat $GG_HOME/dirprm/rep1.prm
+REPLICAT rep1
+USERID ggs_admin, PASSWORD ggs_admin
+ASSUMETARGETDEFS
+MAP hr.emp, TARGET hr.emp;
+CHECKPOINTTABLE ggs_admin.gg_checkpoint;
+
+[oracle@prod dirdat]$ ggsci
+
+Oracle GoldenGate Command Interpreter for Oracle
+Version 19.1.0.0.4 OGGCORE_19.1.0.0.0_PLATFORMS_191017.1054_FBO
+Linux, x64, 64bit (optimized), Oracle 19c on Oct 17 2019 21:16:29
+Operating system character set identified as UTF-8.
+
+Copyright (C) 1995, 2019, Oracle and/or its affiliates. All rights reserved.
+
+
+
+GGSCI (prod.localdomain) 1> ADD REPLICAT rep3, EXTTRAIL ./dirdat/lt, CHECKPOINTTABLE ggs_admin.gg_checkpoint
+REPLICAT added.
+
+
+GGSCI (prod.localdomain) 2>

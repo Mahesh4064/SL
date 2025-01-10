@@ -1,0 +1,39 @@
+explain step-by-step migration NONASM to ASM
+===============================================
+**1. Pre-Migration Preparations:
+ Backup: Ensure you have a full backup of your database and system before starting the migration. Use RMAN (Recovery Manager) for a consistent backup.
+ ->Verify Backup
+ 
+ **2. Prepare the ASM Environment
+ a. Create ASM Disk Group using asmca
+ Start ASM Instance: Ensure the ASM instance is up and running(startup mount;)
+
+
+**3. Configure Oracle Database for ASM
+a. Modify Initialization Parameters (DB_CREATE_FILE_DEST ,DB_CREATE_ONLINE_LOG_DEST_n)
+b. Restart Database
+
+**4. Migrate Datafiles and Redo Logs
+a. Use RMAN for Migration
+Backup Existing Files: Back up your current datafiles and redo logs.
+Migrate to ASM: Use RMAN to migrate the datafiles to the ASM disk group.  
+
+(RMAN> BACKUP DATABASE;
+ RMAN> CONVERT DATAFILE 'path_to_file' FORMAT '+DG_NAME';)
+
+b. Migrate Redo Logs
+
+RMAN> SWITCH DATABASE TO COPY;
+RMAN> BACKUP CURRENT CONTROLFILE;
+
+**5. Verify and Adjust
+Check: Verify that all datafiles, redo logs, and tablespaces are now located on ASM
+SELECT FILE_NAME, TABLESPACE_NAME FROM DBA_DATA_FILES;
+SELECT GROUP#, MEMBER FROM V$LOGFILE;
+
+
+
+**6. Post-Migration Steps
+Remove Old Files: you can remove the old non-ASM files to free up space.(rm -rf /path_to_old_files;)
+b. Monitor and Tune
+

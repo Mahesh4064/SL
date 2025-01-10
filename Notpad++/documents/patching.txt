@@ -1,0 +1,31 @@
+explain patching in step by step
+================================
+
+
+Prerequisites:
+----------------
+Ensure the PSU you are applying is compatible with your current Oracle 19c release.
+Full Backup: Take a complete backup of your database using RMAN 	
+Verify there is enough disk space available for the patch and any temporary files that may be created during the process.		  
+
+Steps to Apply a PSU Patch
+--------------------------
+1. Download the PSU Patch:from oracle supoort
+2. Prepare the Environment:Set Environment Variables:ORACLE_HOME, ORACLE_SID, PATH)
+                           Check for Existing Patches:opatch lsinventory.
+3. Verify the Patch:Ensure the PSU is compatible with your database version and current patch level.
+
+4. Stop Oracle Services:  Shutdown the Database,Stop Listener
+
+                           we need to run two pre check screpts
+						   
+5. Apply the PSU Patch: Go to the directory where you extracted the PSU patch
+                        : Use the OPatch utility to apply the PSU
+6. Verify the Patch Application:$ORACLE_HOME/OPatch/opatch lsinventory
+7. Perform Post-Patch Steps:  Startup the Database,start listener						
+						   
+	$ORACLE_HOME/bin/datapatch 
+					            ./datapatch >>>it is utility to regestre the patch
+						   
+						   SELECT PATCH_ID, PATCH_DESCRIPTION, STATUS, APPLY_DATE FROM DBA_REGISTRY_SQLPATCH;
+						   

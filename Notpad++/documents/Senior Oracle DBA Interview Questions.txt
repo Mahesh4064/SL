@@ -1,0 +1,259 @@
+
+Senior Oracle DBA Interview Questions
+Put your learnings to test by trying to answer below Senior Oracle DBA Interview Questions. I am sure these will definitely challenge you!
+
+3+ Years of DBA Experience Interview Questions 
+
+5+ Years of DBA Experience Interview Questions 
+
+General Interview Questions 
+
+
+3+ Years of DBA Experience Interview Questions
+
+Below are the senior Oracle DBA interview questions for people who are projecting 3+ years of DBA experience
+
+Explain about password file, what is stored inside password file and its use?
+
+What is force=y option while generating password file?
+
+What are the contents of control file and which parameter defines the controlfile retention?
+
+Difference between checkpoint and SCN number?
+
+Differentiate between data file header and data block header? What it contains
+
+Give the command to take controlfile trace backup
+
+Can I have redo log groups with different size?
+
+Differentiate between redo log groups and redo log members
+
+How do you rename redo log file – online or offline? Give the command
+
+Which parameter defines the archive log naming format?
+
+Can I change the archive log destination while the database is running?
+
+I lost redo log file and have no multiplexed copy or archive log. How can I recover the database?
+
+What is different about v$datafile and dba_data_files?
+
+What are the contents of oracle inventory file and in which format does it exists?
+
+You are designing a database for a client. Explain below:
+
+How would you recommend the storage of datafiles, control files, redo log files etc?
+
+How will you calculate the initial size of the database?
+
+What backup strategy you would recommend?
+
+On which locations you will set alerts?
+
+How many OS blocks does DB block contains?
+
+Why data blocks are always 80% used and not 100%?
+
+How many types of segments are there in Oracle? How many types of objects are there in Oracle and how are they stored in the segments?
+
+How will you calculate the best data block size for a new database and propose it to the client?
+
+What is undo retention policy? How do you estimate the undo retention policy?
+
+Explain what happens during instance recovery?
+
+Difference between Roll-back and roll-forward
+
+A user is complaining DB is running slow. What could be the issue?
+
+What is a temporary table and how it is different from normal table?
+
+What is materialized view and how it is different from view and normal table?
+
+How do you query rowID column in a table? What exactly is rowID?
+
+How do you give partial access to a user on a table?
+
+What are the table partitioning strategies used in your environment?
+
+What is global partitioned index and local partitioned index? How does it impact the performance?
+
+Do you recommend partitioned tables in Data Ware House or OLTP databases?
+
+I want to install Oracle software on 300 servers at a time. How will you do it?
+
+There are 50 random email alerts for multiple databases. How will you prioritize the alerts and solve them?
+
+Temp tablespace utilization is 100% full. What you will do?
+
+My client recommends to put undo and temp on auto extend ON. What you have to say about it?
+
+Explain about tablespace utilization process in your environment?
+
+Client is asking for sysdba access. What is the command to give access?
+
+Ping is working but tnsping is not working. What could be the issue?
+
+I am not able to add data file to tablespace. What could be the issue?
+
+My database size is 25 TB. How many channels will you allocate in RMAN command?
+
+Differentiate between automatic channels and manual channels.
+
+What is backup optimization on in RMAN? Do you recommend it to be enabled?
+
+I want to configure tape backups. How will you configure tape with RMAN
+
+How to take cold backup using rman?
+
+What are the ways to improve rman backup / recovery performance in terms of time?
+
+I have taken L0 backup on 1st and L1 everyday till 15th. The recovery window is of only 7 days. So how will you recover database as L0 is OBSOLETE backup
+
+Difference between expired backups and obsolete backups
+
+What is the RMAN command to take controlfile and spfile backup?
+
+What is the command to delete all the backup older than 30 days?
+
+What is database incarnation? What happens when database goes into new incarnation?
+
+I have a reporting database of 2 TB. What backup strategy will you recommend?
+
+How do I sync recovery catalog with my target database?
+
+Tell me the process of recovery catalog creation with commands.
+
+Recovery catalog server is down. How will handle the failed backups for an environment with 1000 databases?
+
+When will you recommend cumulative over differential backups?
+
+What happens when you type recover database?
+
+Why cold backup is known as consistent backup? How can I take consistent backup using RMAN?
+
+What is fractured block?
+
+What happens when you put DB in Begin backup mode?
+
+I lost my entire database. Tell me the steps you will follow to recover the database.
+
+What is database health check? How do you perform health check?
+
+My controlfile retention is 30 days. I want to recover my database from a backup 45 days old. How will you perform the activity when the backup details are not there in the controlfile?
+
+How to do perform PITR recovery?
+
+How do you calculate the archivelog backup frequency and schedule in crontab?
+
+Why you will not recommend catalog scripting over shell scripting for backups
+
+Explain RMAN restore / recover cloning process with steps?
+
+How do you rename a database post cloning?
+
+Explain RMAN Duplicate and difference between RMAN Duplicate cloning for new database and cloning for physical standby?
+
+I started the cloning and it failed in between. What should I do now?
+
+Difference between MRP and LSP
+
+Archives are not arriving at the standby. What will you check?
+
+There is a GAP of 1000 archives in my standby. How will you resolve it?
+
+
+I want my standby to run 4 hours behind the primary server. How can I achieve it?
+
+How to improve the performance of MRP process
+
+The client does not want to spend on active data guard license. What will you recommend?
+
+What happens when you convert physical standby to snapshot standby?
+
+In which conditions you will recommend Oracle Data Guard to client?
+
+Tell me the steps to configure physical standby?
+
+How will you verify that the standby is in sync with primary?
+
+What is guaranteed restore point? How it is different from restore point?
+
+Explain the difference between flashback database and database PITR
+
+Explain about how upgrades are done in your environment?
+
+What are the pre-upgrade steps you follow?
+
+Explain the process of upgrading from 11g to 12c version?
+
+What are the post upgrade steps in oracle?
+
+
+
+5+ Experience Questions
+
+Typical Interview Questions for people projecting 5+ years of experience:
+
+Application team query is running slow. What you will do?
+
+Select statement is taking longer than usual. What could be the issue?
+
+What is the frequency of index rebuilding in your environment?
+
+What is invalid object in Oracle
+
+Differentiate between delete and truncate command
+
+Explain stats gathering and how it impacts database performance?
+
+How many DB writer process can you configure in database? Tell me the command for increasing the DB writer process.
+
+Difference between 8i, 9i, 10g, 11g and 12c databases as per your experience.
+
+What is the most challenging task for you as a DBA?
+
+Explain about TKPROF utility and when do you use it
+
+Explain about cost in SQL and how optimizer defines cost?
+
+How do you setup data guard in 8i?
+
+What are the instance level, RMAN level and other changes in 9i and 10g?
+
+Junior DBA brought down the listener, how do you react?
+
+Your production database is running in NOARCHIVELOG mode, what could be the issue?
+
+How do you migrate database from windows to Linux?
+
+What was your last database design and how did you work on the project?
+
+
+
+General Interview Questions
+
+These are the questions with which interviews generally starts
+
+Tell about yourself, your background, some experience, and what you have worked on.
+
+What do you like doing the most?
+
+What do you like the least
+
+Was there a particular company that you liked and why?
+
+Can you tell me about a specific time that you used your technical skills to solve a problem?
+
+What did you learn from that experience?
+
+Tell me about a time when you had delivered bad news to someone.
+
+What was your approach? And what was the outcome of the situation?
+
+Tell me an example when you were given a task to fix things
+
+Did you learn anything from that experience?
+
+Search for articles.....

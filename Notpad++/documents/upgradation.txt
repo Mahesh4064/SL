@@ -1,0 +1,36 @@
+explain step by step upgradation 12c to 19c in oracle
+======================================================
+1. Pre-Upgrade Preparation
+    Check Compatibility:Ensure that the 12c database version is compatible with 19c.,Run the preupgrd.sql script
+   Backup Your Database:Perform a full backup of your Oracle 12c database using RMAN or other backup tools
+   Install Required Patches:Ensure that the Oracle 12c database is patched to the latest version (e.g., 12.2.0.x) to avoid compatibility issues
+   Check Space Requirements:Ensure sufficient space for the new Oracle 19c software and upgraded database files.
+
+    we need to check INVALIDE objects from
+	
+2. Install Oracle 19c Software:
+     ->Download the Oracle 19c Software
+	 ->Install Oracle 19c:During installation, do not create a new database; just install the software.
+	 
+3. Prepare the Database for Upgrade:
+   ->Stop the 12c Database:SHUTDOWN IMMEDIATE;
+   
+4. Perform the Upgrade
+            ->Set the environment variables to point to the new Oracle 19c home
+        Upgrade Using DBUA (Database Upgrade Assistant):from 19c home($ORACLE_HOME/bin/dbua)			
+		
+==>	(Upgrade Using Command-Line (Manual Method):	
+    SQL> STARTUP UPGRADE;
+SQL> SPOOL upgrade.log;
+SQL> @?/rdbms/admin/catctl.pl -n 4 -l /tmp -d /tmp  ;
+SQL> SPOOL OFF;
+)
+
+
+5. Post-Upgrade Tasks
+   ->Recompile all invalid objects in the database:
+   ->Run any additional post-upgrade fixups using the postupgrade_fixups.sql script.
+   
+   
+   Post-Upgrade: No automatic change in redo log paths.
+Manual Intervention: Required only if you wish to relocate redo logs to a new path after the upgrade

@@ -1,0 +1,489 @@
+1.what was your env like in your privious company?
+Environment: RAC on Linux 6/7, Oracle 19.0.0.0, EXPDP, IMPDP, RMAN, RAC, Data Guard, ASM,Flashback 
+
+2. Have workd on rac? RMAN? what are the backup policies in your organization? Types of backup taken? 
+Backup Frequency: We perform daily incremental backups and weekly full backups.
+Backup Retention: Backups are retained for 30 days.
+Redundancy: We maintain redundancy in our backups, keeping at least two copies on separate storage locations to ensure data safety in case of failure.
+Encryption: Backups are encrypted to ensure data security, especially for sensitive information.
+Backup Validation: We periodically validate our backups to ensure they are recoverable.
+
+3. Do you know export and import?
+
+Yes, I am familiar with Oracle's Data Pump Export   traditional Export
+Parallel Processing: Allows data to be exported and imported in parallel, increasing performance.
+Filtering: You can export or import specific objects (tables, schemas, etc.) or data using filters.
+Network Mode: Allows for exporting/importing directly over a network link between databases.
+Compression: Supports compression of dump files to save space.
+Remapping: You can remap tablespaces, schemas, and data files during import.
+
+4.How would you know the MRP is stopped  by looking into primary database? what is the view?
+-> v$dataguard_status        This will show messages related to the MRP process, including whether it is running or stopped.
+-> V$ARCHIVE_DEST_STATUS     view on the primary to check the log shipping status:
+ ->Another way to know if MRP is stopped is by checking the alert log on the primary
+ 
+ 
+ 
+ 5.How would you restore and recover complete database in same file system & different file system for both regular as well as ASM file system?
+ For the same file system, you restore and recover without changing file locations.
+For a different file system, use the SET NEWNAME RMAN command to remap the data files to the new paths.
+ASM restores need proper connection to the ASM instance, and file paths are defined in disk groups (+DATA or similar).
+Always use RECOVER DATABASE to apply any pending redo logs, and OPEN RESETLOGS when necessary.
+
+Scenario 1: Restore and Recover on the Same File System
+Make sure the database is in the MOUNT state or NOMOUNT state if the control file is lost.
+rman target /
+RESTORE CONTROLFILE FROM '<backup_location>';
+ALTER DATABASE MOUNT;
+
+rman target /
+RUN {
+  RESTORE DATABASE;
+  RECOVER DATABASE;
+}
+ALTER DATABASE OPEN RESETLOGS;
+
+Steps for ASM File System:
+--------------------------
+Ensure that the ASM instance is running and you are connected to it.
+RUN {
+  RESTORE DATABASE;
+  RECOVER DATABASE;
+}
+ALTER DATABASE OPEN RESETLOGS;
+
+
+Scenario 2: Restore and Recover on a Different File System
+When restoring to a different file system, you need to remap the data files to the new locations.
+Shut down the database and start it in MOUNT or NOMOUNT state.
+Connect to RMAN.
+Use SET NEWNAME in RMAN to remap the data files to new locations
+RUN {
+  SET NEWNAME FOR DATAFILE 1 TO '/new_path/system01.dbf';
+  SET NEWNAME FOR DATAFILE 2 TO '/new_path/sysaux01.dbf';
+  -- Repeat for all datafiles
+  RESTORE DATABASE;
+  SWITCH DATAFILE ALL;
+  RECOVER DATABASE;
+}
+
+
+ALTER DATABASE OPEN RESETLOGS;
+
+Steps for ASM to Regular File System or Different ASM Disk Group:
+Start the database in NOMOUNT or MOUNT state.
+Use SET NEWNAME to remap the ASM files to the new file system or different ASM disk group:
+ALTER DATABASE OPEN RESETLOGS;
+
+6.what is the cluster parameter in expdp?
+
+In an Oracle RAC environment, you can distribute the workload of a Data Pump export across multiple RAC nodes to improve performance.
+expdp system/password directory=exp_dir dumpfile=exp_rac.dmp schemas=HR cluster=Y logfile=exp_rac.log
+
+CLUSTER=Y works with other parameters like PARALLEL, where you can control the number of parallel worker processes across the RAC nodes.
+The CLUSTER=N setting can be beneficial if you encounter node-specific issues or want to avoid the overhead of inter-node communication.
+
+7.what are the importent parameter in datagurad setup?
+LOG_ARCHIVE_CONFIG
+. LOG_ARCHIVE_DEST_n
+LOG_ARCHIVE_DEST_STATE_n
+. FAL_SERVER (Fetch Archive Log Server)
+. FAL_CLIENT
+ DB_FILE_NAME_CONVERT
+  LOG_FILE_NAME_CONVERT
+   REMOTE_LOGIN_PASSWORDFILE
+   ARCHIVE_LAG_TARGET
+    FORCE LOGGING >>Purpose: Forces the logging of changes made to the primary database, ensuring that all transactions are captured in the redo
+	log and sent to the standby.
+	
+	
+8.what is force_login?
+	Forces the logging of changes made to the primary database, ensuring that all transactions are captured in the redo log and sent to the standby.
+	
+9.what is TABLE_EXISTS_ACTION ?
+-The TABLE_EXISTS_ACTION parameter in Oracle Data Pump is used to control the behavior of the import process when it encounters a table that already exists in the target database
+SKIP:The existing table is not modified, and Data Pump skips the import of that table. This is the default behavior.
+TRUNCATE:Data Pump truncates the existing table (removes all rows) and then imports the rows from the source into the table.
+REPLACE:Data Pump drops the existing table and recreates it, then imports the rows from the source. This option will also recreate any indexes, constraints, and other table attributes.
+APPEND:Data Pump appends the rows from the source to the existing table. The table structure must be compatible for the append operation to succeed.
+
+
+10.How to install RAC?
+Hardware and Network Requirements:
+Shared Storage
+Configure Users and Groups:
+. Kernel Parameters and Limits:Edit /etc/sysctl.conf 
+SSH Equivalency Between Nodes:
+Install and Configure Oracle Grid Infrastructure:
+Download Oracle RAC software and unzip the files on the first node.
+Run the Oracle RAC Installer:
+dbca
+
+
+
+11. what are the different typs of ips used in RAC? what is VIP?
+1. Public IP Address
+Purpose: This is the regular IP address assigned to each node in the RAC cluster. It is used for client connections and general network communication.
+
+2. Private IP Address (Interconnect IP)
+Purpose: The private IP is used for internal communication between RAC nodes. The interconnect network (using private IPs) is critical for
+ cache fusion and other RAC-specific operations.
+
+3. Virtual IP Address (VIP)
+Purpose: The Virtual IP (VIP) is a failover IP assigned to each node in the RAC cluster. VIPs provide high availability and fast failover
+for client connections. If a node fails, the VIP assigned to that node is automatically moved to another available node, 
+ensuring client connections are not lost but rerouted to a surviving node.
+
+4. SCAN IP Address (Single Client Access Name)
+Usage: The SCAN name resolves to three SCAN IPs (typically virtual IP addresses), providing redundancy. SCAN IPs are typically assigned in DNS or 
+/etc/hosts to provide round-robin resolution.
+
+12. have done patching in single instance? RAC?
+
+
+Prepare the Patch:
+
+Download the patch from Oracle Support and extract it to a directory on your system.
+Stop the Target Instance:
+
+Use srvctl to stop the instance you want to patch:
+
+bash
+Copy code
+srvctl stop instance -d prod -i instance_name
+Make sure you have a backup of your data before proceeding.
+
+Apply the Patch:
+
+Set your Oracle environment variables (e.g., ORACLE_HOME, ORACLE_SID).
+
+Navigate to the directory where the patch files are located.
+
+Apply the patch using opatch:
+
+bash
+Copy code
+$ORACLE_HOME/OPatch/opatch apply
+If you need to apply the patch to a specific instance, you may need to use specific commands or parameters based on the patch requirements. Refer to the patch README file for detailed instructions.
+
+Verify the Patch Installation:
+
+Check if the patch was applied correctly:
+
+bash
+Copy code
+$ORACLE_HOME/OPatch/opatch lsinventory
+Restart the Instance:
+
+Start the patched instance:
+
+bash
+Copy code
+srvctl start instance -d prod -i instance_name
+Check the Status:
+
+Verify that the instance is up and running and the patch has been applied successfully.
+Verify Other Instances:
+
+Ensure that other instances in the RAC are functioning correctly and are not affected by the patch application.
+
+
+
+
+=>datapatch -verbose why it is used? where to checck wether -verbose is applide for the privious patch 
+Review the Log Files:
+Check the Patch Status
+datapatch -status
+SELECT * FROM DBA_REGISTRY_SQLPATCH;
+
+
+2.patching ? 2 methods of patching manuval and automatic  what is differents between both?
+Differences Between Manual and Automatic Patching
+Process Control:
+
+Manual: You have direct control over each step of the patching process.
+Automatic: The process is managed by tools or scripts, with less manual intervention.
+Complexity:
+
+Manual: Requires more technical knowledge and attention to detail.
+Automatic: Simplifies the process, making it easier for users with less technical expertise.
+Flexibility:
+
+Manual: Allows for custom procedures and adjustments based on specific requirements.
+Automatic: Limited to the predefined processes and options provided by the automation tools.
+Error Handling:
+
+Manual: Higher chance of human error, but allows for immediate troubleshooting.
+Automatic: Reduces human error but may have less immediate visibility for troubleshooting.
+Both methods have their place depending on the environment, the complexity of the patching requirements, and the available tools.
+In many cases, a combination of both methods might be used to balance control and automation.
+
+
+Data Patch Utility: Use datapatch for SQL patches, which applies patches automatically based on the metadata provided by Oracle.
+datapatch -verbose
+
+
+5.in expdp i want import any spesific data from table what are the steps?
+Export Specific Data: Use the QUERY parameter in the expdp command to filter the data you want to export.
+expdp your_user/your_password@your_db schemas=your_schema tables=your_table query="your_table:\"WHERE your_column = 'specific_value'\"" directory=data_pump_dir dumpfile=specific_data.dmp logfile=specific_data.log
+
+
+7.what is permetions requred for select user creation?
+GRANT CREATE USER TO your_user;
+
+
+
+11.why we use runclufy?
+Pre-Installation Checks: Before installing Oracle Grid Infrastructure or Oracle RAC, runcluvfy can check whether the cluster nodes meet the
+ required hardware, software, and network prerequisites. This helps identify issues that could cause installation failures or operational problems.
+
+Post-Installation Checks: After installation, runcluvfy can be used to verify that the cluster is correctly configured and operational.
+ This includes checking the status of cluster components, network configuration, and other critical settings.
+
+Patch and Upgrade Validation: runcluvfy can verify the environment before and after applying patches or performing upgrades,
+ensuring that the cluster configuration remains consistent and meets the requirements.
+
+Troubleshooting: If there are issues with the cluster or Oracle RAC, runcluvfy can help diagnose and pinpoint configuration or 
+environment-related problems.
+
+
+14.why we use odd number of voting disk?
+Using an odd number of voting disks in an Oracle RAC environment is a best practice to ensure quorum determination and maintain high availability.
+It helps in achieving a majority in decision-making processes, ensuring fault tolerance, and avoiding split-brain scenarios, 
+which enhances the overall stability and reliability of the cluster.
+Quorum Required=N/2+1
+For a 4-node cluster: 4/2+1=3
+ 
+ 
+ 
+ 
+15.in expdp rac why cluster=N?
+cluster=N Parameter
+Usage: cluster=N is used in the expdp command to specify that the export should be performed on a single instance rather than across the entire  
+RAC cluster.
+ 
+expdp your_user/your_password@your_db directory=data_pump_dir dumpfile=your_dumpfile.dmp logfile=your_logfile.log cluster=N
+Single-Instance Export:
+
+Performance: If you want to perform the export operation on a specific instance for performance reasons or to reduce the impact on other nodes,
+ you can use cluster=N. This is useful when you want to control the load on the RAC cluster or if you need to export data from a specific instance.
+
+
+17.have you face any challeges in patching?
+network related issues & normaly in remont target
+grid permissions issues
+unzip patch file in root user facing in permissions issus
+During patching, common issues that may arise include:
+
+
+
+9.sync and async differents?
+
+SYNC:-  LGWR will wait until RFS given the responce like redo entries are recived.
+ASYNC:- LGWR will not wait for RFS responce 
+
+1. Maximum Availability Mode:-Zero datalose,redo transport sync
+2. Maximum Performance Mode:-minimal data loss,redo transport ASYNC
+3. Maximum Protection Mode:-Zero datalose,redo transport sync
+
+
+init->OHASD
+
+
+OHASD
+-CSSD AGENT-->CSSD
+-ORAROOT AGENT
+-ORAAGENT 
+-CSSD MONITOR
+
+ORAROOT AGENT->CRSD,CTSSD,DISKMONE
+Oraagent ->ASM,MDNSD,GPnPD
+
+CRSD -> ORAROOT AGENT,ORAAGENT
+
+ORAROOT AGENT->NETWORK SOURCES,SCANIP,NODE VIP
+Oraagent->ASM instance,diskgroup,scan Listener,Listener 
+
+
+
+=>If you tack OCR backup the voting disk backup also tacken
+ocrcheck -local  ==>backup check 
+ocrcheck              ''
+
+4. Check OCR and Voting Disk Backup
+ocrconfig -showbackup
+
+Check Power Limit for Ongoing Rebalance Operations
+v$asm_operation;
+
+
+
+
+RAC BG Process
+-------------
+Lmon:This is responsible for reconfiguration of lock resource whenever an instance joins or leaves the cluster
+Lmd: This responsible for deadlock detection and remote eneque request
+LMNS:This daemon is responsible for shiping of the loges whenever cashfusion request
+LCK:manages request that are related to library cash and data dictionary cash (GES)
+DIAG:monitors the health of instance and capture diagnostic information for failure
+
+
+
+Check Specific Resource Status:
+crsctl status resource <resource_name>
+
+Check All Cluster Resources:
+crsctl status resource -t
+
+When Does an Incarnation Happen?
+This happens when the database undergoes a RESETLOGS operation, typically during a point-in-time recovery (PITR), incomplete recovery, or recovery after a database restore.
+RMAN> LIST INCARNATION OF DATABASE;
+
+
+
+---------------------------------------
+Key Points about Voting Disks in Oracle RAC 19c:
+
+Maximum Voting Disks: You can configure up to 32 voting disks.
+
+Redundancy Levels:
+External Redundancy: 1 voting disk.
+Normal Redundancy: Typically 3 voting disks.
+High Redundancy: Up to 32 voting disks can be used.
+
+The voting disks are automatically backed up as a part of the OCR.
+
+Voting files store information about node membership. Each voting file must be accessible by all nodes in the cluster for nodes to be members of the cluster
+You can have up to 32 voting disks in your cluster
+---------------------------------------------------
+sudo su - oracle: Switches to the oracle user and loads their full environment (login shell).
+It simulates a full login, meaning it loads the environment variables, configuration files (like .bash_profile or .profile), and settings as if the user oracle had logged in directly.
+	
+sudo su oracle: Switches to the oracle user but retains the current environment (non-login shell).
+-----------------------------
+Database Incarnation:
+A database incarnation represents a new version of the database created when a resetlogs operation occurs.
+------------------------
+which Kernal parameter is help to increase SGA size?
+SHMMAX (Maximum Shared Memory Segment Size)  Defines the maximum size of a single shared memory segment. This parameter should be large enough to accommodate the entire SGA.
+SHMALL (Total Shared Memory Pages) Specifies the total amount of shared memory pages that can be used by the system.
+
+4. Using DBMS_SPACE for Detailed Fragmentation Analysis
+Oracle provides the DBMS_SPACE package to get detailed space usage information for tables and indexes, which can help determine fragmentation levels
+
+You can query the GV$GES_ENQUEUE view to check which instance is the master for a particular enqueue resource
+
+-----------------------------
+What is DB time in AWR?   
+session time spent in database
+
+What is Elapsed time?
+The time duretion which this awr report has been generated
+----------------------------------------------------
+ASM is required for RAC database creation?
+YES IS mandatory
+
+HOW THE COMUnication happens ASM and DATABASE?
+ASMBA It is BG process
+
+
+ASM AND RDBMS VERSITON IS REQURED SAME OR NOT?
+YES IT SHUDE BE THE SAME MOSTLY BUT IF IT NOT POSSIBLE YOU CAN DO LIKE
+ASM 19C  =DB 19C
+ASM 19C = DB 12C
+
+NOTE: db not accepted higer then ASM VERSTION you can use lower verstion of db compare ASM 
+------------------------------------------
+
+TYPES OF INDEXS:
+---------------
+Primary Index: This is a unique index that is automatically created when a primary key is defined. It ensures that no duplicate values exist in the indexed column.
+Clustered Index: A clustered index determines the physical order of data in a table. Each table can have only one clustered index, which is often created on the primary key. It optimizes retrieval for range queries and sorts data based on specified columns12.
+Bitmap Index: Ideal for columns with a low number of distinct values relative to the total number of rows, bitmap indexes use bitmaps to represent row existence13.
+Hash Index: Utilizes a hash table for quick access to data based on equality comparisons. This type is efficient for lookups but not suitable for range queries45.
+---------------------------------------
+
+Types of Checkpoints in Oracle Database
+
+Full Checkpoint:
+Writes all dirty buffers from all instances to the database.
+Triggered by commands like ALTER SYSTEM CHECKPOINT or during a clean shutdown of the database.
+Updates control files and data file headers.
+
+Thread Checkpoint:
+Similar to a full checkpoint but only for a single instance.
+Writes all dirty buffers associated with one redo thread.
+Triggered by ALTER SYSTEM CHECKPOINT LOCAL.
+
+File Checkpoint:
+Writes dirty buffers for all files in a specific tablespace from all instances.
+Occurs during tablespace operations such as taking a tablespace offline or beginning backup.
+
+Object Checkpoint:
+Writes dirty buffers belonging to a specific object (e.g., table).
+Triggered by operations like dropping or truncating a table, ensuring that the changes are recorded for recovery.
+
+Parallel Query Checkpoint:
+Occurs during parallel queries, writing dirty buffers for objects accessed by the query.
+Ensures consistency across multiple threads accessing data simultaneously.
+
+Incremental Checkpoint:
+Writes some dirty buffers in a controlled manner, typically based on the system change number (SCN).
+Helps manage I/O more efficiently by spreading out writes over time.
+
+Log Switch Checkpoint:
+Triggered during a log switch, writing dirty buffers that correspond to the current log file.
+Ensures that all changes made prior to the log switch are safely written to disk.
+-------------------------------------------------------- 
+
+
+SHMMAX    This parameter specifies the maximum size (in bytes) of a single shared memory segment.  Half of physical memory (64-bit)
+
+SHMALL   This parameter defines the total amount of shared memory (in pages) that can be used at any given time by all processes in the system
+             ~40% of physical memory in pages
+
+SHMMNI     This parameter indicates the maximum number of shared memory segments that can be created in the system.
+
+
+For example, if your system has 16 GB of RAM, this is your starting point.
+SHMMAX = 16 GB / 2 = 8 GB
+
+Calculate SHMALL:
+getconf PAGE_SIZE
+(usually 4096 bytes):
+SHMALL = Total RAM in bytes / PAGE_SIZE
+SHMALL = (16 * 1024 * 1024 * 1024) / 4096 = 4,194,304 pages
+
+---------------------------            
+Expdp user id= \'sys\/sys123 as sysdba \'   directory=datafilterexpdp dumpfile=datafilterexp.dmp logfile=datafilterexp.log  
+content=data_only  schemas=scott  include=table:”in(‘EMP’,DEPT’)” query=”where deptno in(10,20)”
+
+content=metadata_only =>it is tack structure of data
+content=data_only     =>It is tack data only not  structure  
+--------------------------------------------
+During import we want to reduce log genertion
+transform=disable_archive_logging:Y
+->This option does not apply if the database is running in FORCE LOGGING mode; in such cases, redo generation cannot be bypassed.
+
+
+Expire the User's Password: Use the following command to expire the password for a specific user
+ALTER USER username PASSWORD EXPIRE;
+
+alter user username account unlock
+
+--------------------------------------
+This command will remove test_user and all objects owned by them without requiring additional steps.
+DROP USER test_user CASCADE;
+
+If you attempt to drop a user named test_user without using CASCADE:
+DROP USER test_user;
+
+You might receive an error like this:
+ORA-01919: user 'TEST_USER' does not exist
+ORA-01940: cannot drop a user that is currently connected
+ORA-01918: user 'TEST_USER' is still connected
+------------------------------------------------
+For example, if your dropped table was named EMP, you would execute:
+FLASHBACK TABLE EMP TO BEFORE DROP;
+
+------------------------------------

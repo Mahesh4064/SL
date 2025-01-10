@@ -1,0 +1,1904 @@
+P1 (Critical): Severe business impact, immediate response required.
+P2 (High): Significant impact, prompt response required.
+P3 (Medium): Moderate impact, less urgent response.
+p4 (low)
+
+types of tickets:assinging roles to the user , password related,performance related,user creation,
+
+1.	What is your total Experience?
+A. have 3 Years of Experience in this field
+ 
+ 
+2. Why looking for change ?
+A.  I am seeking new challenges and opportunities for career growth
+    I am looking for a role that offers continuous learning and professional development.
+   
+   
+3. What is your current location.?
+A. PUNE
+
+
+4. What is size of DB in your curent project.?
+A. It is arrount 10Tb 
+
+
+5. Do you know RAC Environment.
+A. Yes, I'm familiar with RAC, which stands for Oracle Real Application Clusters. 
+   Oracle RAC is a feature that enables a single Oracle Database to run on multiple interconnected servers
+   providing high availability and scalability.
+   
+  1. High Availability:
+   ------------------
+   * Oracle RAC is designed to provide high availability by allowing the database to continue running even if one or more nodes in the cluster fail
+   
+ 2.  Scalability:
+   ------------
+   * RAC allows you to add more nodes to the cluster as your workload increases. 
+   * This horizontal scaling helps in managing large volumes of transactions and data processing efficiently.
+   
+  3. Shared Storage:
+   ---------------
+   * RAC requires a shared storage subsystem that all nodes can access.
+   * This ensures that the same data is available to all instances in the cluster.
+   *  Oracle Automatic Storage Management (ASM) is commonly used for this purpose.
+   
+  4. Cache Fusion:
+   -------------
+   * Cache Fusion is a key feature of Oracle RAC 
+   * that enables sharing of  in-memory data blocks across multiple nodes. with help of GCS
+   * RAC uses a technology called Cache Fusion to transfer the data directly between caches without writing it to disk. 
+   * This improves performance by reducing disk I/O.
+   
+ 5.  Interconnect:
+   ------------
+   * The interconnect is a private network that connects all nodes in the cluster. 
+   * It allows nodes to communicate with each other quickly and efficiently, essential for coordinating and synchronizing data.
+   
+ 6. Transparent Application Failover (TAF):
+   ---------------------------------------
+   * Oracle RAC supports Transparent Application Failover,
+   * allowing client applications to automatically reconnect to another server node  in the event of a node failure.
+   *  This ensures continuous service availability.
+   
+  7. Oracle Clusterware:
+   -------------------
+   * Oracle Clusterware is the software that manages the cluster. 
+   * It handles node membership, node fencing, and inter-node communication. 
+   * Oracle Grid Infrastructure includes Clusterware and ASM.
+   
+  8. Load Balancing:
+   --------------
+   * RAC distributes the database load across all available nodes.
+   * This ensures optimal utilization of resources and improves overall performance.
+   
+   VIP (Virtual IP) Addresses:
+  --------------------------
+  * if instance filed this users will shift into the athor instence
+  * Each node in the cluster has a Virtual IP address.
+  * VIP addresses are used for client connections and ensure that clients can connect to the database regardless of which node is currently active.
+  
+  SCAN (Single Client Access Name):
+  ---------------------------------
+  * it will checking which node is tacken more requsets and which node is tacken low requests
+  * SCAN is a single entry point for clients to connect to a RAC cluster.
+  * It resolves to multiple IP addresses associated with different nodes in the cluster, providing load balancing and transparent failover.
+  * Understanding the architecture of Oracle RAC is crucial for designing, implementing, and managing a clustered database environment 
+  * That delivers high availability and scalability.							
+   
+   
+   Global Cache Services (GCS):
+  ----------------------------
+  *GCS is responsible for Cache Fusion, which allows Oracle RAC instances to share data blocks in the SGA (System Global Area) across multiple nodes. 
+  * GCS ensures that all nodes have the most up-to-date version of a data block.
+  
+  
+  Voting DISK:
+  ------------
+-In an Oracle RAC environment, the Voting Disk is a special file on check which servers are active and healthy.
+-It keeps track of which servers (nodes) are part of the cluster.
+-It helps monitor the health of each node by recording a "heartbeat" from each node regularly.
+-if voting disk is unavailable the cluster might stop working to prevent data issues.
+
+
+OCR (Oracle Cluster Registry): Manages cluster configuration information, shared among all nodes.
+OLR (Oracle Local Registry): Stores node-specific configuration information, local to each node.
+
+
+
+   
+6. What are technical skills used in day to day activities ?
+
+A.  Database Installation and Configuration:
+    ----------------------------------------
+	* Ability to install and configure Oracle Database software on various operating systems, including Linux, Windows, and Unix.
+
+    Database Design and Schema Management:
+	-------------------------------------
+	* Proficiency in designing database schemas, creating tables, indexes, and other database objects. 
+	* Managing schema changes and optimizing database structures for performance.
+	
+	Backup and Recovery:
+    --------------------
+	* Implementing and managing backup and recovery strategies to protect data against loss or corruption
+	*  Performing regular backups and testing recovery procedures.
+	
+	Performance Tuning:
+    ------------------
+	* Monitoring and optimizing database performance. 
+	* Identifying and resolving performance bottlenecks using tools such as Oracle Enterprise Manager and SQL tuning techniques.
+	
+	Security Management:
+   ---------------------
+   * Implementing and managing database security measures. 
+   *  Configuring user access, roles, and privileges. 
+   *  Ensuring compliance with security best practices and policies.
+   
+   Patch and Upgrade Management:
+   -----------------------------
+   * Applying patches and updates to keep the database software up-to-date. 
+   *  Planning and executing database upgrades to newer versions.
+   
+   Data Migration and Export/Import:
+   ---------------------------------
+   * Performing data migration between databases and environments
+   *  Exporting and importing data using Oracle Data Pump or traditional Export/Import utilities.
+
+   High Availability and RAC:
+   -------------------------
+   * Configuring and managing Oracle Real Application Clusters (RAC) for high availability. 
+   * Implementing features like Oracle Data Guard for disaster recovery
+   
+   Automation and Scripting:
+   -------------------------
+   * Writing and maintaining scripts for automating routine tasks and administrative activities.
+   *  Utilizing tools like SQL*Plus, SQLcl, and scripting languages (e.g., PL/SQL, Shell, or Python).
+
+  Database Monitoring and Alerts:
+  -------------------------------
+  * Setting up monitoring systems to track database performance metrics, resource utilization, and critical events. 
+  *  Configuring alerts for proactive issue identification.
+  
+  
+  Troubleshooting:
+  ----------------
+  * Diagnosing and resolving database issues, errors, and outages. Analyzing log files, trace files, and using diagnostic tools to troubleshoot problems.
+
+
+  Capacity Planning:
+  ------------------
+  * Monitoring and analyzing database growth trends. 
+  * Planning for future capacity needs and optimizing resource allocation.
+
+   Data Encryption and Auditing:
+   -----------------------------
+   * Implementing data encryption for sensitive information. 
+   *  Configuring and managing database auditing to track user activities and changes.
+ 
+   Database Cloning and Refresh:
+   -----------------------------
+   * Creating database clones for testing and development purposes. 
+   * Refreshing test environments with production data.
+   
+   Collaboration and Communication:
+   --------------------------------
+   * Collaborating with development teams, system administrators, and other stakeholders.
+   * Communicating effectively to convey technical information and recommendations.
+
+   Cloud Database Management:
+   -------------------------
+   * As organizations migrate to the cloud, skills in managing Oracle databases in cloud environments
+   * such as Oracle Cloud Infrastructure (OCI) or other cloud platforms.
+   * These skills represent a comprehensive set of abilities needed for Oracle DBAs to effectively manage, optimize, and secure Oracle databases in various environments.
+   * Keeping up-to-date with the latest Oracle technologies and best practices is also crucial for continuous professional development.
+
+
+
+
+8. If DB of 10 TB is compressed what will be the expected size of DB Backup ?
+   
+   A * As a rough estimate, assuming a moderate compression ratio of 2:1
+     * 10 TB database might result in a compressed backup of around 5 TB
+     *  However, this is a generalization, and actual compression ratios can vary widely.
+
+
+
+9. RAC - Explain RAC architecture.?
+
+A * Oracle Real Application Clusters (RAC) is a feature of the Oracle Database 
+  * That allows a single database to run on multiple servers, forming a cluster.
+  * RAC provides high availability and scalability by distributing the database workload across multiple nodes.
+  
+  
+    Nodes:
+    ------
+	* A RAC environment consists of multiple nodes, which are individual servers or instances that participate in the cluster. 
+    * These nodes work together to provide a shared database environment.
+
+   Clusterware:
+   -----------
+   * Oracle Clusterware is a fundamental component of RAC.
+   *  It provides the infrastructure for managing the cluster, including node membership, network communication, and resource coordination. 
+   * It ensures that all nodes in the cluster are aware of each other's status.
+
+   Interconnect:
+   -------------
+   * The interconnect is a private network that connects all nodes in the cluster. 
+   * It allows nodes to communicate with each other quickly and efficiently, essential for coordinating and synchronizing data.
+   
+   Shared Storage:
+   --------------
+   * RAC requires a shared storage subsystem that all nodes can access. 
+   * This ensures that the same data is available to all instances in the cluster.
+   * Oracle Automatic Storage Management (ASM) is commonly used for this purpose.
+  
+  
+  Database Instances:
+  -------------------
+  * Each node in the RAC cluster runs an Oracle Database instance. 
+  * An instance is the combination of Oracle's background processes and memory structures that manage the database on a specific node.
+  
+  
+  Global Cache Services (GCS):
+  ----------------------------
+  *GCS is responsible for Cache Fusion, which allows Oracle RAC instances to share data blocks in the SGA (System Global Area) across multiple nodes. 
+  * GCS ensures that all nodes have the most up-to-date version of a data block.
+  
+  Global Enqueue Services (GES):
+  ------------------------------
+  
+  * GES manages global locks and enqueues to coordinate transactions across the entire cluster. 
+  * It helps maintain data consistency by preventing conflicts when multiple nodes attempt to access the same resource simultaneously.
+
+  Oracle RAC Database:
+  --------------------
+  * The Oracle RAC database is the logical representation of the entire clustered environment. 
+  *  It consists of one or more database instances running on different nodes, all accessing the same set of database files stored on shared storage
+  
+  Cluster Database (Clusterware-managed Database):
+  ------------------------------------------------
+  * In a RAC environment, the database is often referred to as a "cluster database" or "clusterware-managed database.
+  *  This implies that the database is managed by Oracle Clusterware, ensuring high availability and failover capabilities.
+   
+   Services:
+   ---------
+   * RAC allows the creation of services that define how database connections are managed across the cluster.
+   *  Services can be associated with specific instances or configured for workload balancing and high availability.
+  
+  VIP (Virtual IP) Addresses:
+  --------------------------
+  * if instance file this ip will shipt into the ather instence
+  * Each node in the cluster has a Virtual IP address.
+  * VIP addresses are used for client connections and ensure that clients can connect to the database regardless of which node is currently active.
+  
+  SCAN (Single Client Access Name):
+  ---------------------------------
+  * it will check which node is tacken more requsets and which node tacken low requsetes
+  * SCAN is a single entry point for clients to connect to a RAC cluster.
+  * It resolves to multiple IP addresses associated with different nodes in the cluster, providing load balancing and transparent failover.
+  * Understanding the architecture of Oracle RAC is crucial for designing, implementing, and managing a clustered database environment 
+  * That delivers high availability and scalability.
+
+
+
+
+
+
+10. How DB is setup in current project (How many nodes/ Is it on RAC)
+	there are RAC OF 4 NODE and STANDALONE Database also...
+
+
+
+11. How you can start one instance on a host without starting 2nd instance.?
+
+A.    Connect to the server:
+      --------------------
+     *  Access the server  where the Oracle RAC instances are installed.
+     
+	 Set Environment Variables:
+    ---------------------------
+    * Set the Oracle environment variables, including ORACLE_HOME and ORACLE_SID, to values associated with the instance you want to start.
+	* export ORACLE_HOME=/path/to/oracle_home
+    * export ORACLE_SID=your_instance_name
+	
+	Navigate to Oracle Grid Infrastructure Home:
+   ---------------------------------------------
+   * Change your directory to the Oracle Grid Infrastructure Home where the RAC binaries are located.
+   * cd $GRID_HOME
+   
+   Start the Specific Instance Using srvctl:
+   -----------------------------------------
+   * Oracle provides the srvctl utility for managing RAC instances. 
+   * srvctl start instance -d <db_unique_name> -i <instance_name>
+
+   Verify Instance Status:
+   -----------------------
+   * After starting the instance, you can check the status of the instances using the following command:
+   * srvctl status database -d <db_unique_name>
+
+   Connect to the Database:
+   -------------------------
+  * Connect to the database using SQL*Plus or another Oracle Database management tools.
+  * sqlplus / as sysdba
+  
+  
+  
+13. Have you done patching on RAC?
+
+A. Patching an Oracle RAC environment involves updating the Oracle Database
+   software to a higher release or applying patch sets to address bugs, enhance features, or improve security  
+  
+  Preparation:
+  ------------
+  * Review the Oracle documentation and release notes for the specific patch or patch set and plan to apply.
+  * Back up the database and relevant configuration files.
+  
+  Download Stage the Patch:
+  -----------------------------
+  * Download the required patch or patch set from the Oracle Support website.
+  
+   Rolling or Non-Rolling Patching:
+  ---------------------------------
+  * Decide whether to perform a rolling patching or non-rolling patching.
+  * Rolling Patching:     Apply the patch to one node at a time while the other nodes continue to provide service.   
+  * Non-Rolling Patching: Take the entire cluster offline, apply the patch, and then bring the cluster back online. 
+  
+  Apply the Patch:
+ ----------------
+ * Use Oracle OPatch or Database Upgrade Assistant (DBUA) to apply the patch.
+ * Follow the instructions provided in the patch documentation for your specific Oracle Database release.
+ 
+  Verify and Test:
+  ----------------
+  * After applying the patch, verify its success by checking the logs and running post-patching scripts if required.  
+  
+  Monitor for Issues:
+  -------------------
+  * Monitor the system for any issues or performance degradation after the patching process.
+  
+  Rollback Plan:
+  --------------
+  * Have a rollback plan in case issues arise. This may involve taking a backup before applying the patch and having procedures to revert to the previous state if needed.
+  ./opatch rollback (id)
+  Document the Patching Process:
+  -----------------------------
+  * It's important to note that the specific steps and considerations may vary based on the Oracle Database version, patch set, and the organization's specific requirements. 
+  * Always refer to the official Oracle documentation and follow best practices for patching Oracle RAC environments.
+  
+  
+14. If we want to apply PSU on one of DB what are the steps. Mention right from downloading of patch. ?
+
+A. 1. Download the PSU:
+   * Access the Oracle Support website: https://support.oracle.com/.
+   * Log in with your Oracle account.
+   * Navigate to the "Patches & Updates" section.
+   * Search for the specific PSU for your Oracle Database version and platform.
+   * Download the PSU to a location accessible on the database server.
+   
+   2. Prepare for Patching:
+   * Review the release notes and README file associated with the PSU for any specific instructions or prerequisites.
+   * Perform a full backup of the database, including the Oracle software and configuration files.
+   * Notify stakeholders about the planned maintenance window.
+   
+   3. Copy the PSU to Database Servers:
+   * Copy the downloaded PSU files to each node in the Oracle RAC environment.
+   
+   4. Extract the PSU:
+   * Extract the contents of the PSU using a tool like unzip  
+   * Navigate to the directory where the PSU files are extracted
+   
+   5. Stop Database Services:
+   * Connect to each node in the RAC environment.
+   * Stop the Oracle Database services on each node. This can be done using SQL*Plus or Oracle Enterprise Manager.
+   * SQL> SHUTDOWN IMMEDIATE;
+   
+   6. Apply the PSU Using OPatch:
+   * Navigate to the directory where OPatch is located.
+   * cd /path/to/oracle_home/OPatch
+   * Apply the PSU using the following command:./opatch apply -oh /path/to/oracle_home -local /path/to/psu_extracted_directory
+   
+   7. Review and Confirm:
+   * Review the output of the OPatch apply command for any errors or warnings.Confirm the successful application of the PSU.
+
+   8. Start Database Services:
+   * Start the Oracle Database services on each node.
+   * SQL> STARTUP;
+   
+   9. Run Post-Patching Scripts:
+   * Some PSUs may require running post-patching scripts. Refer to the README file for instructions.
+  
+  10. Verify the Patch:
+   * Connect to the database and verify the PSU has been successfully applied.
+   * SQL> SELECT * FROM dba_registry_sqlpatch;
+   * Check the Oracle alert log for any messages related to the PSU application.
+   
+   11. Perform Testing:
+   * Conduct thorough testing to ensure that the database and applications function correctly with the applied PSU.
+   
+   12. Monitor for Issues:
+   * Monitor the system for any issues or performance degradation after applying the PSU.
+   
+   
+   ## Always refer to the official Oracle documentation, README files, and release notes for the specific PSU version you are applying
+   ##  Additionally, it's advisable to test the PSU in a non-production environment before applying it to a production database.
+
+
+
+15. Why we need to run database Verbose ?
+
+A. 1.Troubleshooting and Diagnostics:
+   * Verbose logging provides more detailed information about the internal processes and activities of the Oracle Database.  	
+   * This level of detail is valuable for troubleshooting issues, identifying performance bottlenecks, and diagnosing problems within the database.
+
+   2.Error Identification:
+   * Verbose logs can capture additional details about errors, warnings, and unexpected behaviors. 
+   * This enhanced information helps database administrators quickly identify and address issues that may not be apparent in normal logging levels.
+
+   3.Performance Tuning:
+   * Detailed logging can assist in performance tuning by providing insights into the execution plans of SQL queries, resource usage, and timing information.
+   * Database administrators can use this information to optimize SQL statements and improve overall database performance.
+
+   4.SQL Query Analysis:
+   * In verbose mode, Oracle can log detailed information about the execution of SQL queries, including the steps taken by the query optimizer.
+   * This can be crucial for analyzing and fine-tuning complex queries for optimal performance.
+   
+   5.Transaction Tracking:
+   * Verbose logging may include detailed information about transactions, such as the sequence of SQL statements executed, locks acquired, and changes made to the database. 
+   * This level of detail aids in tracing and understanding the flow of transactions.
+
+   6.Debugging Applications:
+   * During application development or debugging phases, verbose logging can assist developers in understanding how their queries are processed by the Oracle Database.
+   * It provides additional information for debugging and resolving issues during the development lifecycle.
+    
+	7.Oracle Support Assistance:
+    * When seeking assistance from Oracle Support, having verbose logs can be invaluable. 
+	* Oracle Support may request detailed logs to analyze and diagnose specific issues, and verbose logging ensures that comprehensive information is available for review.
+    * It's important to note that enabling verbose logging generates a significant amount of log data, which may impact performance and increase storage requirements. 
+    * Therefore, verbose logging is typically enabled selectively and temporarily for specific diagnostic or troubleshooting purposes.
+   
+   
+   
+16. After PSU loading, how we can check whether patch is successfully applied or not.?
+
+A. 1. Check OPatch Utility: * Use the OPatch utility to check the status of applied patches
+                            * $ORACLE_HOME/OPatch/opatch lsinventory
+   
+   2. Query DBA_REGISTRY_SQLPATCH View:
+     * Connect to the Oracle Database using SQL*Plus or a similar tool and query the DBA_REGISTRY_SQLPATCH view.
+     * SQL> SELECT PATCH_ID, PATCH_UID, PATCH_DESCRIPTION, STATUS FROM DBA_REGISTRY_SQLPATCH;
+   
+   3. Review Oracle Alert Log:
+      * Check the Oracle Alert Log for any messages related to the PSU application. 
+	  * Look for lines that indicate the successful application of the patch.
+      * SQL> SELECT * FROM V$DIAG_INFO WHERE NAME = 'Diag Trace';
+      * alert_<SID>.log file.
+	  
+	4. Review Patch Log Files:  
+      * OPatch typically generates log files during the patching process. Check the log files for any errors or warnings.
+      * $ORACLE_HOME/cfgtoollogs/opatch/opatch<timestamp>.log
+      * Look for messages indicating a successful completion.
+   
+   5. Verify Component Status:
+     * Check the status of Oracle Database components after applying the PSU. Connect to the database and query the DBA_REGISTRY view:
+     *  SELECT COMP_ID, COMP_NAME, VERSION, STATUS FROM DBA_REGISTRY;
+   
+   
+   ###It's important to note that the exact steps and commands may vary depending on the
+       Oracle Database version and the specific PSU being applied. Always refer to the
+       Oracle documentation and release notes for the specific PSU version for accurate
+       and detailed verification steps.
+   
+   
+17. What is TD Wallet.?
+
+A. * Oracle Wallet provides an simple and easy method to manage database credentials across multiple domains. 
+   * It allows you to update database credentials by updating the Wallet instead of having to change individual datasource definitions.
+   * it is store encription keys
+18. What is Datafile Encryption.
+
+A. * In Oracle Database, datafile encryption refers to the process of encrypting the contents of datafiles  
+   * enhance the security of sensitive information stored within the database.   
+   * This is typically achieved through the use of Oracle's Transparent Data Encryption (TDE) feature
+   
+   Transparent Data Encryption (TDE):
+   ----------------------------------
+   * TDE is a comprehensive encryption solution provided by Oracle Database to protect data at rest.
+   * It enables the encryption of entire tablespaces, including datafiles and other associated files.
+   
+   At-Rest Encryption:
+   -------------------
+   * Datafile encryption focuses on securing data when it is at rest, meaning it is stored on disk or in backups.
+   * When TDE is enabled, the data within the datafiles is encrypted, and it remains encrypted until accessed by an authorized user or application.
+   
+   
+   Encryption Algorithms:
+   ----------------------
+   * Oracle Database supports various encryption algorithms for TDE, providing
+    flexibility for organizations to choose an appropriate algorithm based on their security requirements.
+
+
+   Master Encryption Key:
+   ----------------------
+    * TDE uses a master encryption key to encrypt and decrypt the data within datafiles. 
+	* This master key is typically stored in an external security module or an Oracle Wallet, which provides a secure storage location for sensitive key material.
+
+
+   Key Management:
+   ---------------
+   * Proper key management is essential for the security of encrypted data
+   *  Oracle Wallet is commonly used for managing encryption keys securely.
+   * The wallet can be stored locally on the database server or in a centralized location for easier key management.
+ 
+   Performance Considerations:
+   ---------------------------
+   * While datafile encryption enhances security, it may introduce a performance overhead due to the encryption and decryption processes.
+   *  However, Oracle has implemented optimizations to minimize the impact on performance.
+   
+   Compliance and Security Standards:
+   ----------------------------------
+   * Datafile encryption is often implemented to meet compliance standards and security  requirements imposed by various regulations. 
+   * It helps organizations comply with data protection regulations and ensures the confidentiality of sensitive information.
+   
+   Granularity of Encryption:
+   --------------------------
+   * TDE in Oracle Database provides encryption at the tablespace level
+   * Each tablespace, along with its associated datafiles, can be individually encrypted
+   * This provides a level of granularity for securing specific sets of data.
+   * Enabling datafile encryption through TDE in Oracle Database is considered a best
+    practice for securing sensitive data, especially in scenarios where regulatory compliance or internal security policies demand robust protection of data at rest. 
+   * The encryption capabilities provided by TDE contribute to a comprehensive defense against unauthorized access and potential data breaches.
+
+
+
+19. Data masking / data redaction.
+
+ 
+
+#Data Masking:it is hide imp data with in table ex:pan num,adh num, last or first numbers was hide
+#Data redaction:it is hide entire datafile is known as data reduction
+
+   * Data masking, also known as data redaction, is a technique used to protect sensitive information by replacing, encrypting
+   
+   
+   
+   
+   Types of Data Masking:
+   -----------------------
+   
+   Static Data Masking: 
+   -------------------
+   This technique permanently replaces sensitive data in the database with masked values. It is typically used to create a copy of the database for non-production environments.
+    
+	Dynamic Data Masking:
+    --------------------
+ 	This technique dynamically masks data at runtime, so the data remains unchanged in the database but appears masked when accessed by unauthorized users. Technique
+
+   Purpose: 
+   -------
+   * The primary purpose of data masking is to protect sensitive information, such as
+     personally identifiable information (PII) or sensitive business data, during non-production activities like testing, development, or analytics.
+    
+  Sensitive Data Types:
+  ----------------------
+  * Data masking is typically applied to fields or columns containing sensitive information  including
+  *  but not limited to names, addresses, social security numbers, credit card numbers, and other personally identifiable information. 
+
+   Methods:
+  --------
+   * Substitution: Original values are replaced with fictional but realistic-looking data.
+   * Encryption: Sensitive data is encrypted, and only authorized users with the decryption key can view the original values.
+   * Shuffling: Values within a column are shuffled or randomly reassigned to different rows
+   * Nulling: Original values are replaced with null values.
+   
+   Data Redaction:
+   ---------------
+   * Data redaction specifically refers to a feature in database systems where sensitive data is dynamically masked or redacted based on the user's privileges.
+   *  Different users may see different levels of masked data, depending on their access rights.
+   
+  Database Integration:
+  --------------------
+  * Many relational database management systems (RDBMS) offer native data masking or redaction features.
+  *  For example, Oracle Database has the Data Redaction feature, and SQL Server has Dynamic Data Masking.
+
+  Regulatory Compliance:
+  ----------------------
+  *  Ensures that sensitive information is not exposed to unauthorized users.
+  
+  Testing and Development:
+  ------------------------
+  * In testing and development environments, realistic datasets are needed to simulate real-world scenarios.
+  * Data masking allows organizations to use production-like data without exposing sensitive information.
+
+  Fine-Grained Access Control:
+  ----------------------------
+  * Data redaction in databases allows for fine-grained access control.
+  * Different users or roles may have different levels of access to the original or masked data based on their permissions.
+
+   Data Masking Challenges:
+   ------------------------
+   * Ensuring that masked data remains realistic and functionally accurate for testing purposes while being effectively anonymized is a challenge.
+   * Organizations need to strike a balance between privacy and usability.
+   
+    Data masking/data redaction is an essential practice for organizations that handle
+    sensitive information, enabling them to balance the need for realistic data in
+    non-production environments with the requirement to protect individual privacy and
+    comply with data protection laws.
+	
+	
+	
+21. How to encrypt the RMAN Backup.
+	
+	* Encrypting RMAN (Recovery Manager) backups in Oracle is crucial for securing sensitive data during the backup process
+	* Oracle provides the ability to encrypt RMAN backups using Transparent Data Encryption (TDE). 
+    * TDE ensures that the backup files are encrypted, and they remain secure even if the backup files are stored in an unprotected location.
+
+    1. Set Up Transparent Data Encryption (TDE):
+	  * Before encrypting RMAN backups, you need to set up Transparent Data Encryption for the Oracle database.
+      * This involves creating a TDE wallet and enabling encryption for tablespaces or the entire database.
+
+
+    2. Create and Open the TDE Wallet:
+	   * Ensure that the TDE wallet is created and opened. The wallet is used to store the
+         master encryption key. You may need to provide a password for the wallet.
+
+    SQL> ALTER SYSTEM SET ENCRYPTION WALLET OPEN IDENTIFIED BY "your_wallet_password";
+	
+	3. Configure RMAN Encryption:
+	   To enable RMAN encryption, you need to set the ENCRYPTION parameter in your RMAN
+       script or directly in the RMAN command line. Specify the algorithm and the
+       encryption key.
+	   
+       RMAN> SET ENCRYPTION ON IDENTIFIED BY "your_rman_encryption_key" ALGORITHM 'AES256';
+	   
+	   The encryption key specified in the RMAN command should match the encryption key used to open the TDE wallet.
+
+
+    4. Perform RMAN Backup:
+       * Run your regular RMAN backup commands with the encryption settings.
+	   * example:RMAN> BACKUP DATABASE PLUS ARCHIVELOG;
+	   
+	5. Verify the Encrypted Backup:
+       * Once the backup is completed, verify that the backup files are encrypted. You can
+         check the file headers or use Oracle utilities to confirm the encryption status.
+   
+   
+   Additional Considerations:
+   
+   * Backup Compression: You can combine encryption with RMAN backup compression to optimize storage space for encrypted backups
+   * Secure Storage of Encryption Keys: Ensure that the encryption keys (TDE wallet password and RMAN encryption key) are securely stored. Losing access to these keys
+     can result in the inability to restore encrypted backups.
+   * Backup and Recovery Testing: Regularly test the restore process for encrypted backups to ensure that the encryption and decryption mechanisms are working as expected.
+   
+   
+   
+22. How to do Restoration? High level steps of restoration?
+
+   1. Identify Recovery Point:         Determine the specific point in time or SCN (System Change Number) to which you want to restore the database.
+   
+   2. Ensure Valid Backups:            Verify the availability of valid and up-to-date backups, including full database backups and archived redo log files.
+   
+   3. Shut Down Database:              Gracefully shut down the Oracle database to prepare for the restoration process.
+   
+   4. Restore Database Files:          Restore the required database files, including data files, control files, and SPFILE (if applicable), from the backup.
+   
+   5. Restore Archived Redo Logs:      If necessary, restore archived redo log files generated after the recovery point to enable point-in-time recovery.
+   
+   6. Create Restore Point (Optional): Optionally, create a restore point to mark a specific point in the recovery process.
+   
+   7. Start Database in Mount Mode:    Start the database in mount mode to enable control file restoration and recovery.
+   
+   8. Restore Control Files:           Restore the control files from the backup to ensure the integrity of the database.
+   
+   9. Perform Database Recovery:       Apply recovery operations, such as complete recovery or point-in-time recovery, using archived redo logs.
+   
+   10. Open the Database:              After successful recovery, open the database for user access.
+   
+   11. Test Restored Database:         Conduct tests to validate the restored database's integrity and consistency.
+   
+   12. Monitor and Resolve Issues:     Monitor the database for any potential issues post-restoration and address them promptly.
+   
+   
+23. Suppose restoration is going on and while restoring we need to check readlog file. Now, if there are no logfiles, what is your action to check logfiles.
+
+    * Check the Archive Log Destination: Verify the destination where archived redo log files are supposed to be stored. 
+	                                     SQL> SHOW PARAMETER LOG_ARCHIVE_DEST;
+										 
+	* Check Archive Mode:               Confirm that the database is running in ARCHIVELOG mode. This mode is necessary for the generation and archiving of redo log files.
+	                                    SQL> SELECT LOG_MODE FROM V$DATABASE;
+										
+	* Check Archive Process:             Confirm that the ARCH background process is running. This process is responsible for archiving filled redo log files.
+                                         SQL> SELECT PROCESS, STATUS FROM V$MANAGED_STANDBY;
+										 
+	* Check Log Switches:              Check recent log switches to confirm if the database is actively switching between redo log files.
+									   SQL> SELECT * FROM V$LOG_HISTORY;
+
+    * Manually Force Log Switch:        You can manually force a log switch to generate a new redo log file. This may be useful during the restoration process.
+                                        SQL> ALTER SYSTEM SWITCH LOGFILE;
+										After forcing a log switch, check if archived redo log files are generated.
+
+    * Check File System Space:         Ensure that there is sufficient space on the file system where archived redo log files are stored. 
+	
+	* Review Alert Log:                Examine the database alert log for any error messages or warnings related to the archiving process.
+                                       SQL> SHOW PARAMETER BACKGROUND_DUMP_DEST;
+    
+	
+	
+24. Explain startup sequence of a cluster.?
+
+
+-	etc/init.d/ init.ohasd
+	OHASD(oracle high availability service demon)--Will start-->CSSD_AGENT,ORA_ROOT_AGENT,ORA_AGENT,CSSD_MONITOR
+	ORA_ROOT_AGENT(is owner of root user)--will start-->CRSD(cluster ready service demon),CTSSD,DISKMON
+	ORA_AGENT(is owner of oracle user)--Will start-->ORA_ASM,GIPCD,GPNPD,EVMD
+	CRSD(cluster ready service demon)--will start-->ORA_ROOT_AGENT,ORA_AGENT
+	ORA_ROOT_AGENT--wil start-->GNS,GNS_IP,SCAN_VIP,NODE_IP,NETWORK
+	ORA_AGENT--will start-->ORA_ASM_INSTANCE,LISTENER,SCAN_LISTENER,SERVICES,DB,DISKGROUP
+
+  1. Clusterware Startup
+  ----------------------
+    * Clusterware is the foundational software that manages the cluster environment.
+	
+	Clusterware Initialization:               The operating system initializes the clusterware services.
+    Cluster Synchronization Services (CSS):   CSS is started to synchronize and manage the nodes in the cluster.
+    Oracle High Availability Services (OHAS): OHAS is responsible for managing the high availability of the cluster. It starts before any other Oracle Clusterware components.
+    Cluster Ready Services (CRS):             CRS starts the resources required for the cluster, such as the voting disk and OCR.
+	
+  2. Network Initialization
+     ---------------------
+    * Virtual IP (VIP) Addresses: VIPs are configured and brought online. VIPs allow seamless failover and high availability in the event of node failure.
+    * Interconnect Network: The private interconnect network is initialized. This network is used for communication between the nodes in the cluster.  
+  
+  3. Storage Initialization
+     ----------------------
+     * Shared Disk Access: The shared storage (e.g., ASM disks) is initialized and made available to all nodes in the cluster.
+                        	 This step ensures that all nodes can access the necessary shared storage for database files.	 
+  
+  4. Automatic Storage Management (ASM) Startup
+  -----------------------------------------------
+   * ASM Instance: The ASM instance is started on each node. ASM manages the disk groups that contain the database files.
+   * 	Disk Groups: ASM disk groups are mounted, making the storage available for use by the databases.
+
+   5. Database Instance Startup
+   ---------------------------
+     Instance Initialization: Each Oracle database instance on the cluster nodes is started.
+     Parameter Files: The parameter files (SPFILE or PFILE) are read to configure the instance settings.
+     Instance Mounting: The instances mount the database, making it available for access. During this phase, the control files are read.
+     Instance Opening: The database is opened, making it fully available for users. Datafiles and redo log files are opened.	
+
+    6. Cluster Resource Management
+	------------------------------
+   * Resource Management: Cluster resources such as services, listeners, and applications are started and managed by the Oracle Clusterware.
+   *  Failover and Load Balancing: The cluster is configured to handle failover and load balancing, ensuring high availability and efficient resource utilization.	 
+									
+									
+	7. Listener and Services Startup
+	---------------------------------
+    *  Oracle Net Listener: Listeners are started on each node to handle client connection requests.
+    *  Database Services: Database services are started, allowing clients to connect to the database instances. Services provide load balancing and failover capabilities.								
+	
+    8. Verification and Monitoring
+	------------------------------
+    * Cluster Health Monitor: The Cluster Health Monitor checks the status of the cluster components and nodes.
+    * Alert Logs and Trace Files: Review alert logs and trace files to ensure that all components started correctly and are functioning as expected.
+
+
+
+ # Start Oracle Clusterware on each node
+crsctl start crs
+
+# Verify Clusterware status
+crsctl check crs
+
+# Start ASM instance on each node
+srvctl start asm -n <node_name>
+
+# Start the database
+srvctl start database -d <db_name>
+
+# Start the listeners
+srvctl start listener
+
+# Verify the status of all services
+srvctl status database -d <db_name>
+
+	
+   
+
+25. Do you know export / import. 
+   
+    * Yes, I'm familiar with the export and import utilities in Oracle.
+	* These utilities are used for logical backups and restoration of Oracle database objects.
+    
+    1. Oracle Data Pump (expdp / impdp):
+    -----------------------------------
+	  * Oracle Data Pump, introduced in Oracle Database 10g, is an advanced utility for exporting and importing data and metadata. 
+	  * It provides significant enhancements over the older exp/imp utilities.
+
+      Export (Data Pump):
+      ------------------
+	  expdp username/password@connect_string DIRECTORY=dpump_dir1 DUMPFILE=export_file.dmp LOGFILE=export_log.log SCHEMAS=schema_name
+	  
+	  Import (Data Pump):
+     -------------------
+	  impdp username/password@connect_string DIRECTORY=dpump_dir1 DUMPFILE=export_file.dmp LOGFILE=import_log.log SCHEMAS=schema_name
+
+     
+	 
+	 2. Original Export / Import (exp / imp):
+     The original export and import utilities are still available for backward compatibility, but Oracle recommends using Data Pump for better performance and functionality.
+    
+    Export (Original):
+	------------------
+    exp username/password@connect_string file=export_file.dmp log=export_log.log owner=schema_name
+	
+	Import (Original):
+    ------------------
+	imp username/password@connect_string file=export_file.dmp log=import_log.log fromuser=schema_name touser=new_schema_name
+	
+     Data Pump Advantages:
+	 ----------------------
+	 * Data Pump supports parallelism for faster exports and imports.
+     * It provides more flexible and granular options for data and metadata selection.
+	 * Data Pump is the preferred choice for most modern Oracle database versions.
+	 
+	 Original Export / Import:
+    --------------------------
+	While Data Pump is recommended for new implementations, the original exp/imp
+    utilities may still be used in specific scenarios, especially when migrating from older Oracle versions.
+   
+   Connect String:
+   --------------
+   The connect_string typically includes the database connection information, such as hostname, port, and SID (Service Identifier).
+  
+   Directory:
+   ---------
+   The DIRECTORY parameter specifies the directory object in the database where the export or import files are located
+   
+   Dumpfile and Logfile:
+   ---------------------
+   The DUMPFILE parameter specifies the name of the export file, and LOGFILE specifies the name of the log file.
+   
+  
+  
+  
+26. If you are refreshing 5 schema at a time and source name & target name tablespace schema are different.  
+    
+	1. Export Source Schemas:
+	   ----------------------
+      * Use Oracle Data Pump (expdp) or the original export (exp) utility to export the
+       data and metadata of the source schemas. Specify the tablespaces and other relevant options during the export.
+      
+	  expdp username/password@source_db schemas=schema1,schema2,schema3 directory=dpump_dir1 dumpfile=export_file.dmp logfile=export_log.log
+
+    2. Import into Target Schemas:
+	   ---------------------------
+    * Import the exported dump file into the target schemas in the target database. 
+	* Ensure that you map the tablespaces appropriately during the import to match the target environment.
+   
+   * impdp username/password@target_db remap_schema=schema1:schema1_target remap_tablespace=source_ts1:target_ts1 directory=dpump_dir1 dumpfile=export_file.dmp logfile=import_log.log
+    #   Repeat this step for each schema you are refreshing.
+	
+	3. Adjust Constraints and Indexes:
+       -------------------------------
+      * If there are referential constraints or indexes that reference tables across different tablespaces, 
+      * you may need to adjust them after the import to reflect the new tablespaces in the target environment.
+      
+	4. Verify Data and Objects:
+       ------------------------
+     * After the import, thoroughly verify the data, constraints, indexes, and other database objects in the target schemas to ensure they match the source schemas.
+	 
+    5. Update Statistics:
+       ----------------
+     * Gather or update statistics for the refreshed schemas to ensure the query optimizer has accurate information for optimization.
+	   
+	6. Resolve Dependencies:
+       --------------------
+     * If there are dependencies between the refreshed schemas, ensure that these dependencies are resolved.	   
+     * This may include stored procedures, triggers, or any other database objects that reference objects in other schemas.
+     
+	 7. Review and Adjust Privileges:
+        ----------------------------
+     * Review and adjust the privileges and roles for the users in the target schemas based on the requirements of the application.
+
+    8. Testing:
+       --------
+	   * Conduct thorough testing of the refreshed schemas to validate the integrity and functionality of the data and applications.
+       
+	   
+	   
+27. Why is remap need to be used?
+   
+    * The REMAP functionality in Oracle Data Pump is used to alter or remap certain attributes during the import process.	   
+    *  The primary use case for the REMAP feature is to address differences between the source and target databases, ensuring a smooth import when specific conditions need to be adjusted
+
+    Schema Name Change:
+    ------------------
+	* When importing data into a target database, you may want to use a different schema name for the imported data than what was used in the source.
+    *  The REMAP_SCHEMA option allows you to remap the schema name during the import.
+    * impdp username/password@target_db REMAP_SCHEMA=source_schema:target_schema ...
+	
+	Tablespace Name Change:
+    ----------------------
+	* If the tablespaces in the target database have different names than those in the source, you can use REMAP_TABLESPACE to remap the tablespaces during the import.
+    * impdp username/password@target_db REMAP_TABLESPACE=source_ts:target_ts ...
+	
+	Tablespace Objects Relocation:
+    ------------------------------
+	* When you want to move objects (tables, indexes, etc.) to different tablespaces in the target database, REMAP_TABLESPACE can be used to remap specific objects.
+    * impdp username/password@target_db REMAP_TABLESPACE=source_ts1:target_ts1,source_ts2:target_ts2 ...
+   
+    Changing Storage Characteristics:
+    --------------------------------
+	* You may want to change storage characteristics (such as INITIAL and NEXT extents) during the import. 
+    * impdp username/password@target_db REMAP_TABLE=source_table:target_table ...
+    
+	Changing Directory Paths:
+    ------------------------
+	* If the directory paths used in the source and target databases differ, the REMAP_DATAFILE option can be used to remap the directory paths for datafiles.
+    * impdp username/password@target_db REMAP_DATAFILE=source_path:target_path
+	
+	Global Object Name Changes:
+    ---------------------------
+	* When importing into a different database with a different global database name, REMAP_GLOBAL_NAME can be used to remap global object names.
+    * impdp username/password@target_db REMAP_GLOBAL_NAME=source_global_name:target_global_name ...
+    
+	
+	
+	
+28. Suppose you ran import in db and import is running slow, how you can speedup process.
+	
+    Parallelism:
+	-----------
+	* Use the PARALLEL parameter to increase the degree of parallelism during import.
+      This can significantly speed up the import process by utilizing multiple worker processes.
+     
+	 impdp username/password@target_db PARALLEL=4 ...
+	 
+	 Increase Buffer Size:
+     --------------------
+	 * The DATA_BUFFER parameter controls the size of the buffer used for reading data
+        during import. Increasing the buffer size can enhance performance.
+
+      impdp username/password@target_db DATA_BUFFER=2M ...
+	  
+	  
+	 Commit Interval:
+    -----------------
+	* The COMMIT_INTERVAL parameter specifies the number of rows after which a commit is
+      performed. Increasing the commit interval can reduce the overhead of frequent commits.
+    impdp username/password@target_db COMMIT_INTERVAL=10000 ...
+
+   Direct Path Load:
+  ------------------
+  * Use the DIRECT parameter to enable direct path loading, which can be faster than conventional path loading. 
+  *  However, direct path loading may have certain restrictions.
+  impdp username/password@target_db DIRECT=Y ...
+  
+  
+  Disable Constraints and Indexes:
+  --------------------------------
+  * Temporarily disable constraints and indexes during the import and enable them afterward. This can accelerate the import process.
+  * impdp username/password@target_db TRANSFORM=DISABLE_ARCHIVE_LOGGING:Y ...
+
+   Use Network Link for Remote Imports:
+   -----------------------------------
+   * If importing over a network link, consider using the NETWORK_LINK parameter for direct import between databases.
+   * impdp username/password@target_db NETWORK_LINK=source_db ...
+   
+   Monitoring and Tuning:
+  -----------------------
+  * Monitor the import progress using the Data Pump status and log files. If specific
+    tables or objects are causing performance issues, you might consider excluding or adjusting them.
+
+   Optimize Storage:
+   ----------------
+   * Ensure that the tablespaces and datafiles in the target database are appropriately sized and configured to accommodate the imported data.
+   
+   Database Parameters:
+   -------------------
+   * Adjust Oracle database parameters such as DB_BLOCK_SIZE, SORT_AREA_SIZE, and PGA_AGGREGATE_TARGET to optimize memory usage during import.
+   
+   Indexes:
+  ---------
+  * Consider importing indexes after the data to speed up the initial data load. You can use the EXCLUDE=INDEX option during the initial import.
+  * impdp username/password@target_db EXCLUDE=INDEX ...
+  
+  
+  
+29. can I increase filesize in paramater file while running parallel.
+ 
+  *  impdp username/password@target_db PARALLEL=4 DIRECTORY=dpump_dir1 DUMPFILE=exp%U.dmp FILESIZE=1G ...
+     
+	 * PARALLEL=4 indicates that the import will run with four parallel processes.
+     * DIRECTORY=dpump_dir1 specifies the directory object in the database where the dump files will be written.
+     * DUMPFILE=exp%U.dmp is a pattern for generating unique dump file names for each parallel process 
+     * FILESIZE=1G sets the maximum size for each dump file to 1 gigabyte.
+	 
+	 Adjust the value of FILESIZE based on your requirements and the capacity of your
+     storage system. It's important to note that the total disk space required for the
+     import will be the product of the FILESIZE and the number of parallel processes.
+	 
+	 
+	 
+30 Benefit of  implementing TDE in DB.
+  	
+Transparent Data Encryption (TDE) offers several benefits when implemented in a database:
+
+Data Protection:             TDE helps protect sensitive data at rest by encrypting it on disk. 
+                             This encryption ensures that even if unauthorized users gain access to the physical storage media, 
+				             they won't be able to read the encrypted data without the proper encryption key.
+
+Compliance Requirements:     Many regulatory requirements and industry standards, such as GDPR, HIPAA, and PCI DSS, mandate the protection of sensitive data through encryption.
+                             Implementing TDE can help organizations meet these compliance requirements and avoid penalties or fines.
+
+Enhanced Security:           TDE adds an additional layer of security to the database, making it more resilient to various security threats, 
+                             including unauthorized access, data breaches, and insider threats.
+				             It helps prevent data exposure in case of unauthorized database copies, backups, or physical theft of storage media.
+
+Simplified Management:      TDE is transparent to applications and users accessing the database, meaning they don't need to be aware of the encryption process.
+                            This simplifies management and reduces the complexity of application development and deployment.
+					        Encryption and decryption are handled automatically by the database engine.
+
+Granular Control:          TDE allows for granular control over which specific database objects or columns are encrypted.
+                           Organizations can choose to encrypt entire databases, specific tables, or even individual columns containing sensitive information, 
+				           based on their security requirements and compliance needs.
+
+Data Masking:             TDE can also be combined with data masking techniques to further protect sensitive information.
+                          Data masking obscures sensitive data in non-production environments by replacing it with realistic, but fictional, data.
+			              This ensures that developers and testers have access to realistic data for development and testing purposes without exposing sensitive information.
+
+Performance Impact:       While there may be a slight performance overhead associated with encryption and decryption operations, modern hardware and database systems are optimized 
+                          to minimize this impact. In many cases, the performance impact of TDE is negligible compared to the security benefits it provides.
+
+             Overall, implementing TDE in a database enhances data security, helps meet compliance requirements, simplifies management, 
+              and provides peace of mind knowing that sensitive data is protected, both at rest and in transit.
+
+
+
+31.How to encrypt data file in table space
+  
+    * To encrypt a data file in a tablespace in Oracle Database using Transparent Data Encryption (TDE),
+	
+	Create or Open TDE Wallet:
+	--------------------------
+	* ALTER SYSTEM SET ENCRYPTION KEY IDENTIFIED BY "your_wallet_password" ENCRYPTION FOR ALL CONTAINED TABLESPACES;
+	* This command creates or opens a TDE wallet with the specified password.
+	
+	
+	Open the TDE Wallet:
+	------------------
+	* ALTER SYSTEM SET WALLET OPEN IDENTIFIED BY "your_wallet_password";
+	* This command opens the TDE wallet to allow Oracle to access the encryption keys.
+	
+	
+	Encrypt the Data File:
+	---------------------
+	* ALTER DATABASE DATAFILE 'full_path_to_datafile' ENCRYPT;
+	
+	Verify Encryption:
+	------------------
+	* SELECT name, encryption_status FROM v$datafile WHERE name = 'full_path_to_datafile';
+	
+	
+	
+32.How to move data file from one table space to other table space
+ 
+   
+   * ALTER TABLESPACE source_tablespace RENAME DATAFILE 'source_datafile_name' TO 'destination_datafile_path'; 
+
+   * To move a data file from one tablespace to another in Oracle Database, you can use the ALTER DATABASE statement.
+   
+   * Ensure Sufficient Space: Before moving the data file, make sure the destination tablespace has enough space to accommodate the data file.
+  
+  * Identify Data File: Determine the name of the data file you want to move and the tablespace it currently belongs to. You can find this information in the DBA_DATA_FILES view.
+
+  * Identify Destination Tablespace: Determine the name of the destination tablespace where you want to move the data file.
+  
+  Generate SQL Statement: Generate the SQL statement to move the data file.
+  
+  Verify: After executing the SQL statement, verify that the data file has been moved successfully by querying the DBA_DATA_FILES view.
+  
+  Drop Old Data File: Optionally, you can drop the old data file from the source tablespace if it's no longer needed
+  
+  ALTER TABLESPACE source_tablespace
+  DROP DATAFILE 'source_datafile_name';
+  
+  
+  
+33. Tell me any ocassion where you taken ownership and completed actiity on you own.
+
+      Database Performance Optimization
+      ---------------------------------
+	  
+	  *  there is an Oracle database that has been experiencing performance issues. 
+	  *  Users have reported slow response times, and it's affecting critical business operations
+      * In this situation, i am (DBA) takes ownership of the performance optimization initiative.
+      
+	  Identification of Performance Issues:
+	  ------------------------------------
+	  * The DBA conducts a thorough analysis of the database using performance monitoring
+        tools, Oracle Enterprise Manager, or other diagnostic queries. They identify
+        specific SQL queries, inefficient indexes, or other bottlenecks contributing to the performance degradation.
+      
+	 Development of Optimization Plan:
+     ---------------------------------
+     * Based on the analysis, the DBA formulates a comprehensive plan to optimize the
+       database. This plan may include rewriting SQL queries for better efficiency,
+       creating or modifying indexes, adjusting configuration parameters, or redistributing data across tablespaces.
+	 
+    Coordination with Stakeholders:
+    -------------------------------
+	* The DBA communicates with relevant stakeholders, such as application developers,
+     system administrators, and business users, to discuss the optimization plan,
+     potential downtime, and the expected impact on system performance during the optimization process.
+
+    Implementation of Changes:
+    --------------------------
+	* Taking ownership of the optimization process, the DBA implements the planned
+      changes during a scheduled maintenance window. This may involve executing SQL
+      scripts, modifying database structures, or adjusting configuration settings.
+
+    Monitoring and Testing:
+   ------------------------
+   * After the changes are implemented, the DBA closely monitors the database
+     performance in real-time. They conduct testing to ensure that the optimizations
+     have positively impacted response times and have not introduced any adverse effects.
+	 
+	 
+	 Documentation and Reporting:
+    -----------------------------
+	* The DBA documents the optimization activities performed, including changes made,
+      reasons for those changes, and the observed improvements in performance. This
+      documentation serves as a reference for future troubleshooting and analysis.
+
+
+    Continuous Improvement:
+	----------------------
+	* The DBA remains vigilant about the database's performance, continuously monitoring
+      and addressing any emerging issues. They may also proactively suggest long-term strategies for maintaining optimal database performance.
+
+
+    * In this scenario, the DBA takes ownership of the performance optimization
+      initiative, demonstrating a proactive and responsible approach to ensuring the smooth operation of the Oracle database.
+
+
+
+
+33.Rate yourself in performance tuning out of 10.
+
+   ###### 7/10
+
+
+34.There is a long running query, what is your approach to check ?
+
+   # When dealing with a long-running query, it's important to identify the cause of the delay and optimize the query for better performance.
+
+   Here's a systematic approach to check and address a long-running query:
+
+   Identify the Long-Running Query for v$session viwe
+                                      v$sql
+   
+   set linesize 400 pagesize 300
+   col sid format a10
+   col SERIAL# format a10
+   col opname format a20
+   col target format a30
+   col sofar format a20
+   col totalwork format a10
+
+
+   select sid,SERIAL#,username,opname,target,sofar,totalwork,
+   
+(totalwork-sofar)/time_remaining bps, time_remaining/60 rmt, sofar/totalwork*100 fertig, sql_id from v$session_longops where time_remaining > 0 order by 8;
+
+
+   Examine query and Execution Plan
+   -------------------------------
+   * SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR('<SQL_ID>'));
+   * Check Indexes Ensure that the tables involved in the query have appropriate
+     indexes. Missing or inadequate indexes can significantly impact query performance.
+     Use tools like Oracle's SQL Tuning Advisor to suggest index improvements.
+
+
+    Review Query Structure:
+    -----------------------
+	Evaluate the structure of the query. Ensure that it is written efficiently, uses
+    appropriate joins, and includes only the necessary columns and conditions. Avoid
+    using wildcard selects (SELECT *) and consider limiting the result set.
+
+
+
+    check table stale and fagmentation 
+	---------------------------------
+	* SELECT table_name, last_analyzed, stale_stats
+      FROM dba_tab_statistics WHERE table_name = 'employe';
+
+    then stategather or reorg in this table
+
+
+
+35. How to compare that sql has taken a good plan or bad plan?
+
+    * Evaluating whether a SQL query has a good or bad execution plan involves
+      assessing the efficiency of the plan in terms of resource utilization, response time, and overall query performance.
+	  
+	  
+    Execution Time:
+   ---------------
+ * Measure the actual time taken by the query to execute. A good execution plan should
+   result in a reasonably fast execution time. You can compare the execution time against historical values or predefined performance targets.
+   
+   Resource Utilization:
+   --------------------
+   * Evaluate the resource consumption during query execution, including CPU usage,
+     memory, and I/O operations. A good execution plan minimizes resource utilization, avoiding unnecessary strain on the database server.
+
+
+    Query Cost:
+    ----------
+	* Many database management systems provide a query cost or estimated cost associated
+      with an execution plan. Lower query costs generally indicate more efficient plans. Review the cost values provided in the execution plan details.
+
+    Access Methods:
+   ---------------
+   * Assess the access methods employed by the execution plan. Look for efficient index
+     usage, full table scans when appropriate, and appropriate join methods. The plan should leverage indexes and minimize data scans where possible.
+
+
+   Filtering and Predicate Pushdown:
+   ---------------------------------
+   * Check if filters and predicates are applied early in the execution process. A good 
+     plan pushes down filtering operations to reduce the amount of data processed during execution.
+
+
+    Parallel Execution:
+    ------------------
+	* In some cases, parallel execution of a query can enhance performance. Evaluate
+      whether the execution plan utilizes parallel processing efficiently, especially for resource-intensive queries.
+
+    Index Usage:
+    ------------
+	* Confirm that indexes are used appropriately. A good execution plan utilizes indexes
+      for selective queries and avoids unnecessary full table scans. Ensure that the index statistics are up-to-date.
+	
+	Join Methods:
+	------------
+	* Examine the join methods employed in the plan. Nested loop joins, hash joins, and
+      merge joins have different performance characteristics. The chosen join method
+      should be suitable for the data distribution and join conditions.
+
+
+    Table and Index Statistics:
+	---------------------------
+	* Ensure that the statistics for tables and indexes are accurate and up-to-date.
+      Outdated statistics can lead to suboptimal execution plans. Regularly gather or update statistics using tools like Oracle's DBMS_STATS package.
+
+	
+
+36.How to check plan hash / plan ID in sql?
+
+  * To check the plan hash or plan ID for a SQL query in Oracle, you can query the V$SQL or V$SQL_PLAN views.	
+	
+  * These views provide information about executed SQL statements and their execution plans.	
+  
+  * The plan hash value uniquely identifies a specific execution plan for a SQL statement.
+	
+  *  Here's how you can check the plan hash or plan ID	
+  
+  * SELECT sql_id, plan_hash_value, sql_text
+   FROM v$sql
+   WHERE sql_text LIKE 'Your SQL Query%';
+   
+   
+  SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR('<SQL_ID>'));
+
+ 
+38. What is dataguard?
+
+    *  Data Guard is a feature in Oracle Database that provides high availability, data protection, and disaster recovery for enterprise databases.   
+    * It is a solution for creating and maintaining standby databases, which are synchronized copies of the primary database. 
+    *  The primary database and its standby(s) operate in a coordinated fashion to ensure data redundancy and continuity of operations.
+    
+	Primary Database: The primary database is the main operational database that handles read and write operations. It serves as the primary source of data.
+    
+	Standby Database: The standby database is a synchronized copy of the primary database. It can be located at a remote site for disaster recovery purposes.
+	
+	There are different types of standby databases, including physical standby, logical standby, and snapshot standby, each with specific use cases.
+
+    Redo Transport:
+	--------------
+	* Redo data, generated by transactions on the primary database, is continuously transmitted to the standby database(s).
+	*  This ensures that the standby databases are kept up-to-date with changes made on the primary database.
+	 
+	 Apply Mechanism:
+	 ---------------
+	 * Standby databases apply the redo data received from the primary database to keep
+       their data in sync. The apply mechanism depends on the type of standby database:
+
+	 * Physical Standby: Redo data is applied at the block level.
+     * Logical Standby: SQL statements are transformed and applied to maintain logical consistency.
+	 * Snapshot Standby: Acts as a read/write standby, allowing temporary divergence from the primary database.
+	 
+	 Switchover:
+    ------------
+	* Switchover is a planned, controlled role transition between the primary and standby
+      databases. It is often used for maintenance tasks, upgrades, or to temporarily make a standby database the new primary.
+	
+	 Failover:
+    ---------
+     * In the event of a failure or outage affecting the primary database, failover allows
+       a standby database to be quickly and automatically promoted to become the new primary database. This helps minimize downtime.
+	
+	
+	
+	Data Protection and Disaster Recovery:
+    --------------------------------------
+	* Data Guard provides data protection by maintaining a synchronized copy of the data
+      at a remote location. In case of a disaster or primary database failure, the standby database(s) can be activated to take over operations.
+
+	Role Transitions:
+	-----------------
+	* Role transitions involve changing the role of a database from primary to standby or
+      vice versa. These transitions can be planned (switchover) or unplanned (failover).
+
+    Data Guard Broker:
+    -----------------
+	* Data Guard Broker is a management and monitoring tool that simplifies the
+      configuration, monitoring, and maintenance of Data Guard environments. It provides a centralized interface for managing multiple databases in a Data Guard configuration.
+	
+	
+	Maximum Availability Architecture (MAA):
+    ---------------------------------------
+	*  Data Guard is a key component of Oracle's Maximum Availability Architecture, a set
+       of best practices and technologies designed to achieve the highest levels of availability and reliability for Oracle databases.
+       Data Guard is widely used in mission-critical environments where uninterrupted database operations, data protection, and disaster recovery are crucial requirements.
+
+
+      
+39.In DR? - How you are protecting data in case you dont have DR?
+ 
+ ####### Regular Backups:
+         
+		 Implement a robust backup strategy. Regularly back up your data and ensure that backup copies are stored in a secure and separate location from the primary data.
+         This can help recover data in case of accidental deletions, data corruption, or localized failures.
+ 
+      Offsite Storage:
+      ---------------
+	  Store backup copies in an offsite location to protect against site-wide disasters,
+      such as fires, floods, or earthquakes. Having backups in a geographically different location reduces the risk of losing data due to a localized event.
+   
+   Cloud Storage:
+   ------------
+   Consider leveraging cloud storage services for backups. Cloud providers often have
+   redundant data centers across different regions, offering a level of geographical  separation and ensuring data availability even in the face of regional disasters.
+
+
+   Versioning and Snapshots:
+   -------------------------
+   Use versioning or snapshots to maintain multiple versions of your data. This can be
+   helpful in recovering from accidental changes or data corruption by reverting to a known good state.
+
+	
+   Database Replication:
+   ---------------------
+   * If possible, implement database-level replication features provided by your
+     database management system. This can create copies of the database on separate servers, offering some level of redundancy.   
+	 
+    High Availability (HA) Solutions:
+    --------------------------------
+    * Explore high availability solutions that provide automated failover in case of
+      hardware or software failures. While not a complete DR solution, HA solutions can minimize downtime and data loss.
+	
+
+    Redundant Systems:
+    -----------------
+	* Deploy redundant systems and components for critical infrastructure. Redundancy in
+      servers, storage, and network components can reduce the impact of hardware failures.
+
+
+    * Business Continuity Planning: 
+	  ----------------------------
+	  * Develop and document a business continuity plan that outlines procedures for data
+        recovery and continuity of operations in the event of disruptions. This includes
+        communication plans, roles and responsibilities, and specific steps to be taken during incidents.
+
+       Security Measures:
+       ------------------
+	   * Implement strong security measures to protect against data breaches and unauthorized access. Regularly update and patch systems to address security vulnerabilities.
+       
+	   Monitoring and Alerts:
+       ---------------------
+	   * Implement monitoring systems that can detect anomalies or issues with data
+         integrity. Set up alerts to notify administrators of potential problems so that they can be addressed promptly.
+		 
+		* While a comprehensive Disaster Recovery plan is ideal for ensuring data protection
+           in various scenarios, implementing the above practices can enhance your
+           organization's ability to recover data and maintain business continuity even in the
+           absence of a dedicated DR setup. It's important to tailor these measures to the specific needs and risks of your organization.
+		   
+		   	   
+40. How to check sync status of DR?
+  
+   * To check the synchronization status of a Data Guard configuration in Oracle, you can use the Data Guard broker or query specific views in the database.
+     Here are a few methods to check the synchronization status:  
+	 
+	 Using Data Guard Broker:
+     Connect to the Primary Database:
+	 
+	 Connect to the primary database using SQL*Plus or another SQL client
+	 
+	 Start Data Guard Broker:
+    
+     Start the Data Guard broker by executing the following SQL command: ALTER SYSTEM SET DG_BROKER_START=TRUE;
+	 
+	 Query Data Guard Status:
+     SELECT * FROM V$DATAGUARD_STATUS;
+	 
+	 * This query will provide information about the synchronization status, including the state of the primary and standby databases.
+    
+	Query Detailed Configuration:
+    ----------------------------
+	* For more detailed information, you can query the V$DATABASE view on both the 
+	
+	primary and standby databases:
+    * SELECT NAME, OPEN_MODE, DATABASE_ROLE FROM V$DATABASE;
+	* This query will show the current role (PRIMARY or STANDBY) and the open mode of the database.
+	
+    Using Data Guard Views:
+    Query V$DATAGUARD_STATUS:
+
+   On the primary or standby database, you can use the following query to check the  Data Guard status:
+   SELECT * FROM V$DATAGUARD_STATUS;
+   
+   This query provides information about the current state of the Data Guard configuration.
+    Query V$ARCHIVE_DEST_STATUS:
+	
+	
+	* To check the archiver process status on the primary and standby databases, you can 
+	SELECT DEST_NAME, STATUS FROM V$ARCHIVE_DEST_STATUS;
+	
+	* This query shows the status of the archiver process, which is crucial for maintaining synchronization.
+    Query V$LOG:
+	
+  To check the log sequence numbers on the primary and standby databases, use the following query:
+  SELECT GROUP#, THREAD#, SEQUENCE# FROM V$LOG;
+  
+  Compare the log sequence numbers between the primary and standby databases to ensure synchronization.
+
+
+
+
+
+41. What is DB Link ? How DB Link works ?
+   
+   * # A database link (DB Link) in the context of databases, particularly Oracle
+       databases, is a feature that allows you to connect and access objects (tables,views, etc.) in one database from another.
+
+    Definition of Database Link:
+    ----------------------------
+	* A database link is a named connection that is defined in the Oracle database. It
+      includes information such as the network address, authentication details, and the 
+	  
+	  remote database to which it connects.
+      
+	  Creation of Database Link:
+	  -------------------------
+	  * To create a database link, a user with the necessary privileges executes a CREATE
+         DATABASE LINK SQL statement. This statement specifies the connection details and credentials for the remote database.
+       * CREATE DATABASE LINK remote_db
+         CONNECT TO username IDENTIFIED BY password
+         USING 'remote_database_tns';
+
+     Accessing Remote Objects:
+	 --------------------------
+	 Once the database link is created, users can reference objects in the remote database using a special syntax. For example, to query a table named employees in 
+    * SELECT * FROM employees@remote_db;
+	
+	
+	Security Considerations:
+	-------------------------
+	When creating a database link, it's important to consider security. The credentials
+    used in the CREATE DATABASE LINK statement determine the level of access the
+    connected user has in the remote database. Users must have the necessary privileges on the remote objects they are trying to access.
+
+
+    Types of Database Links:
+    -----------------------
+	There are two main types of database links in Oracle: private and public. 
+	Private database links are specific to a user and are only accessible by that user.
+	Public database links are shared among multiple users.
+
+
+
+     Transaction Control:
+     -------------------
+	     Transactions involving a database link are subject to commit and rollback operations. If a transaction is committed on the local database, the changes
+         affecting the remote database through the link are also committed. Similarly, a rollback on the local database also rolls back the changes on the remote database.
+
+     Network Communication:
+    -----------------------
+	When a query is executed across a database link, the Oracle database establishes a
+    connection to the remote database, sends the SQL statement for execution, and
+    retrieves the results. Network communication plays a crucial role in the performance of queries involving database links.
+
+
+    Performance Considerations:
+	----------------------------
+	While database links provide a convenient way to access data across databases, performance considerations, such as network latency and the volume of data being
+    transferred, should be taken into account. Indexing and optimizing queries involving remote objects can help improve performance.
+
+
+42. Do you know how to perform DR Drill?
+ 
+    Performing a Disaster Recovery (DR) drill is a crucial activity to test
+the readiness and effectiveness of your DR plan. A DR drill simulates a real
+disaster scenario to ensure that the organization can successfully recover its IT
+systems and data in the event of a disaster.
+
+
+perform a DR drill:
+
+Pre-Drill Preparation:
+
+Define Objectives:
+
+Clearly define the objectives and scope of the DR drill. Outline the specific
+systems, applications, and services that will be included in the simulation.
+
+
+Notify Stakeholders:
+------------------
+Inform all relevant stakeholders, including IT teams, business continuity teams,
+and external partners, about the upcoming DR drill. Clearly communicate the
+schedule and expected duration.
+
+
+Backup Systems:
+--------------
+Take backups of critical systems and data before initiating the DR drill. This
+ensures that you have a known good state to revert to if needed.
+
+Documentation Review:
+--------------------
+Review and update documentation related to the DR plan. Ensure that all procedures,
+contact lists, and recovery steps are up-to-date.
+
+
+DR Drill Execution:
+Initiate the Simulation:
+
+
+Start the DR drill by simulating the triggering event, whether it's a data center
+outage, hardware failure, or other disaster scenario.
+
+
+
+Activate DR Plan:
+---------------
+Execute the DR plan as if it were a real disaster. This includes activating standby
+systems, restoring data from backups, and implementing any necessary recovery
+procedures.
+
+
+Monitor and Evaluate:
+---------------------
+Monitor the progress of the DR drill in real-time. Evaluate the effectiveness of
+each step, including the time taken to complete tasks and the overall success of
+the recovery process.
+
+
+
+Communication:
+--------------
+Communicate regularly with stakeholders during the DR drill. Provide status
+updates, and if applicable, inform users and customers about the temporary
+unavailability of services.
+
+Inject Realism:
+---------------
+Inject realism into the drill by introducing unexpected challenges or variations.
+This could include simulated network issues, additional failures, or changes in the
+scenario to test the adaptability of the DR plan.
+
+
+Data Validation:
+----------------
+Validate the recovered data to ensure its integrity. Perform checks to verify that
+the recovered systems and applications are functioning correctly
+
+Post-Drill Activities:
+
+Debriefing:
+
+Conduct a debriefing session with key participants and stakeholders. Discuss the
+outcomes, challenges faced, and lessons learned during the DR drill.
+
+Documentation Update:
+--------------------
+Update the DR plan documentation based on the findings and feedback from the drill.
+Make any necessary adjustments to improve the plan's effectiveness.
+
+
+Training and Awareness:
+----------------------
+Provide additional training or awareness sessions for staff based on the lessons
+learned during the drill. This helps in enhancing the skills and readiness of the
+DR team.
+
+
+Report and Analysis:
+-------------------
+Generate a comprehensive report that includes a summary of the DR drill, observed
+performance metrics, and recommendations for improvement. Use this report for
+analysis and as a basis for refining the DR plan.
+
+
+
+Iterative Improvement:
+----------------------
+Use the insights gained from the DR drill to iteratively improve the DR plan.
+Address any identified weaknesses or areas for improvement to enhance the
+organization's overall readiness for a real disaster.
+
+Performing regular DR drills is essential for validating the effectiveness of your
+DR plan, identifying areas for improvement, and ensuring that your organization can
+respond effectively to unforeseen events.
+
+PRIMARY 
+-------
+select switchover_status from v$database;
+select name,open_mode,log_mode,database_role from v$database;
+
+show parameter log_archive_dest_state;
+archive log list;
+
+
+STANDBY
+------
+select name,open_mode,log_mode,database_role from v$database;
+select sequence#,first_time,next_time,applied from v$archived_log order by
+sequence#;
+
+PRIMARY
+-------
+alter system switch logfile;
+alter database commit to switchover to physical standby;
+shut immediate
+startup mount
+select name,open_mode,log_mode,database_role from v$database;
+
+STANDBY
+-------
+select name,open_mode,log_mode,database_role from v$database;
+alter database recover managed standby database cancel;
+select process,sequence#,status from v$managed_standby;
+select switchover_status from v$database;
+
+PRIMARY
+-------
+alter database recover managed standby database disconnect from session;
+select process,sequence#,status from v$managed_standby;
+
+
+STANDBY
+------
+select switchover_status from v$database;
+alter database commit to switchover to primary with session shutdown;
+alter database open;
+select name,open_mode,log_mode,database_role from v$database;
+archive log list;
+alter system switch logfile;
+/
+/
+archive log list;
+
+
+PRIMARY
+-------
+select sequence#,first_time,next_time,applied from v$archived_log order by sequence#;
+
+
+
+
+
+43 WHAT IS ORACLE WHY WE NEED USE ORACLE SERVER ?
+ 
+ Oracle Database:
+ ---------------
+  * Oracle Database is a relational database management system (RDBMS) that supports multiple data models, including relational, document, graph, and more.
+  *  It allows for the storage, retrieval, and management of large amounts of data with high availability, security, and performance.
+  
+  1.Scalability and Performance:
+  -------------------------------
+  * Real Application Clusters (RAC): Allows multiple instances to run on different servers, improving performance and providing high availability.
+  * In-Memory Database: Improves query performance by storing data in memory.
+  * Partitioning: Enhances performance and manageability by dividing large tables into smaller, more manageable pieces.
+  
+  
+  2.High Availability and Disaster Recovery:
+  ----------------------------------------
+  * Data Guard: Provides data protection and disaster recovery solutions.
+  * GoldenGate: Ensures data replication and integration across various systems
+  * Flashback Technology: Allows data to be recovered to a previous state, protecting against logical data corruption.
+  
+  
+  3.Security:
+  -----------
+  * Advanced Security Features: Includes data encryption, masking, and redaction.
+  * User and Role Management: Granular control over access and permissions.
+  * Audit Vault and Database Firewall: Provides monitoring and protection against unauthorized access.
+  
+  4.Manageability:
+  --------------
+  * Automatic Storage Management (ASM): Simplifies database storage management.
+  * Oracle Enterprise Manager: Provides a web-based interface for managing Oracle databases and applications.
+  * SQL Developer: A graphical tool for database development and management.
+  
+  5.Multitenancy:
+  ---------------
+  * Pluggable Databases (PDBs): Allows multiple databases to run under a single instance, improving resource utilization and management.
+  
+  6.Advanced Analytics:
+  ---------------------
+  * Oracle Machine Learning: Built-in machine learning algorithms for data analysis.
+  * Spatial and Graph Data: Support for spatial data types and graph analytics.
+  
+  
+  
+44.EXPLAIN DATAGURD PARAMETERS
+
+  * Oracle Data Guard is a feature of Oracle Database that ensures high availability, data protection, and disaster recovery for enterprise data
+  
+  Primary Database Parameters:
+  ----------------------------
+  
+  1.LOG_ARCHIVE_DEST_n:
+  ---------------------
+  
+  Description: Specifies up to 31 (n=1...31) destinations for archived redo logs.
+  Usage: Configures the destination for sending redo data to standby databases.
+  
+ * ALTER SYSTEM SET LOG_ARCHIVE_DEST_2='SERVICE=standby_db ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=standby_db';
+
+
+  2.LOG_ARCHIVE_DEST_STATE_n:
+  --------------------------
+  
+    Description: Enables or disables the specified destination.
+    Usage: Controls whether the archive destination is active or not.
+
+   * ALTER SYSTEM SET LOG_ARCHIVE_DEST_STATE_2=ENABLE;
+
+  3.REMOTE_LOGIN_PASSWORDFILE:
+   --------------------------
+
+      Description: Specifies the authentication method for remote logins.
+      Usage: Required for sending redo data to standby databases.
+	  
+      Values: NONE, EXCLUSIVE, SHARED.
+  
+   * ALTER SYSTEM SET REMOTE_LOGIN_PASSWORDFILE=EXCLUSIVE SCOPE=SPFILE;
+
+
+   4.FAL_SERVER:
+   ------------
+   
+   Description: Specifies the FAL (Fetch Archive Log) server for the primary database to fetch missing archive logs from.
+   Usage: Used in configurations with gap resolution.
+   
+   * ALTER SYSTEM SET FAL_SERVER=standby_db;
+
+  Standby Database Parameters
+  ----------------------------
+  
+   1.DB_FILE_NAME_CONVERT:
+
+     Description: Converts the filenames of the primary database data files to filenames for the standby database.
+     Usage: Used to ensure the correct mapping of data files between primary and standby.
+
+
+   * ALTER SYSTEM SET DB_FILE_NAME_CONVERT='/primary/data/','/standby/data/';
+
+   2.LOG_FILE_NAME_CONVERT:
+
+     Description: Converts the filenames of the primary database redo log files to filenames for the standby database.
+     Usage: Ensures the correct mapping of redo log files between primary and standby.
+	 
+    * ALTER SYSTEM SET LOG_FILE_NAME_CONVERT='/primary/logs/','/standby/logs/';
+
+
+   3.STANDBY_FILE_MANAGEMENT:
+   ------------------------
+
+   Description: Controls whether or not changes to the physical structure of the primary database are automatically propagated to the standby database.
+   Values: AUTO, MANUAL.
+   
+   * ALTER SYSTEM SET STANDBY_FILE_MANAGEMENT=AUTO;
+
+   4. FAL_CLIENT:
+     ----------
+
+    Description: Specifies the FAL (Fetch Archive Log) client name for the standby database.
+    Usage: Used in configurations with gap resolution.
+   
+    ALTER SYSTEM SET FAL_CLIENT=standby_db;
+
+
+ 9.LOG_ARCHIVE_CONFIG:
+   ------------------
+
+   Description: Specifies the Data Guard configuration parameters, including the unique database names for the primary and standby databases.
+   Usage: Defines the Data Guard configuration.
+   
+   ALTER SYSTEM SET LOG_ARCHIVE_CONFIG='DG_CONFIG=(primary_db,standby_db)';
+ 
+
+
+45.after restoring database archive logs is not there so what you do?
+
+A.1.we need to check archive log dest  
+  
+  show parameter archive_log_dest
+  connect to database
+  
+  sqlplus / as sysdba
+  
+  >>>we need to recver database two ways (time) and using (scn)
+  
+  >>recover database until scn <scn number>
+  
+  we need to check the archive logs
+  
+  >>show archivelog list
+  
+  >>select * from v$archived_log
+  
+  
+  
+  
+  20. If you are taking full db backup on your env, how to configure each db so that size should not go beyond 100TB.
+  
+  These compression levels are categorized as BASIC, LOW, MEDIUM, and HIGH
+  1. BASIC Compression
+  
+  Description: The BASIC compression level provides a good balance between compression ratio and CPU usage. It is available without any additional licensing requirements.
+
+Usage: Suitable for environments where moderate CPU overhead is acceptable, and no extra licensing cost is preferred.
+
+BACKUP AS COMPRESSED BACKUPSET DATABASE;
+
+2. LOW Compression
+------------------
+Description: The LOW compression level provides the least amount of compression, resulting in the lowest CPU usage.
+ This level is intended for scenarios where minimizing CPU overhead is more critical than reducing backup storage size.
+
+Usage: Ideal for systems with limited CPU resources where the primary goal is to perform backups with minimal impact on performance.
+
+BACKUP AS COMPRESSED BACKUPSET DATABASE
+USING COMPRESSED BACKUPSET;
+
+
+3. MEDIUM Compression
+----------------------
+Description: The MEDIUM compression level offers a balance between compression ratio and CPU usage, providing better compression than LOW but with moderate CPU usage.
+
+Usage: Suitable for environments where a reasonable balance between backup size and CPU resource consumption is required.
+
+BACKUP AS COMPRESSED BACKUPSET DATABASE
+USING COMPRESSED BACKUPSET;
+
+
+4. HIGH Compression
+-------------------
+Description: The HIGH compression level achieves the highest compression ratio, resulting in the smallest possible backup size. 
+This level consumes the most CPU resources.
+
+Usage: Best suited for environments where storage savings are a priority and sufficient CPU resources are available to handle the increased processing overhead.
+
+
+BACKUP AS COMPRESSED BACKUPSET DATABASE
+USING COMPRESSED BACKUPSET;
+
+
+
+* how to tack expdp metadata?
+expdp your_user/your_password@your_service_name DIRECTORY=dpump_dir DUMPFILE=metadata.dmp CONTENT=METADATA_ONLY LOGFILE=metadata_export.log

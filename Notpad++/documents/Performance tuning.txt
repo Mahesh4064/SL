@@ -1,0 +1,91 @@
+Performance tuning in Oracle:
+
+1. Understanding the Environment:
+Hardware resources: CPU, memory, disk I/O, and network.
+Database configuration: Initialization parameters, storage structures, and schema design.
+Workload characteristics: Types of transactions, volume, and peak usage times.
+
+
+2. Identifying Performance Bottlenecks:
+Use Oracle's diagnostic tools to identify areas where performance can be improved:
+
+Automatic Workload Repository (AWR): Collects, processes, and maintains performance statistics.
+Automatic Database Diagnostic Monitor (ADDM): Analyzes AWR data to identify performance issues.
+Statspack: A tool to collect and report on database performance data.
+Oracle Enterprise Manager (OEM): Provides a graphical interface to monitor and manage Oracle databases.
+
+
+3. SQL Tuning:
+SQL statements often contribute to performance problems. Optimizing SQL queries can have a significant impact:
+
+Execution Plans: Use EXPLAIN PLAN and SQL*Plus AUTOTRACE to understand how SQL statements are executed.
+Indexes: Ensure that appropriate indexes are in place. Use CREATE INDEX to create indexes and ANALYZE to maintain them.
+Bind Variables: Use bind variables to reduce parsing overhead.
+Hints: Provide directives to the optimizer to choose a particular execution plan.
+Partitioning: Divide large tables into smaller, more manageable pieces.
+
+
+4. Instance Tuning:
+Instance tuning involves configuring Oracle's memory and processes to improve performance:
+
+Memory Allocation:
+SGA (System Global Area): Adjust the size of components like the buffer cache, shared pool, and large pool.
+PGA (Program Global Area): Configure the PGA for efficient sort and hash operations.
+Initialization Parameters: Tune parameters such as DB_CACHE_SIZE, SHARED_POOL_SIZE, PGA_AGGREGATE_TARGET, and SGA_TARGET.
+Background Processes: Ensure that background processes like DBWR, LGWR, CKPT, and ARCH are operating efficiently.
+
+5. Storage Tuning:
+Storage configuration impacts database performance significantly:
+
+Tablespace Management: Use locally managed tablespaces and automatic segment space management.
+Data Files: Distribute data files across multiple disks to balance I/O load.
+Redo Logs: Optimize the size and placement of redo log files.
+Undo Management: Properly configure undo tablespaces and retention settings.
+
+
+6. Network Tuning:
+Optimize network settings to reduce latency and improve data transfer rates:
+
+SDU and TDU: Adjust the Session Data Unit (SDU) and Transport Data Unit (TDU) settings.
+Multiplexing: Use Oracle Net connection pooling and multiplexing to reduce network overhead.
+Compression: Enable network compression for large data transfers.
+
+
+7. Application Design:
+Ensure that the application design supports efficient database operations:
+
+Connection Pooling: Use connection pooling to manage database connections efficiently.
+Batch Processing: Process large volumes of data in batches to reduce transaction overhead.
+Efficient Data Access: Avoid unnecessary data retrieval and processing.
+
+
+
+8. Monitoring and Maintenance:
+Continuously monitor and maintain the database to ensure optimal performance:
+
+AWR Reports: Regularly generate and review AWR reports to identify trends and issues.
+ADDM Analysis: Use ADDM recommendations to address performance problems.
+Health Checks: Perform regular health checks and database maintenance tasks like statistics gathering, index rebuilding, and data file defragmentation.
+
+
+AWR Reports:
+EXEC DBMS_WORKLOAD_REPOSITORY.create_snapshot;
+@?/rdbms/admin/awrrpt.sql
+
+
+ADDM Analysis:
+EXEC DBMS_ADDM.ANALYZE_DB(performance_data);
+
+
+
+SQL Execution Plan:
+EXPLAIN PLAN FOR <SQL statement>;
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+
+Statspack:
+@?/rdbms/admin/spreport.sql
+
+V$SESSION_LONGOPS: Used to monitor long-running operations and their progress.
+V$SESSION: Provides details about all active sessions, useful for monitoring session activity and performance.
+V$SQL: Contains information about SQL statements in the shared SQL area, useful for SQL performance tuning and analysis. 

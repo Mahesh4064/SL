@@ -1,0 +1,138 @@
+Step-1:-
+--------------Check both primary and standby role------------------
+Primary:-    
+    SQL> select name, open_mode, database_role from v$database;
+Standby:-
+    SQL> select name, open_mode, database_role from v$database;
+    
+
+
+first check dr and prod is in sync
+then,
+alter system switch logfile; 
+
+Again check dr and prod status                                
+
+select flashback_on from v$database;                        
+
+Step 2:-
+-----------------Check the archived sequence in standby-----------------
+select thread#,max(sequence#) from v$archived_log group by thread#;
+
+
+Step 3:-
+----------------Check the flashback status and db_recovery_file_set location------------
+select flashback_on from v$database;
+alter database flashback on;
+show parameter db_recovery_file_dest
+
+
+CREATE RESTORE POINT snapshot1 GUARANTEE FLASHBACK DATABASE;
+Step 4:  
+--------------In standby side,stop the mrp process.--------------
+alter database recover managed standby database cancel;
+
+
+---------------to check the ASM dislgroup size--------------------------
+check ASM_DISKGROUP size with command
+        select name,state,total_mb,free_mb,total_mb-free_mb "USED_MB", (free_mb/total_mb)*100 "%Free MB" from v$asm_diskgroup order by 1;
+        SELECT name, free_mb, total_mb, free_mb/total_mb*100 as percentage FROM v$asm_diskgroup;
+
+
+Step 5 :
+------------------------Bounce the database and keep in mount stage---------------------
+SQL> shut immediate
+
+SQL> startup mountfcprd3gl
+
+
+Step 6 :
+---------------------- physical DR to snapshot -----------------
+
+alter database convert to snapshot standby;
+
+alter database open;
+
+select status, instance_name, database_role,open_mode from v$database, v$instance;
+
+Step 7 :
+-------------In Standby Side,bounce and mount the database
+............................................................................for snapshot to physical......................
+SQL> shut immediate
+
+SQL> startup mount
+
+
+
+Step 7A: 
+----------------snapshot to physical DR-----------
+
+alter database convert to physical standby;
+
+
+
+
+select name,open_mode,database_role from v$database;
+
+Step 8:
+--------------- Enable the MRP process----------
+
+
+SQL> alter database recover managed standby database disconnect from session;
+
+
+drop restore point snapshot;
+
+select * from v$restore_point;
+
+----------------------------------------------------------------second putty------------------
+
+
+
+ssh 192.168.29.133 
+pass oracle
+
+
+export $ORACLE_SID=FCRPOD2
+
+sqlp
+startup;
+select status, instance_name, database_role,open_mode from v$database, v$instance;
+
+
+export $ORACLE_SID=FCPRD3GL2
+
+sqlp
+startup;
+select status, instance_name, database_role,open_mode from v$database, v$instance;
+
+export $ORACLE_SID=OBDXPROD2
+
+sqlp
+startup;
+select status, instance_name, database_role,open_mode from v$database, v$instance;
+
+once the activty is complete shutdown all the nodes on 192.168.29.133
+
+export $ORACLE_SID=FCRPOD2
+
+sqlp
+shutdown immdiate;
+
+export $ORACLE_SID=FCPRD3GL2
+
+sqlp
+shutdown immdiate;
+
+
+export $ORACLE_SID=OBDXPROD2
+
+sqlp
+shutdown immdiate;
+-------------------------END-----------------
+ 
+
+
+now come to Step 7A: 
+
+snapshot to physical DR

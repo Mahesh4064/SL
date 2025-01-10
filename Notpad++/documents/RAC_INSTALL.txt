@@ -1,0 +1,311 @@
+
+The package oracle-database-preinstall-19c
+contains all the prerequisites on Oracle Linux using the Oracle Unbreakable Enterprise Kernel (UEK). 
+
+yum install -y oracle* --skip-broken
+yum install -y oracle-database-preinstall-19c
+yum install -y oracleasm-support
+sysctl -p
+
+crosscheck >>>  cat /etc/sysctl.conf
+
+
+                  groups oracle
+group checking >> getent group
+
+Group Creation:
+
+groupadd -g 5001 oinstall
+groupadd -g 5002 dba
+groupadd -g 5003 oper
+groupadd -g 5004 asmadmin 
+groupadd -g 5005 asmdba
+groupadd -g 5006 asmoper
+
+
+User Creation:
+
+useradd -u 5007 -g oinstall -G dba,oper,asmdba oracle
+useradd -u 5008 -g oinstall -G asmadmin,asmdba,asmoper,dba grid
+
+usermod -g oinstall -G dba,oper,asmdba oracle
+usermod -g oinstall -G asmadmin,asmdba,asmoper,dba grid
+
+passwd oracle
+passwd grid
+
+
+sudo nano /etc/security/limits.conf
+
+
+# Increase file descriptor limits for the oracle user
+oracle soft nofile 1024
+oracle hard nofile 65536
+
+# Increase the number of processes limits for the oracle user
+oracle soft nproc 16384
+oracle hard nproc 16384
+
+# Increase the stack size limits for the oracle user
+oracle soft stack 10240
+oracle hard stack 32768
+
+# Increase the memory lock limits for the oracle user
+oracle soft memlock 134217728
+oracle hard memlock 134217728
+
+# Increase file descriptor limits for the grid user
+grid soft nofile 1024
+grid hard nofile 65536
+
+# Increase the number of processes limits for the grid user
+grid soft nproc 16384
+grid hard nproc 16384
+
+# Increase the stack size limits for the grid user
+grid soft stack 10240
+grid hard stack 32768
+
+# Increase the memory lock limits for the grid user
+grid soft memlock 134217728
+grid hard memlock 134217728
+
+
+
+
+Create the directories in which the Oracle / Grid software will be installed.
+
+mkdir -p /u01/app/grid
+mkdir -p /u01/app/19c/gridhome_1
+mkdir -p /u02/app/oracle
+mkdir -p /u02/app/oracle/product/19c/dbhome_1
+mkdir -p /u01/app/oraInventory
+mkdir -p /u01/LATEST_PATCH/
+chown -R grid:oinstall /u01
+chown -R oracle:oinstall /u02
+chown -R grid:oinstall /u01/app/oraInventory
+chmod -R 775 /u01
+chmod -R 775 /u02
+
+
+
+Set bash_profile for grid and oracle user login to grid user and set .bash_profile :
+
+
+
+nano .bash_profile
+
+export TMP=/tmp
+export TMPDIR=$TMP
+export ORACLE_BASE=/u01/app/grid
+export ORACLE_HOME=/u01/app/19c/gridhome_1
+export ORACLE SID=+ASM1
+export ORACLE TERM=xterm
+export BASE_PATH=/usr/sbin:$PATH
+export PATH=$ORACLE_HOME/bin:$BASE PATH
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=$ORACLE_HOME/JRE:$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+export PATH=/bin:/usr/bin:/usr/sbin:$PATH
+
+------------------------
+source ~/.bash_profile
+
+
+login to oracle user and set .bash_profile :
+
+export TMP=/tmp
+export TMPDIR=$TMP
+export ORACLE_BASE=/u02/app/oracle
+export ORACLE_HOME=/u02/app/oracle/product/19c/dbhome_1
+export ORACLE_SID=prodl
+export ORACLE TERM=xterm
+export BASE_PATH=/usr/sbin:$PATH
+export PATH=$ORACLE_HOME/bin:$BASE PATH
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=$ORACLE_HOME/JRE:$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+export PATH=/bin:/usr/bin:/usr/sbin:$PATH
+
+
+---------------------------------------------
+
+source ~/.bash_profile
+
+
+===========================
+Add the following entry in /etc/hosts file and crosscheck node rea Primary Site:
+
+
+Add the following entry in /etc/hosts file and crosscheck node reachability Primary Site:
+localhost localhost.localdomain localhost4 localhost4.localdomain4 localhost localhost.localdomain localhost6 localhost6.localdomain6
+127.0.0.1
+::1
+
+
+127.0.0.1 localhost.db.com localhost
+# Public
+192.168.0.171 db1.db.com db1
+192.168.0.172 db2.db.com db2
+# Private
+192.168.1.171 db1-priv.db.com db1-priv
+192.168.1.172 db2-priv.db.com db2-priv
+# Virtual
+192.168.0.181 db1-vip.db.com db1-vip
+192.168.0.182 db2-vip.db.com db2-vip
+# SCAN
+192.168.0.191 db-scan.db.com db-scan
+192.168.0.192 db-scan.db.com db-scan
+192.168.0.193 db-scan.db.com db-scan
+
+
+
+
+
+Firewall Stop and Disable
+We can open firewall after installation
+
+systemctl stop   firewalld
+systemctl disable firewalld
+
+Chrony NTP Configuration
+
+
+yum install ntp -y
+
+systemctl enable ntpd
+systemctl restart ntpd
+
+yum install chrony -y
+
+systemctl enable chronyd
+systemctl restart chronyd
+
+
+chronyc -a 'burst 4/4'
+chronyc -a makestep
+
+systemctl status ntpd
+
+
+===>disk partion<<====================================
+
+
+Create shared ASM Disk FOR OCR, DATAFILE and ARCHIVE on Both Sites
+Add new shared disk to virtual box machines it should be sharable
+
+Login to system and run ls /dev/sd
+
+
+
+
+fdisk -l | grep /dev/sd
+
+printf "o\nn\np\n1\n\n\nw\n" | sudo fdisk /dev/sdb
+
+printf "o\nn\np\n1\n\n\nw\n" | sudo fdisk /dev/sdc
+
+printf "o\nn\np\n1\n\n\nw\n" | sudo fdisk /dev/sdd
+
+
+
+
+Set ASM disks >>>> oracleasm configure -i
+intial >>>>>>      oracleasm init
+Create ASM disks >>>> oracleasm createdisk ASM1 /dev/sdb1
+Scan ASM disks >>>> oracleasm scandisks
+                    oracleasm listdisks
+
+
+oracleasm createdisk ASM_OCR  /dev/sdb1
+oracleasm createdisk ASM_DATA /dev/sdc1
+oracleasm createdisk ASM_RECO /dev/sdd1
+
+========================================================================================
+
+Now we will Bring Down Nodel i.e. Prodl and clone it to 3 more nodes i.e Prod2, STBY1, STBY2
+After cloning start each node one by one and make changes i.e. modify Hostname, ORACLE_SID in bash_profile, Network file on standby side.
+
+Use below command to change Hostnames:
+
+nmcli general hostname
+nmcli general hostname prod2.localdomain
+nmcli general hostname
+service systemd-hostnamed restart
+
+nmcli general hostname
+nmcli general hostname stbyl.localdomain
+nmcli general hostname
+service systemd-hostnamed restart
+
+nmcli general hostname
+nmcli general hostname stby2.localdomain
+nmcli general hostname
+service systemd-hostnamed restart
+
+
+================================================
+
+
+
+ping -c 2 stbyl-priv
+ping -c 2 stby2-priv
+ping -c 2 stbyl
+ping -c 2 stby2
+ping -c 2 stby-scan
+ping -c 2 prodi-priv 
+ping c 2 prod2-priv 
+ping -c 2 prod1 
+ping -c 2 prod2
+ping -c 2 prod-scan
+
+##########################################################
+
+UNZIP GRID FILE >> IN Grid_HOME
+UNZIP ORACLE_HOME>> IN ORACLE_HOME
+
+######### On Primary Site ##################################
+
+Copy software to nodel on primary site and unzip software at grid home location and rdbms home locations by login to respective users Setup passwordless ssh configuration
+
+cd /u01/app/19c/gridhome_1/deinstall
+
+./sshUserSetup.sh -user grid -hosts "prod1 prod2" -noPrompt Passphrase -confirm -advanced
+
+Similarly do it for oracle user
+
+cd /u02/app/oracle/product/19c/dbhome_1/deinstall
+
+./sshUserSetup.sh user oracle -hosts "prod1 prod2" -noPromptPassphrase confirm -advanced
+
+./sshUserSetup.sh user root -hosts "prod1 prod2" -noPromptPassphrase confirm -advanced
+
+Set profile and go to ORACLE_HOME location from grid user and run following command and follow the steps.
+
+
+
+scp cvuqdisk-1.0.10-1.rpm root@prod2:/tmp
+rpm -i cvuqdisk-1.0.10-1.rpm
+
+
+cd $ORACLE HOME
+
+./gridSetup.sh -applyRU /u01/LATEST_PATCH/32$45008
+
+Once Grid Installation done, Install RDBMS Software through oracle user and create RAC database prod (check our previous video's for more detail)
+
+ ./runInstaller -applyRU /u01/LATEST PATCH/32545008
+ 
+Use DBCA to create database prod
+
+
+####Primary Site Step 1: ################################
+
+Enable Forced Logging on Primary: 
+
+select name, open_mode, cdb from v$database;
+ 
+select force_logging from v$database;
+ALTER DATABASE FORCE LOGGING; >>>>> change using this command 
+select force_logging from v$database; >>>>> Verify changes
+
+
+

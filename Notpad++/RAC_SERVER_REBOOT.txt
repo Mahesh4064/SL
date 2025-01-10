@@ -1,0 +1,138 @@
+srvctl stop database -d ONELMSML
+
+srvctl start database -d ONELMSCLDR -o mount
+srvctl start database -d ONELMSDR -o mount
+srvctl start database -d ONELMSFRDR -o mount
+srvctl start database -d ONELMSMLDR -o mount
+
+
+srvctl start database -d ONELMSML
+srvctl status database -d ONELMSML
+
+[oracle@ltgdl2vslmsdbo01 dbscripts]$ srvctl config database ==============Delhi DR 
+ONELMSCLDR
+ONELMSDR
+ONELMSFRDR
+ONELMSMLDR
+
+[oracle@povsltflipslmsdb5 dbscripts]$ srvctl config database ================NDR 
+ONELMS_CL
+ONELMSCLDR
+ONELMSDR
+ONELMSFRDR
+ONELMSMLDR
+
+
+
+TO STOP RAC INSTANCE:
+***********************************
+Oracle or grid user
+
+1)CHECK INSTANCE STATUS
+========================
+srvctl status instance -d ONE_LMS  -i ONELMS1 -v 
+srvctl status instance -d ONELMSML -i ONELMSML1 -v 
+srvctl status instance -d ONELMSCL -i ONELMSCL1 -v 
+srvctl status instance -d ONELMSFR -i ONELMSFR1 -v 
+
+srvctl status instance -d ONE_LMS  -i ONELMS2 -v 
+srvctl status instance -d ONELMSML -i ONELMSML2 -v 
+srvctl status instance -d ONELMSCL -i ONELMSCL2 -v 
+srvctl status instance -d ONELMSFR -i ONELMSFR2 -v 
+
+srvctl status instance -d ONE_LMS   -i ONELMS3 -v 
+srvctl status instance -d ONELMSML -i ONELMSML3 -v 
+srvctl status instance -d ONELMSCL -i ONELMSCL3 -v 
+srvctl status instance -d ONELMSFR -i ONELMSFR3 -v 
+
+2) STOP INSTANCE CMD
+========================
+srvctl start instance -d ONE_LMS -i ONELMS1
+srvctl stop instance -d ONELMSML -i ONELMSML1
+srvctl start instance -d ONELMSCL -i ONELMSCL1
+srvctl stop instance -d ONELMSFR -i ONELMSFR1
+
+srvctl stop instance -d ONE_LMS -i ONELMS2
+srvctl stop instance -d ONELMSML -i ONELMSML2
+srvctl stop instance -d ONELMSCL -i ONELMSCL2
+srvctl stop instance -d ONELMSFR -i ONELMSFR2
+
+srvctl start instance -d ONE_LMS -i ONELMS3
+srvctl stop instance -d ONELMSML -i ONELMSML3
+srvctl start instance -d ONELMSCL -i ONELMSCL2
+srvctl stop instance -d ONELMSFR -i ONELMSFR3
+
+3)SWITCH TO ROOT USER THEN FROM GRID_HOME/BIN USE BELOW CMD
+============================================================
+
+sudo su -
+oracle@123
+
+ps -ef | grep tns--->add the home path.
+
+. oraenv +ASM2/+ASM3/+AMS1
+
+crsctl check crs
+crsctl stat res -t
+crsctl stop crs
+*************************************************************
+METHOD 2:
+
+GO TO grid home /bin then use below cmd.
+
+./crsctl check crs
+./crsctl stat res -t
+./crsctl stop crs
+====================================
+
+TO START RAC INSTANCE
+=====================
+sudo su -
+oracle@123 
+
+. oraenv +ASM2/+ASM3/+AMS1
+
+
+./crsctl check crs
+./crsctl stat res -t
+./crsctl start crs 
+
+
+crsctl check crs
+crsctl stat res -t
+crsctl start crs    (WAIT FOR 5 TO 10 MIN)--->after AMS instance comes thhen use below cmds
+
+2) START INSTANCE CMD
+=====================
+srvctl start instance -d ONE_LMS  -i ONELMS1
+srvctl start instance -d ONELMSML -i ONELMSML1
+srvctl start instance -d ONELMSCL -i ONELMSCL1
+srvctl start instance -d ONELMSFR -i ONELMSFR1
+
+srvctl start instance -d ONE_LMS  -i ONELMS2
+srvctl start instance -d ONELMSML -i ONELMSML2
+srvctl start instance -d ONELMSCL -i ONELMSCL2
+srvctl start instance -d ONELMSFR -i ONELMSFR2
+
+srvctl start instance -d ONE_LMS  -i ONELMS3
+srvctl start instance -d ONELMSML -i ONELMSML3
+srvctl start instance -d ONELMSCL -i ONELMSCL3
+srvctl start instance -d ONELMSFR -i ONELMSFR3
+
+3)CHECK INSTANCE STATUS
+========================
+srvctl status instance -d ONE_LMS  -i ONELMS1 -v 
+srvctl status instance -d ONELMSML -i ONELMSML1 -v 
+srvctl status instance -d ONELMSCL -i ONELMSCL1 -v 
+srvctl status instance -d ONELMSFR -i ONELMSFR1 -v
+
+srvctl status instance -d ONE_LMS  -i ONELMS2 -v 
+srvctl status instance -d ONELMSML -i ONELMSML2 -v 
+srvctl status instance -d ONELMSCL -i ONELMSCL2 -v 
+srvctl status instance -d ONELMSFR -i ONELMSFR2 -v
+ 
+srvctl status instance -d ONE_LMS  -i ONELMS3 -v 
+srvctl status instance -d ONELMSML -i ONELMSML3 -v 
+srvctl status instance -d ONELMSCL -i ONELMSCL3 -v 
+srvctl status instance -d ONELMSFR -i ONELMSFR3 -v
+ 

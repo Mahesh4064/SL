@@ -1,0 +1,626 @@
+192.168.223.130   testhost testhost.localdomain
+
+192.168.122.1  ol8-19  ol8-19.localdomain
+192.168.223.1---dell
+192.168.223.131
+
+
+scp SPFILEMAHESH1.ORA 192.168.223.131:C:\u01\app\oracle\product\19c\dbhome_1\dbs
+
+RMAN> RUN
+{
+  ALLOCATE CHANNEL ch11 TYPE DISK MAXPIECESIZE 10G;
+  ALLOCATE CHANNEL ch12 TYPE DISK MAXPIECESIZE 10G;
+  ALLOCATE CHANNEL ch13 TYPE DISK MAXPIECESIZE 10G;
+  BACKUP
+  FORMAT '%d_D_%T_%u_s%s_p%p'
+  INCREMENTAL LEVEL 0 DATABASE
+  CURRENT CONTROLFILE
+  FORMAT '%d_C_%T_%u'
+  SPFILE
+  FORMAT '/%d_S_%T_%u'
+  PLUS ARCHIVELOG
+  FORMAT '/%d_A_%T_%u_s%s_p%p';
+  RELEASE CHANNEL ch11;
+  RELEASE CHANNEL ch12;
+  RELEASE CHANNEL ch13;
+}
+
+
+
+ BACKUP   INCREMENTAL LEVEL 0 DATABASE  CURRENT CONTROLFILE  SPFILE PLUS ARCHIVELOG
+ 
+ RMAN> backup incremental level 0 database plus current control file plus archivelog plus spfile
+ 
+ RMAN> BACKUP INCREMENTAL LEVEL 0 DATABASE PLUS CURRENT CONTROLFILE PLUS ARCHIVELOG PLUS SPFILE
+ 
+ 
+ vi /etc/sysconfig/network-scripts/ifcfg-eth0
+ DEVICE=eth0
+ HWADDR=00:0C:29:AC:47:B5
+ TYPE=Ethernet
+ NETMASK=255.255.255.0
+ IPADDR=192.168.223.132
+ UUID=F44AB6DF-1DBA-4424-Babc-c55f4c6985ba
+ ONBOOT=YES
+ NM_CONTROLLED=YES
+ BOOTPROTO=dhcp
+ 
+ifconfig eth0 up
+
+
+ip addr add 192.168.223.132/255.255.255.0 dev ens160
+
+
+[root@ol8-19 user]# vi /etc/sysconfig/network-scripts/ifcfg-ens160
+
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+NAME=ens160
+UUID=99dcc730-b353-4f84-ba47-3a6e609d7140
+DEVICE=ens160
+ONBOOT=yes
+NM_CONTROLLED=yes
+
+# Static IP configuration
+IPADDR=192.168.223.132
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.2
+DNS1=8.8.8.8
+DNS2=8.8.4.4
+
+PREFIX=24
+
+
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=dhcp
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=yes
+IPV6INIT=no
+IPV6_AUTOCONF=no
+IPV6_DEFROUTE=no
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens160
+UUID=3337c131-5f77-43d8-8230-a5d3dae50948
+DEVICE=ens160
+ONBOOT=yes
+
+
+NM_CONTROLLED=yes
+
+# Static IP configuration
+IPADDR=192.168.223.132
+NETMASK=255.255.255.0
+GATEWAY=192.168.223.4
+DNS1=8.8.8.8
+DNS2=8.8.4.4
+
+PREFIX=24
+
+
+
+8.223.0/24 dev ens160 proto kernel scope link src 192.168.223.130 metric 100 
+[oracle@testhost ~]$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.223.2   0.0.0.0         UG    100    0        0 ens160
+192.168.122.0   0.0.0.0         255.255.255.0   U     0      0        0 virbr0
+192.168.223.0   0.0.0.0         255.255.255.0   U     100    0        0 ens160
+[oracle@testhost ~]$ 
+
+
+ip route add default via 192.168.1.2
+
+
+ifconfig ens160 up
+ip route add default via 192.168.1.2 dev ens160
+
+
+ip route add default via 192.168.223.4 dev ens160
+
+
+DEVICE=ens160
+BOOTPROTO=none
+ONBOOT=yes
+IPADDR=192.168.223.132
+NETMASK=255.255.255.0
+
+
+sudo vi /etc/NetworkManager/NetworkManager.conf
+
+redhat-config-network
+sudo ip addr add 192.168.122.1 /24 dev vibr0
+
+
+cat /etc/redhat-release
+Red Hat Enterprise Linux release 8.9 (Ootpa)
+
+
+
+
+export CV_ASSUME_DISTID=RHEL8
+
+
+
+ ./runInstaller
+
+
+
+
+Could not open virtual machine "TEST" (C:\Users\valle\OneDrive\Documents\Virtual Machines\Red Hat Enterprise Linux 8 64-bit (2)\Red Hat Enterprise Linux 8 64-bit (2).vmx):
+
+
+
+hostnamectl set-hostname=prod.localdomain
+192.168.223.133  prod.localdomain  prod
+
+ 192.168.223.134  ol8-19.localdomain  ol8-19
+
+hostnamectl set-hostname ol8-19.localdomain
+
+
+
+xhost +192.168.223.133
+
+vi /home/oracle/scripts/setEnv.sh
+
+
+mahesh1:/u01/app/oracle/product/19.0.0/dbhome_1:Y
+
+DISPLAY=192.168.223.133:0.0; export DISPLAY
+
+CREATE TABLESPACE my_tablespace
+    DATAFILE 'D:\u01\app\oracle\oradata\MAHESH1.dbf'
+    SIZE 100M
+    AUTOEXTEND ON
+    NEXT 10M
+    MAXSIZE 500M;
+
+
+unzip LINUX.X64_193000_db_home.zip -d /u01/app/oracle/product/19C/dbhome/
+
+
+C:\Users\valle\VirtualBox VMs\oraclelab1
+
+C:\Users\valle\VirtualBox VMs
+
+
+===========================
+dnf install -y oracle-database-preinstall-19c
+ dnf update -y
+curl -o oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm
+
+dnf -y localinstall oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm
+
+vi /etc/sysctl.conf
+fs.file-max = 6815744
+kernel.sem = 250 32000 100 128
+kernel.shmmni = 4096
+kernel.shmall = 1073741824
+kernel.shmmax = 4398046511104
+kernel.panic_on_oops = 1
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048576
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.default.rp_filter = 2
+fs.aio-max-nr = 1048576
+net.ipv4.ip_local_port_range = 9000 65500
+
+
+
+/sbin/sysctl -p
+
+vi /etc/security/limits.d/oracle-database-preinstall-19c.conf
+oracle   soft   nofile    1024
+oracle   hard   nofile    65536
+oracle   soft   nproc    16384
+oracle   hard   nproc    16384
+oracle   soft   stack    10240
+oracle   hard   stack    32768
+oracle   hard   memlock    134217728
+oracle   soft   memlock    134217728
+
+
+
+
+dnf install -y bc    
+dnf install -y binutils
+dnf install -y compat-libcap1
+dnf install -y compat-libstdc++-33
+dnf install -y dtrace-modules
+dnf install -y dtrace-modules-headers
+dnf install -y dtrace-modules-provider-headers
+dnf install -y dtrace-utils
+dnf install -y elfutils-libelf
+dnf install -y elfutils-libelf-devel
+dnf install -y fontconfig-devel
+dnf install -y glibc
+dnf install -y glibc-devel
+dnf install -y ksh
+dnf install -y libaio
+dnf install -y libaio-devel
+dnf install -y libdtrace-ctf-devel
+dnf install -y libXrender
+dnf install -y libXrender-devel
+dnf install -y libX11
+dnf install -y libXau
+dnf install -y libXi
+dnf install -y libXtst
+dnf install -y libgcc
+dnf install -y librdmacm-devel
+dnf install -y libstdc++
+dnf install -y libstdc++-devel
+dnf install -y libxcb
+dnf install -y make
+dnf install -y net-tools # Clusterware
+dnf install -y nfs-utils # ACFS
+dnf install -y python # ACFS
+dnf install -y python-configshell # ACFS
+dnf install -y python-rtslib # ACFS
+dnf install -y python-six # ACFS
+dnf install -y targetcli # ACFS
+dnf install -y smartmontools
+dnf install -y sysstat
+
+# Added by me.
+dnf install -y gcc
+dnf install -y unixODBC
+
+
+dnf install -y libnsl
+dnf install -y libnsl.i686
+dnf install -y libnsl2
+dnf install -y libnsl2.i686
+
+
+
+groupadd -g 54321 oinstall
+groupadd -g 54322 dba
+groupadd -g 54323 oper 
+groupadd -g 54324 backupdba
+groupadd -g 54325 dgdba
+groupadd -g 54326 kmdba
+groupadd -g 54327 asmdba
+groupadd -g 54328 asmoper
+groupadd -g 54329 asmadmin
+groupadd -g 54330 racdba
+
+useradd -u 54321 -g oinstall -G dba,oper oracle
+
+passwd oracle
+
+
+vi /etc/selinux/config
+SELINUX=permissive
+after restart run bell command
+setenforce Permissive
+
+
+systemctl stop firewalld
+systemctl disable firewalld
+
+mkdir -p /u01/app/oracle/product/19.0.0/dbhome_1
+mkdir -p /u02/oradata
+chown -R oracle:oinstall /u01 /u02
+chmod -R 775 /u01 /u02
+
+
+xhost +192.168.223.134
+mkdir /home/oracle/scripts
+
+cat > /home/oracle/scripts/setEnv.sh <<EOF
+Oracle Settings
+export TMP=/tmp
+export TMPDIR=\$TMP
+
+export ORACLE_HOSTNAME=ol8-19.localdomain
+export ORACLE_UNQNAME=cdb1
+export ORACLE_BASE=/u01/app/oracle
+export ORACLE_HOME=\$ORACLE_BASE/product/19.0.0/dbhome_1
+export ORA_INVENTORY=/u01/app/oraInventory
+export ORACLE_SID=cdb1
+export PDB_NAME=pdb1
+export DATA_DIR=/u02/oradata
+
+export PATH=/usr/sbin:/usr/local/bin:\$PATH
+export PATH=\$ORACLE_HOME/bin:\$PATH
+
+export LD_LIBRARY_PATH=\$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=\$ORACLE_HOME/jlib:\$ORACLE_HOME/rdbms/jlib
+EOF
+
+
+
+
+echo ". /home/oracle/scripts/setEnv.sh" >> /home/oracle/.bash_profile
+
+cat > /home/oracle/scripts/start_all.sh <<EOF
+#!/bin/bash
+. /home/oracle/scripts/setEnv.sh
+
+export ORAENV_ASK=NO
+. oraenv
+export ORAENV_ASK=YES
+
+dbstart \$ORACLE_HOME
+EOF
+
+
+cat > /home/oracle/scripts/stop_all.sh <<EOF
+#!/bin/bash
+. /home/oracle/scripts/setEnv.sh
+
+export ORAENV_ASK=NO
+. oraenv
+export ORAENV_ASK=YES
+
+dbshut \$ORACLE_HOME
+EOF
+
+chown -R oracle:oinstall /home/oracle/scripts
+chmod u+x /home/oracle/scripts/*.sh
+
+
+
+~/scripts/start_all.sh
+~/scripts/stop_all.sh
+
+
+DISPLAY=192.168.223.134:0.0; export DISPLAY
+
+# Unzip software.
+cd $ORACLE_HOME
+unzip -oq /path/to/software/LINUX.X64_193000_db_home.zip
+
+# Fake Oracle Linux 7.
+export CV_ASSUME_DISTID=OEL7.6
+
+# Interactive mode.
+./runInstaller
+
+unzip LINUX.X64_193000_db_home.zip -d /u01/app/oracle/product/19.0.0/dbhome_1/
+
+
+sudo yum install -y unzip
+sudo chown -R oracle:oinstall /u01/app/oracle
+
+su - oracle
+cd /u01/app/oracle/product/19.0.0/dbhome_1/
+./runInstaller
+
+
+sudo chown -R oracle:oinstall /u01/app/oracle/product/19C/dbhome
+
+sudo chmod -R 750 /u01/app/oracle/product/19C/dbhome
+
+sudo chmod +x /u01/app/oracle/product/19C/dbhome/runInstaller
+
+
+sudo rpm -ivh .rpm
+sudo mv /u01/app/oracle/product/19C/dbhome /u01/app/oracle/product/19.0.0/dbhome_1/
+
+
+Package: compat-libcap1-1.10 - This is a prerequisite condition to test whether the package "compat-libcap1-1.10" is available on the system.
+Expected Value
+ : compat-libcap1-1.10
+Actual Value
+ : missing
+ Details: 
+ - 
+PRVF-7532 : Package "compat-libcap1" is missing on node "prod"  - Cause:  A required package is either not installed or, if the package is a kernel module, is not loaded on the specified node.  - Action:  Ensure that the required package is installed and available. 
+==================================================================
+
+
+
+
+
+=============================================================
+
+
+dnf install -y oracle-database-preinstall-19c
+
+passwd oracle
+
+mkdir -p /u01/app/oracle/product/19c/dbhome/
+mkdir -p /u01/app/19c/gridhome
+chown -R oracle:oinstall /u01
+chmod -R 775 /u01
+
+
+su - oracle
+[oracle@test ~]$ ls -la ==> It is display hiddin files
+
+nano .bash_profile
+
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+export ORACLE_BASE=/u01/app/oracle
+export ORACLE_HOME=/u01/app/oracle/product/19c/dbhome
+
+export ORACLE_SID=prodstd
+
+export LD_LIBRARY_PATH=\$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=\$ORACLE_HOME/jlib:\$ORACLE_HOME/rdbms/jlib
+export NLS_LANG=american_america.al32utf8
+export NLS_DATE_FORMAT="yyyy-mm-dd:hh24:mi:ss"
+
+export PATH=$PATH:$HOME/.local/bin:$ORACLE_HOME/bin
+export GRID_HOME=/u01/app/19c/gridhome
+
+export PATH
+
+
+
+. .bash_profile
+     or 
+	 source ~/.bash_profile
+
+ Once software is downloaded, copy the zip file from Downloads directory to ORACLE_HOME directory:
+ 
+ unzip -qo /softwares/LINUX.X64_193000_db_home.zip 
+ 
+ 
+ 
+ export CV_ASSUME_DISTID=OL8
+ ./runInstaller
+ 
+ 
+ 
+ 
+ ===>DBCA
+ export ORACLE_HOME=/u01/app/oracle/product/19C/dbhome
+export PATH=$PATH:$HOME/.local/bin:$ORACLE_HOME/bin
+export ORACLE_SID=prod
+
+export GG_HOME=/u01/gghome
+export PATH=$GG_HOME:$PATH
+export LD_LIBRARY_PATH=$GG_HOME/lib:$LD_LIBRARY_PATH
+
+
+
+
+---------------------------------------------------
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+
+export PATH
+
+export ORACLE_BASE=/u01/app/oracle
+export ORACLE_HOME=/u01/app/oracle/product/19c/dbhome
+
+export ORACLE_SID=prod
+
+export GG_HOME=/u01/gghome
+export PATH=$GG_HOME:$PATH
+export LD_LIBRARY_PATH=$GG_HOME/lib:$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+export NLS_LANG=american_america.al32utf8
+export NLS_DATE_FORMAT="yyyy-mm-dd:hh24:mi:ss"
+
+export PATH=$PATH:$HOME/.local/bin:$ORACLE_HOME/bin
+export GRID_HOME=/u01/app/19c/gridhome
+
+---------------------------------------------------
+ 
+ ====================================================
+ 
+ tail -f /path/to/alert_<SID>.log
+/u01/app/oracle/diag/rdbms/mahesh/mahesh/trace
+--->alert_log_file
+tail -f /u01/app/oracle/diag/rdbms/test/test/trace/alert_test.log
+
+=======================
+
+
+ https://prod:9090
+ https://10.0.2.15:9098
+ 
+
+set ORACLE_SID=ORCL
+set ORACLE_SID=MAHESH1
+set ORACLE_HOME=D:\u01\app\oracle\product\19C\dbhome\
+
+ set PATH=%ORACLE_HOME%\bin;%PATH%
+ RESTORE DATAFILE '/u01/app/oracle/oradata/ORCL/system01.dbf';
+ RECOVER DATAFILE '/u01/app/oracle/oradata/ORCL/system01.dbf';
+
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = mahesh1)
+      (ORACLE_HOME = D:\u01\app\oracle\product\19c\dbhome)
+      (SID_NAME = mahesh1)
+    )
+  )
+
+rman target source sys/admin@mahesh auxiliary sys/admin@mahesh1
+
+
+DUPLICATE DATABASE TO auxiliary_database
+  FROM ACTIVE DATABASE
+  SPFILE
+  PARAMETER_VALUE_CONVERT 'mahesh1','mahesh1
+  SET DB_NAME='mahesh1'
+  SET SID='mahesh1';
+
+
+enp0s3:inet 10.0.2.15
+
+
+192.168.223.129 mahesh.localdomain  mahesh
+
+192.168.223.130  test.localdomain  test
+
+10.0.2.15 linux.myguest.virtualbox.org
+
+
+SQL> alter system set log_archive_config=’DG_CONFIG=(db11g,std)’; 
+
+
+
+sudo vi /etc/fstab
+/swapfile swap swap defaults 0 0
+sudo vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
+================
+
+
+
+[oracle@localhost ~]$ export ORACLE_HOME=/u01/app/oracle/product/19C/dbhome
+[oracle@localhost ~]$ export PATH=$ORACLE_HOME/bin:$PATH
+[oracle@localhost ~]$ sqlplus / as sysdba
+CREATE PFILE = '/u01/app/oracle/oradata/initorcl.ora' FROM SPFILE = '/u01/app/oracle/product/19C/dbhome/dbs/spfileorcl.ora';
+
+
+SQL> SELECT name, value FROM v$parameter WHERE name = 'log_archive_config';
+
+
+================
+22-5-24
+--------
+unconditionaly i have encripted file by using vi editer like bellow steps
+enctripted
+-----------
+1.esc
+2.:X
+3.then it ask password
+4.new passwd
+finsh
+
+dicripted
+----------
+Type :X (colon followed by capital X) and press Enter.
+Save the file using :wq if you've made changes.
+
+finaly it unencripted
+
+===========================
+
+
+ alter system set log_archive_config=’DG_CONFIG=(test,newdr)’; 

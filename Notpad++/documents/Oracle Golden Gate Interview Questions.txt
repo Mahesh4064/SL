@@ -1,0 +1,449 @@
+
+Oracle Golden Gate Interview Questions
+Here are some of the frequently asked Oracle Golden Gate interview questions and answers. Enjoy!
+
+
+Q. What is the significance of Oracle GoldenGate Manager?
+
+To give users control over Oracle GoldenGate processes, Manager provides a command line interface to perform a variety of administrative, housekeeping, and reporting activities, including
+
+Setting parameters to configure and fine-tune Oracle GoldenGate processes
+
+Starting, stopping, and monitoring capture and delivery modules
+
+Critical, informational event, and threshold reporting
+
+Resource management
+
+Trail File management
+
+Q. Why it is highly desirable that tables that you want to replicate should have primary key?
+
+In simple words, to uniquely identify a record GoldenGate requires a primary key. If the primary key does not exist on the source table, GoldenGate will create its own unique identifier by concatenating all the table columns together. This will certainly prove inefficient as volume of data that needs to be extracted from the redo logs will increase exponentially. In normal scenario, when a table has primary key, GoldenGate process will fetch only the primary key and the changed data (before and after images in the case of an update statement).
+
+
+GoldenGate process will also warn you that primary key does not exist on the target table and you may receive the following warning in the GoldenGate error log
+
+WARNING OGG-xxxx No unique key is defined for table ‘TARGET_TABLE_NAME’. All viable columns will be used to represent the key, but may not guarantee uniqueness. KEYCOLS may be used to define the key
+Having primary key also insure fast data lookup when the Replicat recreates and applies the DML statements against the target database. But keep in mind that it is not “mandatory” that primary key must be present for the table.
+
+
+Q. Is it MUST that the source database should be in archivelog mode?
+
+It is NOT must that the source database is in the archivelog mode but for any serious, mission-critical GoldenGate system it is almost mandatory to have source system in Archive Log mode.
+
+
+Q. Without going into details, explain high level steps of setting up GoldenGate.
+
+Below are the key steps to install and configure the Golden Gate 
+
+Download the software from the Oracle website and upload to server
+
+Unpack/Unzip the installation zip file
+
+Prepare source and target system
+
+Install the software on the source and target system (for 12c use OUI)
+
+Prepare the source database (some DB parameters need to be adjusted) Configure the Manager process on the source and target system
+
+Configure the Extract process on the source system
+
+Configure the data pump process on the source system
+
+Configure the Replicat process on the target system
+
+Start the Extract process
+
+Start the data pump process
+
+Start the Replicat process
+
+Q. When creating GoldenGate database user for database 12c, what special precaution you need to take?
+
+You must grant the GoldenGate admin user access to all database containers on the source side so that GoldenGate can access the redo logs for all the databases (container and pluggable)
+
+
+You must also grant the DBA role with the container=all option.
+
+SQL> GRANT DBA TO C##GOLDENADMIN CONTAINER=ALL
+Q. What is Downstream capture mode of GoldenGate?
+
+Traditionally log mining work for the source data happens on Source database side but in Downstream capture mode Oracle Data Guard redo transport mechanism is used. This enables continuous log shipping to the target database’s standby redo logs in real time. Log mining work to fetch DDL/DML transactions happens on the target side.
+
+
+Q. How do you take backup of GoldenGate?
+
+Your source/database you can backup easily using backup tools like Oracle Recovery Manager (RMAN) but to backup the GoldenGate you will need to back up the GoldenGate home and subdirectories that contain the trail files, checkpoint files etc. Without these key files, GoldenGate will not be able to recover from the last checkpoint. It means that if somehow you lose all these key GoldenGate files then you will have no option but to go for a new initial load. RMAN simply do not have capability to backup the OS or no database files.
+
+
+So either you keep all your GoldenGate related files on some kind of SAN setup which gets backed up daily at storage level or use Unix shell commands etc in cron job to take filesystem backups.
+
+
+Q. What is checkpoint table? In which capture mode it is used: classic or integrated?
+
+Oracle GoldenGate extract and replicat processes perform checkpoint operations. Now in the event of some unexpected failure, the checkpoint file or database table ensures extract and replicat re-start from the point of failure and avoid re-capture and re-apply of transactions.
+
+
+So, Checkpoint table enables the checkpoint to be included within Replicat’s transaction, ensuring complete recovery from all failure scenarios.
+
+
+You use the GGSCI add checkpoint table command to create the checkpoint table.
+
+
+Checkpoint table is used for Classic capture/replicate mode.
+
+
+For Integrated mode, the Checkpoint table is not required and should not be created.
+
+
+Q. What transaction types does Golden Gate support for Replication?
+
+Goldengate supports both DML and DDL Replication from the source to target.
+
+
+Q. What are the supplemental logging pre-requisites?
+
+The following supplemental logging is required.
+
+Database supplemental logging
+
+Object level logging
+
+Q. Why is Supplemental logging required for Replication?
+
+Integrated Capture (IC)
+
+In the Integrated Capture mode, GoldenGate works directly with the database log mining server to receive the data changes in the form of logical change records (LCRs).
+
+IC mode does not require any special setup for the databases using ASM, transparent data encryption, or Oracle RAC.
+
+This feature is only available for oracle databases in Version 11.2.0.3 or higher.
+
+It also supports various object types which were previously not supported by Classic Capture.
+
+This Capture mode supports extracting data from source databases using compression.
+
+Integrated Capture can be configured in an online or downstream mode.
+
+
+Q. List the minimum parameters that can be used to create the extract process?
+
+The following are the minimum required parameters which must be defined in the extract parameter file.
+
+EXTRACT NAME
+
+USERID
+
+EXTTRAIL
+
+TABLE
+
+Q. I want to configure multiple extracts to write to the same exttrail file? Is this possible?
+
+Only one Extract process can write to one exttrail at a time. So, you can’t configure multiple extracts to write to the same exttrail.
+
+
+Q. What type of Encryption is supported in Goldengate?
+
+Oracle Goldengate provides 3 types of Encryption.
+
+Data Encryption using Blow fish.
+
+Password Encryption.
+
+Network Encryption.
+
+Q. What are some of the key features of GoldenGate 12c?
+
+The following are some of the more interesting features of Oracle GoldenGate 12c:
+
+Support for Multitenant Database
+
+Coordinated Replicat
+
+Integrated Replicat Mode
+
+Use of Credential store
+
+Use of Wallet and master key
+
+Trigger-less DDL replication
+
+Automatically adjusts threads when RAC node failure/start
+
+Supports RAC PDML Distributed transaction
+
+RMAN Support for mined archive logs
+
+Q. If have created a Replicat process in OGG 12c and forgot to specify DISCARDFILE parameter. What will happen?
+
+Starting with OGG 12c, if you don’t specify a DISCARDFILE OGG process now generates a discard file with default values whenever a process is started with START command through GGSCI.
+
+
+Q. Is it possible to start OGG EXTRACT at a specific CSN?
+
+Yes, Starting with OGG 12c you can now start Extract at a specific CSN in the transaction log or trail.
+
+
+Example:
+
+START EXTRACT fin ATCSN 12345
+START EXTRACT finance AFTERCSN 67890
+Q. List a few parameters which may help improve the replicat performance?
+
+Below are the parameters below can be used to improve the replicat performance:
+
+BATCHSQL
+
+GROUPTRANSOPS
+
+INSERTAPPEND
+
+Q. What are the most common reasons of an Extract process slowing down?
+
+Some of the possible reasons are
+
+Long running batch transactions on a table.
+
+Insufficient memory on the Extract side. Uncommitted, long running transactions can cause writing of a transaction to a temporary area (dirtmp) on disk. Once the transaction is committed it is read from the temporary location on the file system and converted to trail files.
+
+Slow or overburdened Network.
+
+Q. What are the most common reasons of the Replicat process slowing down?
+
+Some of the possible reasons are
+
+Large amount of transactions on a particular table.
+
+Blocking sessions on the destination database where non-Goldengate transactions are also taking place on the same table as the replicat processing.
+
+If using DBFS, writing & reading of trail files may be slow if SGA parameters are not tuned.
+
+For slow Replicat’s, latency may be due to missing indexes on target.
+
+Replicat having to process Update, delete of rows in very large tables.
+
+Q. My extract was running fine for a long time. All of a sudden it went down. I started the extract processes after 1 hour. What will happen to my committed transactions that occurred in the database during last 1 hour?
+
+OGG checkpoint provides the fault tolerance and make sure that the transaction marked for committed is capture and captured only once. Even if the extract went down abnormally, when you start the process again it reads the checkpoint file to provide the read consistency and transaction recovery.
+
+
+Q. I have configured Oracle GoldenGate integrated capture process using the default values. As the data load increases I see that extract starts lagging behind by an hour (or more) and database performance degrades. How you will resolve this performance issue?
+
+When operating in integrated capture mode, you must make sure that you have assigned sufficient memory to STREAMS_POOL_SIZE. An undersized STREAMS_POOL_SIZE or limiting the streams pool to use a specific amount of memory can cause troubles.
+
+
+The best practice is to allocate STREAMS_POOL_SIZE at the instance level and allocate the MAX. SGA at GG process level as below
+
+SQL> alter system set STREAMS_POOL_SIZE=3G
+
+TRANLOGOPTIONS INTEGRATEDPARAMS (MAX_SGA_SIZE 2048, PARALLELISM 4)
+Q. Why would you segregate the tables in a replication configuration? How would you do it?
+
+In OGG you can configure replicat at the data at the schema level or at the table level using TABLE parameter of extract and MAP parameter of replicat.
+
+
+For replicating the entire database, you can list all the schemas in the database in the extract/replicat parameter file.
+
+
+Depending the amount of redo generation, you can split the tables in a schema in multiple extracts and replicats to improve the performance of data replication. Alternatively, you can also group a set of tables in the configuration by the application functionality.
+
+
+Alternatively, you may need to remove tables which have long running transactions in a separate extract process to eliminate lag on the other tables.
+
+
+Let’s say that you have a schema named SCOTT and it has 100 hundred tables.
+
+
+Out of these hundred tables, 50 tables are heavily utilized by application.
+
+
+To improve the overall replication performance, you create 3 extracts and 3 replicats as follows:
+
+
+Ext_1/Rep_1 –> 25 tables
+
+
+Ext_2/Rep_2 –> 25 tables
+
+
+Ext_3/Rep_3 –> 50 tables
+
+
+Ext_1/Rep_1 and Ext_2/Rep_2 contains 25 table each which are heavily utilized or generate more redo.
+
+
+Ext_3/Rep_3 contains all the other 50 tables which are least used.
+
+
+Q. How do you view the data which has been extracted from the redo logs?
+
+The logdump utility is used to open the trail files and look at the actual records that have been extracted from the redo or the archive log files.
+
+
+Q. Why should I upgrade my GoldenGate Extract processes to Integrated Extract?
+
+Oracle is able to provide faster integration of the new database features by moving the GoldenGate Extraction processes into the database. Due to this, the GoldenGate Integrated Extract has a number of features like Compression which are not supported in the traditional Extract. You can read more about how to upgrade to Integrated Extract and more about Integrated Delivery. Going forward, preference should be give to create new extracts as Integrated Extracts and also to upgrade existing traditional Extracts.
+
+
+Q. What is the minimum Database version which supports Integrated Delivery?
+
+Oracle 11.2.0.4 is the minimum required database version that supports both Integrated extract and Integrated Reaplicat.
+
+
+Q. What databases supports GoldenGate Integrated Delivery?
+
+Oracle Integrated Delivery is only available for Oracle Databases.
+
+
+Q. With Integrated Delivery, where can we look for the performance stats?
+
+Yes with 12c, performance statistics are collected in the AWR repository and the data is available via the normal AWR reports.
+
+
+Q. What are the steps required to add a new table to an existing replication setup?
+
+The steps to be executed would be the following
+
+Include the new table to the Extract & pump process.
+
+Obtain starting database SCN and Copy the source table data to the target database
+
+Start Replicat on target at the source SCN database point.
+
+Q. What is the purpose of the DEFGEN utility?
+
+When the source and the target schema objects are not the same (different DDL’s) the Replicat process needs to know the source definition of the objects. The output from the DEFGEN utility is used in conjunction with the trail data to determine which column value in the trail belongs to which column.
+
+
+Q. We want to setup one-way data replication for my online transaction processing application. However, there are compressed tables in the environment. Please suggest how I can achieve it.
+
+You must use Oracle Golden Gate 11.2 and configure Golden Gate Integrated Capture process to extract data from compressed tables.
+
+
+Note: Pre OGG 11.2 doesn’t support extracting data from compressed tables
+
+
+Q. What are the different OGG Initial load methods available?
+
+OGG has 2 functionalities, one it is used for Online Data Replication and second for Initial Loading.
+
+
+If you are replicating data between 2 homogeneous databases then the best method is to use database specific method (Exp/Imp, RMAN, Transportable tablespaces, Physical Standby and so on). Database specific methods are usually faster than the other methods.
+
+
+—If you are replicating data between 2 heterogeneous databases or your replicat involves complex transformations, then the database specific method can’t be used. In those cases you can always use Oracle GoldenGate to perform initial load.
+
+
+Within Oracle GoldenGate you have 4 different ways to perform initial load.
+
+Direct Load – Faster but doesn’t support LOB data types (12c include support for LOB)
+
+Direct Bulk Load – Uses SQL*LOAD API for Oracle and SSIS for MS SQL SERVER
+
+File to replicat – Fast but the rmtfile limit is 2GB. If the table can’t be fit in 1 rmtfile you can use maxfiles but the replicat need to be registered on the target OGG home to read the rmtfiles from source.
+
+File to Database utility – depending on the target database, use SQL*LOAD for Oracle and SSIS for MS SQL SERVER and so on.
+
+Q. I have a table called ‘TEST’ on source and target with same name, structure and data type but in a different column order. How can you setup replication for this table?
+
+OGG by default assumes that the sources and target tables are identical. A table is said to be identical if and only if the table structure, data type and column order are the same on both the source and the target.
+
+
+If the tables are not identical you must use the parameter ‘SOURCEDEFS’ pointing to the source table definition and COLMAP parameter to map the columns from source to target.
+
+
+Q. What is the best practice to delete the extract files in OGG?
+
+Use the manager process to delete the extract files after they are consumed by the extract/replicat process
+
+PURGEOLDEXTRACTS /u01/app/oracle/dirdat/et*, USECHECKPOINTS, MINKEEPHOURS 2
+
+Q. I have a one-way replication setup. The system administration team wants to apply an OS patch to both the OGG source host and the target servers. Provide the sequence of steps that you will carry before and after applying this patch.
+
+Check to make sure that the Extract has processed all the records in the data source 
+
+(Online Redo/archive logs)
+
+GGSCI> send extract , logend
+(The above command should print YES)
+
+
+Verify the extract, pump and replicat has zero lag.
+
+GGSCI> send extract , getlag
+
+GGSCI> send extract , getlag
+
+GGSCI> send replicat , getlag
+(The above command should pring “At EOF, no more records to process.”)
+
+
+Stop all application and database activity.
+
+
+Make sure that the primary extract is reading the end of the redolog and that there is no LAG at all for the processes.
+
+
+Now proceed with stopping the processes on Source
+
+Stop the primary extract
+
+Stop the pump extract
+
+Stop the manager process
+
+Make sure all the processes are down
+
+On Target
+
+Stop replicat process
+
+Stop mgr
+
+Make sure that all the processes are down.
+
+Proceed with the maintenance
+
+After the maintenance, proceed with starting up the processes on Source
+
+Start the manager process
+
+Start the primary extract
+
+Start the pump extract
+
+(Or simply all the extract processes as GGSCI> start extract *)
+
+Make sure all that the processes are up. On Target
+
+Start the manager process
+
+Start the replicat process
+
+Make sure that all the processes are up
+
+Q. What are the basic resources required to configure Oracle GoldenGate high availability solution with Oracle Clusterware?
+
+There are 3 basic resources required
+
+Virtual IP
+
+Shared storage
+
+Action script
+
+Q. How can you determine if the parameters for a process was recently changed?
+
+Whenever a process is started, the parameters in the .prm file for the process is written to the process REPORT. You can look at the older process reports to view the parameters which were used to start up the process. By comparing the older and the current reports you can identify the changes in the parameters.
+
+
+Q. Is there a way to check the syntax of the commands in the parameter file without actually running the GoldenGate process?
+
+Yes, you can place the SHOWSYNTAX parameter in the parameter file and try starting. If there is any error you will see it.
+
+
+Q. What are macros?
+
+Macro is an easier way to build your parameter file. Once a macro is written it can be called from different parameter files. Common parameters like username/password and other parameters can be included in these macros. A macro can either be another parameter file or a library.

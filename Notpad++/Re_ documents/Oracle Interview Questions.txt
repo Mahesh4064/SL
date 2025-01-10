@@ -1,0 +1,51 @@
+1. What is your total Experience
+2. Why looking for change
+3. What is your current location.
+4. What is size of DB in your curent project.
+5. Do you know RAC Environment.
+
+6. What are technical skills used in day to day activities 
+7. How frequent you execute cloning of DB
+
+8. If DB of 10 TB is compressed what will be the expected size of DB Backup
+9. RAC - Explain RAC architecture.
+10. How DB is setup in current project (How many nodes/ Is it on RAC)
+11. How you can start one instance on a host without starting 2nd instance.
+12. In ASM is running and DB is down, now how I can start only db instance on an asked instance of a host node.
+13. Have you done patching on RAC?
+14. If we want to apply PSU on one of DB what are the steps. Mention right from downloading of patch.
+15. Why we need to run database Verbose
+16. After PSU loading, how we can check whether patch is successfully applied or not.
+17. What is TD Wallet.
+
+18. What is Datafile Encryption.
+19. Data masking / data redaction.
+20. If you are taking full db backup on your env, how to configure each db so that size should not go beyond 100TB.
+21. How to encrypt the RMAN Backup.
+22. How to do Restoration? High level steps of restoration?
+
+23. Suppose restoration is going on and while restoring we need to check readlog file. Now, if there are no logfiles, what is your action to check logfiles.
+
+24. Explain startup sequence of a cluster.
+
+25. Do you know export / import.  
+26. If you are refreshing 5 schema at a time and source name & target name tablespace schema are different.
+27. Why is remap need to be used?
+28. Suppose you ran import in db and import is running slow, how you can speedup process.
+29. can I increase filesize in paramater file while running parallel.
+30. In shift you are in a critical activity and your shift is ending. What will be your approach. // what you are going to do // hanover or continue
+
+31. What do you think, DB activity is small ?
+32. Tell me any ocassion where you taken ownership and completed actiity on you own.
+33. Rate yourself in performance tuning out of 10.
+    
+34. There is a long running query, what is your approach to check ?
+
+35. How to compare that sql has taken a good plan or bad plan?
+37. How to check plan hash / plan ID in sql?
+
+38. What is dataguard?
+39. In DR? - How you are protecting data in case you dont have DR?
+40. How to check sync status of DR?
+41. What is DB Link ? How DB Link works ?
+42. Do you know how to perform DR Drill?

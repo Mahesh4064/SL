@@ -1,0 +1,485 @@
+
+
+how to see who performed the actions?
+Ensure Auditing is Enabled: Make sure that auditing is properly configured and enabled for the actions you want to track.
+Regular Monitoring: Regularly monitor and review audit logs to ensure any suspicious or unauthorized activities are promptly addressed.
+
+-- To see session logins
+SELECT
+    USERNAME,
+    TIMESTAMP,
+    ACTION_NAME,
+    SESSION_ID,
+    SESSION_USER
+FROM
+    DBA_AUDIT_SESSION;
+	
+	-- To see SQL statement executions
+SELECT
+    USERNAME,
+    TIMESTAMP,
+    ACTION_NAME,
+    SQL_TEXT
+FROM
+    DBA_AUDIT_TRAIL;
+	
+how to add 2dbwriter?
+##ALTER SYSTEM SET DB_WRITER_PROCESSES=2 SCOPE=BOTH;
+
+
+What Happens if You BG Kill These Processes?( V&process or v$bgprocess)
+
+PMON (Process Monitor):
+Role: PMON cleans up after failed processes, releases resources, and performs process recovery.
+Impact if Killed: If PMON is killed, Oracle will try to restart it. If PMON cannot be restarted, the instance will crash. You might see an ORA-00600 error.
+
+SMON (System Monitor):
+Role: SMON performs crash recovery, cleans up temporary segments, and coalesces free space.
+Impact if Killed: If SMON is killed, Oracle will attempt to restart it. If unsuccessful, the instance will crash. 
+This can lead to issues with space management and crash recovery.
+
+LGWR (Log Writer): oracle create automatically
+Role: LGWR is responsible for writing redo log buffer entries to the online redo log files.
+Impact if Killed: If LGWR is killed, the instance will immediately crash. This is because Oracle relies on LGWR to ensure data integrity through the redo logs.
+ Upon instance recovery, data loss might occur if uncommitted transactions were not written to the redo logs.
+
+db_writer:oracle create automatically
+
+CKPT (Checkpoint Process):oracle create automatically
+Role: CKPT signals DBWR to perform a checkpoint and updates control files and datafile headers with the checkpoint information.
+Impact if Killed: If CKPT is killed, Oracle will attempt to restart it. If CKPT cannot be restarted, the database will continue running,
+ but with the potential for outdated checkpoint information. Over time, this can lead to slower recovery in case of a crash, 
+ as the system might need to redo more work.
+ ------------------------------------------------------------------------------------------------
+ 
+ File Management Concepts in Data Guard
+ --------------------------------------
+ Oracle Managed Files (OMF) simplifies file management by letting Oracle automatically create, name, and manage files. When OMF is enabled, 
+ Oracle handles file naming and location based on predefined parameters, reducing administrative tasks.
+
+
+how to run scrept on background?
+nohup ./datapatch &
+-------------------
+How to find location of file
+[oracle@prod ~]$ find / -name awr_report.html 2>/dev/null
+/home/oracle/awr_report.html
+[oracle@prod ~]$
+-----------------------
+how to read html file in linux
+
+total 608
+-rw-r--r--. 1 oracle oinstall 619526 Aug  7 17:23 awr_report.html
+[oracle@prod ~]$ xdg-open awr_report.html
+START /usr/bin/firefox "awr_report.html"
+
+-------------------------------------------
+HOW TO SPESIFIEY UNIC file NAME
+EX:Backup CURRENT CONTROLFILE FORMATE '/u01/app/%u';
+
+
+
+
+## exported log it is requred (expdp=schma_1.log) on import time?
+no>>we can create new log when we importing dumpfile
+
+###role can have multiple roles??
+yes we can add multiple roles into the one role
+Grant dba to role_name
+
+##how to check database size
+- SELECT bytes/1024/1024/1024 FROM dba_data_files;
+
+############################
+
+##cheking datafiles
+SQL> SELECT file_name FROM dba_data_files;  
+
+FILE_NAME
+------------------------------------------------------------
+/u01/app/oracle/oradata/ORCL/users01.dbf
+/u01/app/oracle/oradata/ORCL/undotbs01.dbf
+/u01/app/oracle/oradata/ORCL/system01.dbf
+/u01/app/oracle/oradata/ORCL/sysaux01.dbf
+
+#####################################
+
+##one tablespace how many datafiles will be store
+By default, the MAXDATAFILES parameter is set to a fairly high value (typically 1022) in modern versions of Oracle Database, 
+
+
+##whate it is max size of datafile?
+it is in block size in 8kb so we need to create max 32gb
+#####################
+
+###how to  create tablespace?
+
+CREATE TABLESPACE my_tablespace DATAFILE '/path/to/datafile1.dbf' SIZE 100M AUTOEXTEND ON NEXT 100M MAXSIZE UNLIMITED;
+
+#######################
+##add datafile to the database
+ALTER TABLESPACE my_tablespace ADD DATAFILE '/path/to/datafile2.dbf' SIZE 100M AUTOEXTEND ON NEXT 100M MAXSIZE UNLIMITED;
+
+################################
+####Archive loges regetser standby
+ALTER Database REGISTER LOGFILE 'PATH/FILE_NAME.ARC';
+
+soft parsing and hord porsing?
+server process read data from the databuffer cash is calld softparsing and read data from the datafiles is calld hord parsing
+
+#######################
+SMON (System Monitor Process): Performs crash recovery when the database is started and manages the instance recovery process.
+PMON (Process Monitor Process): Monitors and cleans up failed user processes.
+DBWR (Database Writer Process): Writes modified blocks from the database buffer cache to the data files.
+LGWR (Log Writer Process): Writes redo log entries from the redo log buffer to the online redo log files.
+CKPT (Checkpoint Process): Signals the database writer to write all dirty buffers to disk, updates data file headers, and control files with checkpoint information.
+ARCn (Archiver Process): Copies redo log files to a designated storage location after a log switch has occurred.
+RECO (Recoverer Process): Used in distributed databases to recover failed transactions.
+
+
+####################
+
+ASM REDUNANCY TYPS:
+
+
+merining:cpoy the disk
+striping : split the load accross the disks
+
+-NORMAL:* 2 DISK IS THEAR , it is merring 
+
+HIGH: 3 DISK IS THER, STRIPING + MERRING
+	  
+EXTERNAL:2 DISKS ,JUST ONLY STRIPING IS THEAR	  
+		 
+##############################################
+		
+How to tack OCR backup?
+Automatic OCR Backups:Oracle Clusterware automatically backs up the OCR every 4 hours
+Manual OCR Backups:ocrconfig -manualbackup /path/to/backup_directory
+
+ocrconfig -showbackup
+
+----------------------------------------
+####What will  happen if OCR will be deleted?
+-Oracle Clusterware will not  able to start properly.
+-Critical cluster services,CRS,voting disks,CSS will be disrupted.
+-Database instances might fail to start or function properly.
+-The configuration details for all nodes in the cluster will be lost.
+
+Restoring OCR from Backup:crsctl stop crs
+                          ocrconfig -restore path/to/backup
+						  crsctl start crs
+
+If backup also not available so you need to  reconfigure Oracle Clusterware
+-Perform a fresh installation of Oracle Grid Infrastructure.
+-Reconfigure the cluster and add the nodes back into the cluster.
+
+-----------------------------------------------
+### what happen if OLR is correpeted?
+-Oracle Clusterware services on the affected node may fail to start.
+-The node might fail to join the cluster.
+-CRS,CSS Not properly function 
+ Restore OLR from Backup:crsctl stop crs
+                         ocrconfig -local -restore /path/to/olr_backup
+						 crsctl start crs
+ Backup is not available:
+ Deconfigure and Reconfigure the Local Oracle Clusterware:cd $ORACLE_HOME/crs/install
+                                                          ./rootcrs.pl -deconfig -force
+														  ./rootcrs.pl -config
+>root.sh script again can help regenerate the OLR with the necessary information.
+cd $ORACLE_HOME
+./root.sh
+./rootcrs.pl -config -init
+crsctl start crs
+---------------------------------------------------
+what is Voting DISK
+-In an Oracle RAC environment, the Voting Disk is a special file on check which servers are active and healthy.
+-It keeps track of which servers (nodes) are part of the cluster.
+-It helps monitor the health of each node by recording a "heartbeat" from each node regularly.
+-if voting disk is unavailable the cluster might stop working to prevent data issues.
+-----------------------------
+what is cluster?
+cluster is a group of interconnected computers
+
+
+whate is clousterware?
+Clusterware is specialized software that provides the infrastructure to manage clusters. 
+
+
+----------------------------
+What is Split-Brain Syndrome?
+- when the network connecting the nodes in a cluster fails,causing the nodes to be unable to communicate with each other.
+-Communication Failure: The most common cause is a failure in the network that connects the nodes, such as a network switch failure, cabling issues, or configuration errors.
+- Node Isolation:Nodes may become isolated due to hardware failures or software bugs, causing them to lose communication with the rest of the cluster.
+-Data Corruption:the resulting data may become corrupted or inconsistent.
+-System Instability:Split-brain scenarios can lead to unstable system behavior, crashes, and loss of service availability.
+
+-----------------------------------
+How do you start in the mount stage using SRVCTL?
+                                                             -startoption nomount
+-srvctl start instance -db <dbname> -instance <instancename> -startoption mount
+                                                             -startoption open
+															 ALTER DATABASE OPEN READ ONLY;
+
+-------------------------------------
+All instances in the open, read, and write mode but in my instance, I am put in mount mode this affects other instance?
+-no your instance only in mount mode other instance accese the data
+--------------------------------------------
+
+what is TABLE_EXISTS_ACTION ?
+-The TABLE_EXISTS_ACTION parameter in Oracle Data Pump is used to control the behavior of the import process when it encounters a table that already exists in the target database
+SKIP:The existing table is not modified, and Data Pump skips the import of that table. This is the default behavior.
+TRUNCATE:Data Pump truncates the existing table (removes all rows) and then imports the rows from the source into the table.
+REPLACE:Data Pump drops the existing table and recreates it, then imports the rows from the source. This option will also recreate any indexes, constraints, and other table attributes.
+APPEND:Data Pump appends the rows from the source to the existing table. The table structure must be compatible for the append operation to succeed.
+
+impdp username/password@db schemas=schema_name directory=dir_name dumpfile=dumpfile.dmp logfile=logfile.log TABLE_EXISTS_ACTION=SKIP
+impdp username/password@db schemas=schema_name directory=dir_name dumpfile=dumpfile.dmp logfile=logfile.log TABLE_EXISTS_ACTION=TRUNCATE
+impdp username/password@db schemas=schema_name directory=dir_name dumpfile=dumpfile.dmp logfile=logfile.log TABLE_EXISTS_ACTION=REPLACE
+impdp username/password@db schemas=schema_name directory=dir_name dumpfile=dumpfile.dmp logfile=logfile.log TABLE_EXISTS_ACTION=APPEND
+
+
+----------------------------------
+how to add paralall expdp running
+-Since you cannot modify the PARALLEL parameter for an ongoing export, stopping and restarting the job with the desired settings is the recommended approach.
+
+sqlplus / as sysdba
+SELECT JOB_NAME, STATE FROM DBA_DATAPUMP_JOBS;
+
+stop the job
+BEGIN
+  DBMS_DATAPUMP.STOP_JOB(job_name => 'your_job_name');
+END;
+/ 
+
+restart
+expdp username/password@db_url \
+      DIRECTORY=dir_name \
+      DUMPFILE=export_file%U.dmp \
+      LOGFILE=export_log.log \
+      PARALLEL=num_of_threads \
+      FULL=Y
+
+
+
+Incremental Export:FLASHBACK_SCN or FLASHBACK_TIME
+----------------------------------------------------
+
+how to convert physical standby to snapshot standby?
+#ALTER DATABASE CONVERT TO SNAPSHOT STANDBY;
+-Ensure that flashback is enabled on both the primary and standby databases. Flashback is required for converting a snapshot standby back to a physical standby.
+ALTER DATABASE FLASHBACK ON;
+Convert the Physical Standby to a Snapshot Standby: ALTER DATABASE CONVERT TO SNAPSHOT STANDBY;
+                                                    ALTER DATABASE CONVERT TO PHYSICAL STANDBY;
+                                                    ALTER DATABASE CONVERT TO LOGICAL STANDBY;
+
+------------------------------------------
+ASM DISKS
+--------
+NORMAL:	    The disk is functioning properly and is available for use.
+ONLINE:	    The disk is online and available to the ASM instance.
+UNKNOWN:	ASM is unable to determine the status of the disk. This could be due to a failure to communicate with the disk or an issue with the ASM metadata.
+FORMER:	    The disk was previously part of an ASM disk group but is no longer part of the group. This may occur after a disk has been removed or dropped.
+MEMBER:	    The disk is currently a member of an ASM disk group and is part of the disk group configuration.
+Offline:    The disk is offline and not available for normal I/O operations. It could be intentionally taken offline or due to a failure.
+MISSING:	The disk is no longer available or cannot be located. It may have been removed or failed.
+INVALID:	The disk is invalid and cannot be used for ASM operations. It may have failed or is in a state that makes it unusable.
+CANDIATE: It is avalible in server but not added in disk group
+    
+
+---------------------------------
+RE ORG
+Fragmentation remove DBA_SEGMENTS
+                     DBA_TABLES	 
+alter table table_name move		 
+ALTER INDEX <index_name> REBUILD;		 
+		 
+		 
+		 
+		 
+##############################################
+	 
+RECO:Fast Recovery Area (FRA)
+
+OCR (Oracle Cluster Registry): Manages cluster configuration information, shared among all nodes.
+ -->It contains information about cluster nodes, cluster services, and the configuration of various cluster resources.
+ -->Backup and Restore: Regular backups of OCR are crucial for disaster recovery and restoration purposes. 
+ -->Storage: Typically stored on shared storage accessible by all nodes in the cluster, such as a shared disk or in a filesystem.
+ -->every 4hr auto backup
+ 
+OLR (Oracle Local Registry): Stores node-specific configuration information, local to each node.
+-->Fallback: In scenarios where network connectivity to the shared OCR or Voting Disk is lost,
+ OLR helps in maintaining cluster operations locally until connectivity is restored.
+
+Voting Disk: Manages node membership and ensures cluster integrity.
+--> It prevents split-brain scenarios where two clusters believe they are the primary.
+-->Node Voting: Ensures that all nodes agree on the state of the cluster and manage failover processes effectively.
+
+
+
+
+SYSAUX TABLE SPACE:If system tablespace full the sysaux provied the space
+                   It capture performance information
+				   IT capature AWD snapshot
+                   
+MATERIALZED VIEWS
+----------------
+* materialised view are called as snapshots.
+* view and materialised view :view is a store qurey and it is not space demanding abject.
+                              materialised view is space demanding object;
+							  
+* meterialised view is a local copy of remount database object.
+							  
+							 
+==============================================================
+
+###TDE#############
+
+Porpose of TDE:Protect sensitive data at rest through encryption
+
+KEY COMPONENTS
+--------------
+TDE Column Encryption:Encrypts selected columns in a table
+TDE Tablespace Encryption:Encryption the entire table
+key mangement:oracle wallet for storing master encryption key
+Encryption Alogorithms:AES(128 ,192, AND 256-BIT) and 3DES(168-BIT)
+auto-login: key accese without manual intervention
+
+
+TDE Tablespace encryption
+--------------------------
+encrypts entire tablespace,including all associated date file
+provide border protecion for all data in the tablesapace
+Tablespace-level encryption key mangement
+silghtly higher performance impact compared to column encryption
+
+
+         oracle wallet -->master encryption key --->encryption data
+		 
+		 
+		 
+Conclusion
+---------
+Oracle TDE offers robust encryption options for protectiong sensitive data at rest
+User can choose between column-level or tablesapace-level encription
+oracle wallet provide secure  key mangement,with the option for centralized mangemant through Oacle key valut
+TDE is a valuable tool for enhancing data security and meeting complince requrements		 
+
+#########################################################################################
+* Coustemr report slowsnes database whate are the steps
+- so database is up and running no problem for user connection
+  we need check the block level is ther or not 
+  we can communicate the clint to the same issue if it is ok we need kill the block 
+  we need to check top activetis to see cpu,uses,ram etc...
+  
+  
+*  user not able to connect to the database?
+we need to check listener
+check user profile lock or not
+
+
+
+* custemr seying exuctuing qury is fine but i am exiquting qury today is not done?
+  check I/Oacle
+  check AWR
+  check crontab running or not
+  
+  
+  
+* i am using standalon versin i am not using enterprice edition so from hear AWR is not ther how to check any issue? 
+
+ 1. Statspack
+ Statspack is a performance diagnostic tool provided by Oracle for databases that do not have access to AWR. It captures performance data and provides reports similar to AWR. Here's how to set it up and use it:
+ @$ORACLE_HOME/rdbms/admin/spcreate.sql
+2. Dynamic Performance Views (V$ Views)
+V$SESSION: Provides information about currently active sessions.
+V$SQL: Contains information about SQL statements that are currently in the shared SQL area.
+V$SYSTEM_EVENT: Displays information about system-wide events.
+V$SESSION_WAIT: Shows the events for which sessions are waiting
+
+
+
+------------------------------------------------------
+courent package 5.3 40% hike
+joing pack 3.8
+exp 8+
+
+-------------------
+
+how to tack cumilateve back tusday to firday
+ChatGPT
+To schedule cumulative backups from Tuesday to Friday using Oracle RMAN, you can set up a script or schedule RMAN commands to run on those specific days. Below is a basic approach using a shell script combined with a cron job for automation.
+
+Step 1: Create the RMAN Script
+Create an RMAN script that performs the cumulative backup.
+
+bash
+Copy code
+#!/bin/bash
+rman target / <<EOF
+BACKUP INCREMENTAL LEVEL 1 CUMULATIVE DATABASE;
+EOF
+Save this script as rman_cumulative_backup.sh (or any name you prefer).
+--------------------------------
+
+In Oracle RMAN (Recovery Manager), you can perform incremental backups, which include Level 1 (L1) backups and cumulative backups. Here's how you can use RMAN commands for each type:
+
+1. Level 1 Incremental Backup
+A Level 1 incremental backup captures all the changes made to the database since the last Level 0 or Level 1 incremental backup.
+RMAN> BACKUP INCREMENTAL LEVEL 1 DATABASE;
+
+2. Cumulative Incremental Backup
+A cumulative incremental backup at Level 1 captures all the changes made to the database since the last Level 0 backup, regardless of any intervening Level 1 backups.
+RMAN> BACKUP INCREMENTAL LEVEL 1 CUMULATIVE DATABASE;
+
+Usage Example:
+Level 0 Backup: You typically take a Level 0 backup initially, which serves as a base for subsequent incremental backups.
+RMAN> BACKUP INCREMENTAL LEVEL 0 DATABASE;
+Regular Incremental Backup: Schedule a regular Level 1 backup to capture changes since the last backup.
+RMAN> BACKUP INCREMENTAL LEVEL 1 DATABASE;
+Cumulative Backup: Schedule a cumulative backup periodically, depending on your backup strategy, to capture all changes since the last Level 0 backup.
+
+sql
+Copy code
+RMAN> BACKUP INCREMENTAL LEVEL 1 CUMULATIVE DATABASE;
+These commands can be included in a script or scheduled as part of your backup strategy
+
+=======================================================================================
+
+During a switchover process in Oracle Data Guard, if it gets stuck, follow these steps:
+
+1. Check the Logs: Start by examining alert logs and Data Guard broker logs on both the primary and standby databases. Look for any specific errors or warnings indicating why the switchover is stuck.
+
+2. Verify Network Connectivity: Ensure that the network connection between the primary and standby databases is stable. Network issues can prevent the switchover from completing.
+
+3. Check the Status of the Databases: Verify the role transition status using the Data Guard broker command SHOW CONFIGURATION;. This will give you the current state of the primary and standby databases.
+
+4. Manual Intervention: If the Data Guard broker is unable to complete the switchover, manually perform the steps:
+  - Convert the primary database to the standby role using ALTER DATABASE COMMIT TO SWITCHOVER TO STANDBY;.
+  - Activate the standby database as the primary using ALTER DATABASE COMMIT TO SWITCHOVER TO PRIMARY;.
+
+5. Re-sync if Necessary: If any archives are missing, transfer them manually and apply them to bring both databases in sync before attempting the switchover again.
+
+
+
+WHATE IS Materialized VIEWS?
+Materialized views:
+it is maintaining copy of remount database
+it store qury output and precomuted result
+
+->we need to create materialised views then it will store qury output
+ if you done changes in table it's not appleyd to meterialised view by default
+ 
+ 
+create materialised view view_name
+as
+select id,sum(sal) from emp;
+
+->updateing meterialised view is calld refreshing meterialised view 
+execute dbms_mview.refresh('MATERIALZED_TABLE_NAME');
+
+
+how to change default block size?
+not possible to change default block size if you want big size of block  you need to create one more tablesapace add datafile
+
+create tablesapace tb_name add datafile 'path' size 10M blocksize 16k

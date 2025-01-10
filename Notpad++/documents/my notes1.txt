@@ -1,0 +1,235 @@
+Upgradation, RMAN, Slowness, Statistics gathering,
+Table reorg, tuning advisor
+OEM
+Patching
+
+
+---slowness table Re-org,table move,index rebulid,chang optimager plan,check cpu utilaisetion top,check wait events,sessions
+>>select * from table(dbms_xplan.display());  ##THIS display resent sql plan ,name,cost,cpu,time,byts... 
+==========================================
+SQL qurey running slower?
+--------------------------
+1.whate is data ther are process (like yesterday 1000 data today 100000 data)
+2.they have done any deployement or not (change code or modify)
+3.ganereate AWR report(yeastday this time and today this time) compare both AWR reports helth same or not(cpu,load,session,..etc)
+4.ganerate the explain plan (list of the table in the sql,check indexes or invaled)
+5.gather stacks
+6. we have to do fragmentaion also
+7.we need to check plan (some times optimager will pick bad plan duto multiple resons(we need plush the plan kill the sessions restart the session)
+8.the particular sql id we can enable tace and we can genaret ticket profes and we can do detailed annalsis
+9 go for sql tuning adviser well give the advise 
+
+
+
+=============================================
+Tracing SQL Execution
+---------------------
+1.End-to-End application tracing  (tracing instance&database,clite identifier,service,module,action,session)
+2.sql tracing(individual sql statments)
+  * parse,execute,fetch count
+  * cpu and elapsed time
+  * physical reads and logical reads
+  * number of rows processd
+  * misse on the libraray catch
+  * username under which each parse occurred
+  * each commit and rollback
+  * wait event data for each sql and summary of each trace file
+
+
+===========================================================
+whate is wait events in oracle?
+## A wait event occurs when a session is not actively using the CPU but is waiting for some resource to become available or for an operation to complete.   
+
+=====================================
+how to boost of the SQL query?
+
+1. Optimize the SQL Query:
+  -Use Indexes
+  -Avoid Full Table Scans:
+  -Rewrite Queries:
+  -Use Efficient Joins:
+  
+2. Database Configuration and Tuning :
+   -Analyze Statistics: Regularly gather statistics on tables and indexes using DBMS_STATS to help the optimizer make informed decisions.
+   -Optimize Execution Plans: 
+   Tune Memory Settings:Adjust memory parameters like SGA and pga
+   -Configure Redo Log and Undo Tablespaces: 
+   
+3 Utilize Oracle Performance Tools:
+  -Explain Plan:
+  SQL Trace and TKPROF: Use SQL trace to capture detailed performance data and analyze it with TKPROF.
+  -Automatic Workload Repository (AWR):
+  -Active Session History (ASH): Use ASH to monitor real-time performance and diagnose issues
+  -SQL Monitoring: Use SQL Monitoring to track the execution of long-running queries and view detailed performance metrics.
+
+
+4. Database Schema Design
+  -Partitioning: Use table partitioning to improve performance by splitting large tables into smaller, more manageable pieces.
+ 
+6. Regular Maintenance 
+   Rebuild Indexes: Regularly rebuild indexes that may become fragmented over time.
+Clean Up Data: Regularly purge or archive old data that is no longer needed.
+Review Execution Plans: Periodically review and update execution plans as your data and query patterns evolve.
+   
+=================================================================================================================
+ what is Statistics  Gathering 
+ 
+ Improved Query Performance:Accurate statistics allow the Oracle optimizer to make better decisions when choosing execution plans.
+                             This often results in faster query execution and more efficient use of resources.
+							 
+Efficient Resource Utilization:With up-to-date statistics, the optimizer can choose the most efficient execution plan, reducing CPU, memory, 
+and I/O resource consumption. This helps in managing workloads more effectively.
+
+Optimized Execution Plans:
+The optimizer can choose the best access paths, join methods, and join orders when statistics are accurate, leading to optimized execution plans and 
+reduced execution time.
+
+Automatic Adjustment:
+Oracle’s automatic statistics gathering ensures that statistics are regularly updated, reducing the need for manual intervention and 
+ensuring that the optimizer has the most recent data.
+
+Better Handling of Data Skew:
+With detailed statistics, including histograms, the optimizer can better handle columns with skewed data distributions,
+ leading to more accurate cardinality estimates and better query plans.
+ 
+Improved Load Balancing:
+By providing accurate data distribution information, statistics help in balancing the load across parallel execution servers, 
+improving the performance of parallel operations.
+
+Disadvantages of Gathering Statistics
+Overhead on System Resources:
+Gathering statistics can consume significant system resources, including CPU, memory, and I/O, especially for large tables.
+ This can impact system performance, particularly during peak times.
+ 
+Possible Performance Degradation:
+If statistics are gathered at inappropriate times (e.g., during peak business hours), it can lead to contention and degrade overall system performance.
+
+Risk of Stale Statistics:
+If statistics are not gathered frequently enough, they can become stale, leading the optimizer to make poor decisions based on outdated information. 
+This can degrade query performance.
+
+Complexity in Management:
+Managing statistics can be complex, especially in environments with frequent data changes. Deciding when and how to gather statistics requires careful planning 
+to avoid performance issues.
+
+Potential for Suboptimal Plans with Inaccurate Statistics:
+If statistics are not collected properly or are incomplete, the optimizer might generate suboptimal execution plans, 
+leading to slower queries and inefficient resource usage.
+
+Increased Maintenance Effort:
+Regularly gathering and managing statistics requires ongoing effort, especially in large or complex environments.
+ This includes setting up appropriate jobs, monitoring their impact, and tuning the process if needed.
+ 
+Dependency on Histograms:
+While histograms can improve query performance for skewed data, they also add complexity and can sometimes lead to unexpected performance 
+issues if not used correctly.
+
+=======================================================================================================================
+
+							 
+If you have over 100 databases and an agent (like Oracle Management Agent from Oracle Enterprise Manager) 
+installed on each database, and you suspect that one of the agents is not working properly, you can follow 
+these steps to identify and troubleshoot the problematic agent.
+ANS:
+Step 1: Check the Agent Status from Oracle Enterprise Manager (OEM)
+1	:Log in to Oracle Enterprise Manager (OEM)
+2	:Go to the "Targets" menu and select "All Targets" or "Agents" to view the status of all agents.
+3	:IDENTIFIED Problematic AGENT :
+	 Look for any agent that shows as "Down," "Unreachable," or "Metric Collection Error."	
+	 If an agent is not functioning correctly, it will typically be highlighted in red or show an error status in OEM.
+4	:Click on the specific agent to see detailed information about its status, including the last time it communicated with the OEM server.
+	 Check the "Status," "Last Upload," and "Heartbeat" metrics.
+Step 2: Check the Agent Logs Manually on the Host
+1	:Check the Agent Status:
+	 ./emctl status agent
+2	:Restart the Agent:
+	 If you find issues, try restarting the agent
+		./emctl stop agent
+		./emctl start agent
+Step 5: Reinstall the Agent (If Necessary):
+1	:If the agent continues to fail and other troubleshooting steps do not resolve the issue, you may need to reinstall the agent
+2	:Remove the Existing Agent:
+		./emctl stop agent
+		./emctl uninstall agent
+3	:Install the Agent Again:							 
+=========================================
+simple logic interview
+==========================================
+explain sga and pga?
+mandatory background process?
+
+why we need Multiplexing ?
+Use a Surviving Control File: If you have configured multiple (multiplexed) control files, Oracle will continue to operate as long as at least one
+control file is intact. If one control file is deleted, you can copy the surviving control file(s) to the location of the deleted file and restart the database.
+
+what is redo log file?
+why we need to put forceloging?
+FORCE LOGGING ensures that all changes to the database are recorded in the redo logs, regardless of the logging settings of individual tablespaces 
+or objects.
+
+what is nologing?
+NOLOGGING is used to reduce redo log generation for specific operations, which can improve performance for bulk data operations or index rebuilds
+
+whate we call user read data from dataffer cash?
+soft parsing and hard parsing
+
+why we need to use stand by redologes?
+how to create asm disks?
+whate vip?
+how many scan ips we requred 6nodes?
+what is cashfusion?
+command for mrp stop?
+upgradation? 11g to 19c?
+patching?
+
+==================================================
+Locking: Refers to the mechanism that Oracle uses to ensure data consistency and manage concurrency. 
+          Locks prevent multiple sessions from conflicting when accessing or modifying the same data.
+
+Blocking: Occurs when one session holds a lock that another session needs, causing the second session to wait. 
+          Blocking can lead to performance issues and potentially deadlocks if not managed properly.
+		  ==========================================================================================
+		  
+		  
+		  alter system set stadby_file_management=auto  (it create automaticaly datafile in stand by side)
+=============================================================		  
+
+optimager:it is choose the best plan based on the statistics
+        ->it is think we need scan full tablespace or index on the time statasticks can help to scan index
+		>we can gather statasticks all object like (table,views..etc) DBMS_STATS
+		->stats gathering meanse it dosont scan the full table it will give boost of performance
+		
+		
+		cssd demone will be down in rac whate hapen?
+		how to tack dblink structer backup? =>CONTENT=METADATA_ONLY
+		if check point is downe?=> auto genereted
+		in rac patching your geting error some log what you need to do?
+		explain cluster startup sequence?
+		sql will be running slow ?
+		dr protection modes? which one is you chose
+		if we can put max protucion modes database will be slow?
+		how can we ecrept datafile
+		we have 3redo loges how to increse size of all the redo loges?
+		how to tack table structure backup?
+		why we need to use n+1 redologes in stand by?
+		how to clear fra?
+		how to check which index or not working?
+		one instance will be downe whate is reasen?
+		Overview of GNSPD 
+		
+		######focus on rac and prefomance tuning basic stuff
+----------------------------------------------------------------------------
+WHAT IS  GNSPD?
+
+GNS is a feature of Oracle RAC that provides dynamic network configuration for the cluster.		
+It automates the management of host names and IP addresses within the cluster by dynamically allocating IP addresses as nodes are added or removed.
+GNSPD (GNS Proxy Daemon):
+GNSPD acts as a proxy for the GNS, managing communication between the GNS service and the DNS (Domain Name System) server.
+It allows the RAC cluster to interact with an external DNS server without requiring direct modifications to the DNS server's configuration.
+How GNSPD Works
+
+
+
+GNSPD is the Grid Naming Service Proxy Daemon used in Oracle RAC to manage the interaction between the GNS service and an external DNS server.
+It simplifies the management of dynamic IP addresses and hostnames in a RAC environment by handling DNS queries and ensuring they are correctly resolved.
+GNSPD is essential for environments where the RAC cluster's network configuration needs to be flexible and scalable, reducing the need for manual DNS management.

@@ -1,0 +1,72 @@
+
+    create table sales_comp
+     (sales_man_id int primary key,
+      product_name varchar(20),
+      city varchar(20),
+      sale_date date
+     )
+    partition by range(sale_date)
+    subpartition by list(city)
+    subpartition template
+    (
+      subpartition up values('lucknow','agra','kanpur') tablespace tbs1,
+      subpartition mp values('indore','bhopal') tablespace tbs2,
+      subpartition mh values('pune','mumbai') tablespace tbs3
+    )
+   (
+    partition sale_jan_01 values less than (to_date('2020-02-01','yyyy-mm-dd')),
+    partition sale_feb_02 values less than (to_date('2020-03-01','yyyy-mm-dd'))
+  )
+
+insert into sales_comp values(1,'brush','lucknow','01-jan-2020');
+
+
+
+
+
+
+
+alter table sales_comp add partition sales_mar_03 values less than(to_date('2020-04-01','yyyy-mm-dd'));
+
+
+
+alter table sales_comp modify partition sales_mar_03 add subpartition ap values ('hyderabad');
+
+
+
+select partition_name,table_name,tablespace_name,subpartition_count from user_tab_partitions where table_name='SALES_COMP';
+
+select table_name,subpartition_name,tablespace_name from user_tab_subpartitions where table_name='SALES_COMP';
+
+alter tablespace tbs1 offline;
+
+
+
+insert into sales_comp values(8,'toothpest','lucknow','01-jan-2020');
+
+
+
+select * from sales_comp;
+
+
+
+create table sales_comp2
+     (
+     sales_man_id int,
+     sale_date date
+    )
+    partition by range(sale_date)
+    subpartition by hash (sales_man_id)
+     subpartition template
+     (
+      subpartition sp01 tablespace tbs1,
+      subpartition sp02 tablespace tbs2
+    )
+   (
+    partition sale_jan_001 values less than(to_date('2020-02-01','yyyy-mm-dd')),
+    partition sale_feb_002 values less than(to_date('2020-03-01','yyyy-mm-dd'))
+   );
+
+
+select table_name,subpartition_name,tablespace_name from user_tab_subpartitions where table_name='SALES_COMP2';
+

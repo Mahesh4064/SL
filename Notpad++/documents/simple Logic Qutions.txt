@@ -1,0 +1,64 @@
+1.what was your env like in your privious company?
+2. Have workd on rac? RMAN? what are the backup policies in your organization? Types of backup taken? 
+3. Do you know export and import?
+4.How would you know the MRP is stopped  by looking into primary database? what is the view?
+5.How would you restore and recover complete database in same file system & different file system for both regular as well as ASM file system?
+6.what is the cluster parameter in expdp?
+7.what are the importent parameter in datagurad setup?
+8.what is force_login?
+9.what are remap_table & table_exist_action_parameters in expdp?
+10.How to install RAC?
+11. what are the different typs of ips used in RAC? what is VIP?
+12. have done patching in single instance? RAC?
+13. Have you done complete db restoration in your organization?
+14. How would you know the stas are satus of the tables?>>>
+
+----------------------------------------------------------
+->roles and responsible of in privious position job?
+->Rman backup stratergies->whate is full database backup,level0 backup & level1 backup. level1 backup types?
+->datapatch -verbose why it is used? where to checck wether -verbose is applide for the privious patch 
+->Do you know database instalation steps ?
+->what are cluster parameter is export why it is used?
+->How to give privillege drop to table from anthor schema ?
+->export remap_table and remap_schema?
+->prerequisites for patch?
+-> what is qurey parameter in export?
+-> Have worked on Rac environment ?
+Rac setup instaltion?
+->Have you worked on datagurad  ? types of datagurad?
+------------------------------------------------------------------
+1. let me about your self and day to day activities and roles and responsible?
+2.patching ? 2 methods of patching manuval and automatic  what is differents between both?
+3.datagurad creation parameter ?
+4.why force login used?
+5.in expdp i want import any spesific data from table what are the steps?
+6.why we do index rebuild?
+7.what is permetions requred for select user creation?
+8.datagurad syc resolved methods?
+9.sync and async differents?
+10. qurey slow what is your approach? 
+11.why we use runclufy?
+12.rac instaltion steps?
+13.what is scan ip, vip,votig disk?
+14.why we use odd number of voting disk?
+15.in expdp rac why cluster=N?
+16.snpshot creation steps and different types of standby database?
+17.have you face any challeges in patching?
+18.have you done upgradaiton?
+19.Do you Know DB_link?
+20.How to add asm disk?
+ 
+ 
+I have exported data using datapump in point in time recovery (10am) db crash at (12am) how to import archive loges to fill the gap
+
+which Kernal parameter is help to increase SGA size?
+
+How do you know fragmetion is requerd?
+How do you know start gathered requerd?   
+
+dba_tab_statistics we can see statistics from heare 
+dba_table >>we can see table status 
+
+
+types of checkpoints
+types of indexes

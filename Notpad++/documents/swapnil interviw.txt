@@ -1,0 +1,87 @@
+
+
+Why Odd Numbers of Voting Disks?
+Quorum Mechanism:
+The primary reason for using an odd number of voting disks is to ensure that there is always a clear majority of votes to establish quorum.
+Avoiding Split-Brain:
+A split-brain scenario occurs when there is a network partition, and each side of the partition believes it is the active part of the cluster.
+This can lead to data corruption if both partitions continue to operate independently.
+
+
+quorum  use of in rac?
+
+Cluster quorum is like a voting system in a group to ensure that decisions are made correctly and that the cluster continues to run smoothly.
+It prevents issues when parts of the cluster can't communicate with each other, making sure that only the majority can make decisions and avoid conflicts.
+ 
+Quorum ensures that Oracle RAC nodes agree on the cluster state, preventing split-brain scenarios and ensuring high availability.
+Voting Files/Disks are used to achieve quorum and maintain cluster integrity.
+Heartbeat Communication and voting mechanisms help nodes determine which are active and should be part of the cluster.
+Proper configuration and management of quorum settings are crucial for maintaining a stable and reliable Oracle RAC environment.
+
+why scan ip 3
+load balancing
+redundancy and high availability
+
+my redunecy is extarnal so how many scan ips use i can use one
+yes you can use but load balancing we can use 3
+
+rac bg process
+asm and instance recover
+->Investigate any operating system-level issues, such as hardware failures, disk corruption, or network issues, that might have caused the crash
+->ensure the environment is correctly set up
+->check for errors in the alert log
+-> verify that all resources (disk groups, memory, permissions) are correctly configured
+->you might need to restore from a backup
+ 
+how to start anther instance ?
+Verify the ORACLE_HOME and ORACLE_SID environment 
+srvctl start instance -d <db_unique_name> -i <instance_name>
+
+how to take metadata backup 
+CONTENT=METADATA_ONLY 
+ 
+
+how to tack expd backup in dblink? 
+expdp local_username/password@local_database DIRECTORY=local_directory DUMPFILE=remote_backup.dmp NETWORK_LINK=remote_db_link LOGFILE=remote_backup.log SCHEMAS=schema_name
+==>NETWORK_LINK=remote_db_link: The name of the database link that connects to the remote database.
+
+crsd and ohasd difference ?
+CRSD (Cluster Ready Services Daemon):
+->Manages Oracle Clusterware resources and services
+->- Resource management (start, stop, monitor)
+->- Failover and recovery of cluster resources
+->- Dependency management between resources
+-Operates at the resource level (e.g., databases, listeners)
+-Manages specific Oracle RAC resources and their availability
+-Monitors the health of resources and performs failover if needed
+-Runs on all nodes within the Oracle RAC cluster
+-Manages dependencies between various Oracle RAC resources
+-Databases, listeners, services, and other RAC resources
+
+OHASD (Oracle High Availability Services Daemon):
+ Provides foundational services for Oracle Grid Infrastructure and cluster management
+  - Cluster management and infrastructure services
+  - Monitoring and managing core Oracle Grid Infrastructure components
+  - Ensuring availability and health of cluster infrastructure
+     Operates at the infrastructure level (e.g., cluster services)
+     Manages overall cluster infrastructure and core services
+     Monitors the health of the cluster and core services
+     Runs on all nodes within the Oracle RAC cluster
+      Manages dependencies at the infrastructure level
+    Oracle Clusterware stack, Grid Infrastructure services                                                 
+
+what is use of I/O?
+Data Read/Write: I/O operations are used to read data from and write data to storage devices (like disks or SSDs). 
+File Access: Database files (data files, redo log files, control files) are stored on disks. Disk I/O operations handle the access and modification of these files.
+Backup and Recovery: I/O operations are involved in creating backups and performing recovery operations. Backup tools read data from storage to create copies and write them to backup media.
+Data Handling: I/O operations are fundamental for reading and writing data to storage devices.
+Performance Impact: Efficient I/O operations are essential for optimal database performance and responsiveness.
+Backup and Recovery: I/O is involved in creating backups and recovering data.
+Concurrency Management: Ensures data consistency and synchronization across different nodes in a distributed system.
+Optimization: Monitoring and tuning I/O performance helps address bottlenecks and improve overall system efficiency.
+
+
+RMAN ENCREPT Parameter
+CONFIGURE ENCRYPTION FOR DATABASE ON;
+CONFIGURE ENCRYPTION ALGORITHM 'AES256';
+CONFIGURE ENCRYPTION PASSWORD 'your_password';

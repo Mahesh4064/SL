@@ -1,0 +1,43 @@
+
+Adding a node to an Oracle Real Application Clusters (RAC) environment
+
+Hardware and OS setup: The new node should meet the same hardware and operating system requirements as the existing nodes.
+Oracle software and patches: Ensure that the Oracle software version and patch levels match on the new node with the existing nodes.
+Shared storage: The new node must have access to the shared storage used by the existing RAC nodes.
+Network configuration: The new node must have access to the public and private networks used in the RAC setup.
+Passwordless SSH: Set up passwordless SSH between the new node and the existing nodes for both oracle and grid users.
+
+1. Add the Node to the Cluster
+
+Install the required operating system packages.(oracle and oracle asm)
+create groups,
+create users oracle and grid
+set .bash_profile (oracle and Grid)
+Configure IPS in etc/hosts file
+set passwordless connection
+set oracleasm configuration -i
+set oracleasm init 
+scan oracleasm disks
+
+run cluvfy for requirements check
+
+2.Run addnode.sh on an existing node:
+$ cd $ORACLE_HOME/grid/oui/bin
+$ ./addnode.sh -silent "CLUSTER_NEW_NODES={new_node_name}" "CLUSTER_NEW_VIRTUAL_HOSTNAMES={new_vip_name}"
+Replace {new_node_name} with the hostname of the new node and {new_vip_name} with its Virtual IP address (VIP).
+
+3.Run gridSetup.sh on the new node: After successfully running addnode.sh,
+$ cd $ORACLE_HOME/grid
+$ ./gridSetup.sh
+Choose the option "Add Node to Cluster" during installation.
+
+Run root scripts: After the installation is done, you will be prompted to run root.sh
+
+4. Verify the Node Addition:
+$ crsctl check cluster -all
+
+Verify the status of services: 
+$ crsctl stat res -t
+
+ Add Oracle Database Software to the New Node
+ 

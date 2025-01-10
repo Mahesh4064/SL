@@ -1,0 +1,216 @@
+1)All steps will be carried out on one of the node (node1) and later we will clone to other nodes or machines:
+
+Install the system Linux prerequisites: 
+
+The package oracle-database-preinstall-19c contains all the prerequisites on Oracle Linux using the Oracle Unbreakable Enterprise Kernel (UEK).
+
+yum install -y oracle-database-preinstall-19c
+
+yum install -y oracleasm-support
+
+sysctl -p
+
+crosscheck >>> cat  /etc/sysctl.conf 
+
+2)
+Group Creation: –
+
+groupadd -g 5001 oinstall
+groupadd -g 5002 dba
+groupadd -g 5003 oper
+groupadd -g 5004 asmadmin
+groupadd -g 5005 asmdba
+groupadd -g 5006 asmoper
+
+3)
+User Creation: –
+
+useradd -u 5007 -g oinstall -G dba,oper,asmdba oracle
+useradd -u 5008 -g oinstall -G asmadmin,asmdba,asmoper,dba grid
+
+usermod -g oinstall -G dba,oper,asmdba oracle
+usermod -g oinstall -G asmadmin,asmdba,asmoper,dba grid
+
+passwd oracle
+passwd grid
+
+4)
+Add below entries in /etc/security/limits.conf file which will detine limits 
+
+oracle   soft   nofile    1024
+oracle   hard   nofile    65536
+oracle   soft   nproc    16384
+oracle   hard   nproc    16384
+oracle   soft   stack    10240
+oracle   hard   stack    32768
+oracle   hard   memlock    134217728
+oracle   soft   memlock    134217728
+
+
+grid   soft   nofile    1024
+grid   hard   nofile    65536
+grid   soft   nproc    16384
+grid   hard   nproc    16384
+grid   soft   stack    10240
+grid   hard   stack    32768
+grid   hard   memlock    134217728
+grid   soft   memlock    134217728
+
+5)
+Create the directories in which the Oracle / Grid software will be installed.
+
+mkdir -p /u01/app/grid
+mkdir -p /u01/app/19c/gridhome_1
+mkdir -p /u02/app/oracle
+mkdir -p /u02/app/oracle/product/19c/dbhome_1
+mkdir -p /u01/app/oraInventory
+mkdir -p /u01/LATEST_PATCH/
+chown -R grid:oinstall /u01
+chown -R oracle:oinstall /u02
+chown -R grid:oinstall /u01/app/oraInventory
+chmod -R 775 /u01
+chmod -R 775 /u02
+
+6)
+Set bash_profile for grid and oracle user
+
+login to grid user and set .bash_profile :
+
+export TMP=/tmp
+export TMPDIR=$TMP
+export ORACLE_BASE=/u01/app/grid
+export ORACLE_HOME=/u01/app/19c/gridhome_1
+export ORACLE_SID=+ASM1
+export ORACLE_TERM=xterm
+export BASE_PATH=/usr/sbin:$PATH
+export PATH=$ORACLE_HOME/bin:$BASE_PATH
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=$ORACLE_HOME/JRE:$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+
+
+login to oracle user and set .bash_profile :
+
+export TMP=/tmp
+export TMPDIR=$TMP
+export ORACLE_BASE=/u02/app/oracle
+export ORACLE_HOME=/u02/app/oracle/product/19c/dbhome_1
+export ORACLE_SID=racdb1
+export ORACLE_TERM=xterm
+export BASE_PATH=/usr/sbin:$PATH
+export PATH=$ORACLE_HOME/bin:$BASE_PATH
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=$ORACLE_HOME/JRE:$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+
+
+7)
+Add the following entry in /etc/hosts file and crosscheck node reachability
+Primary Site:
+
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+# Private
+192.168.10.1    node1-priv.localdomain   node1-priv
+192.168.10.2    node2-priv.localdomain   node2-priv
+
+# Public
+192.168.56.71    node1.localdomain        node1
+192.168.56.72    node2.localdomain        node2
+
+# Virtual
+192.168.56.81    node1-vip.localdomain    node1-vip
+192.168.56.82    node2-vip.localdomain    node2-vip
+
+# SCAN
+192.168.56.91    node-scan.localdomain    node-scan
+192.168.56.92    node-scan.localdomain    node-scan
+192.168.56.93    node-scan.localdomain    node-scan
+
+
+
+8)
+Firewall Stop and Disable
+
+We can open firewall after installation
+
+systemctl stop firewalld.service
+systemctl disable firewalld.service
+
+Chrony NTP Configuration
+
+systemctl enable chronyd.service
+systemctl restart chronyd.service
+
+
+
+Now we will Bring Down Node1 i.e. Prod1 and clone it to 3 more nodes i.e Prod2, STBY1, STBY2
+After cloning start each node one by one and make changes i.e. modify Hostname, ORACLE_SID in bash_profile, Network file on standby side.
+Use below command to change Hostnames:
+
+nmcli general hostname
+nmcli general hostname node2.localdomain
+nmcli general hostname
+service systemd-hostnamed restart
+
+9)
+###################################
+Verify the network reachability using ping command:
+
+From Node1:
+
+ping node2
+ping node2-priv 
+
+From Node2:
+
+ping node1
+ping node1-priv 
+
+##################################
+10)
+Create shared ASM Disk FOR OCR, DATAFILE and ARCHIVE on Both Sites: Check My Previous Video Link: https://youtu.be/yv-ldikjn9k
+
+Add new shared disk to virtual box machines it should be sharable  
+
+Login to system and run ls /dev/sd* 
+
+/dev/sda /dev/sda1 /dev/sda2 /dev/sdb 
+
+fdisk /dev/sdb 
+
+The sequence of answers is "n", "p", "1", "Return", "Return" and "w". 
+
+Set ASM disks >>>> oracleasm configure -i
+Create ASM disks >>>> oracleasm createdisk ASM1 /dev/sdb1
+Scan ASM disks >>>> oracleasm scandisks 
+List ASM disks >>>> oracleasm listdisks
+
+
+######### On Primary Site ##########
+11)
+Copy software to node1 on primary site and unzip software at grid home location and rdbms home locations by login to respective users
+Setup passwordless ssh configuration
+
+cd /u01/app/19c/gridhome_1/deinstall
+
+./sshUserSetup.sh -user grid -hosts "node1 node2" -noPromptPassphrase -confirm -advanced
+
+Similarly do it for oracle user
+
+cd /u02/app/oracle/product/19c/dbhome_1/deinstall
+
+./sshUserSetup.sh -user oracle -hosts "node1 node2" -noPromptPassphrase -confirm –advanced
+
+./sshUserSetup.sh -user root -hosts "node1 node2" -noPromptPassphrase -confirm –advanced
+
+Set profile and go to ORACLE_HOME location from grid user and run following command and follow the steps.
+
+cd $ORACLE_HOME
+
+./gridSetup.sh -applyRU /u01/LATEST_PATCH/32545008
+
+Once Grid Installation done, Install RDBMS Software through oracle user and create RAC database prod (check our previous video’s for more detail)
+
+./runInstaller -applyRU  /u01/LATEST_PATCH/32545008
+
+Use DBCA to create database prod

@@ -1,0 +1,81 @@
+Oracle Data Pump is a powerful utility for exporting and importing data in Oracle databases. It utilizes two main commands: expdp for export and impdp for import. Below is an overview of key parameters associated with these commands.
+Export Parameters
+
+1. FULL
+Description: Exports the entire database.
+Usage: expdp system/password@db10g full=y directory=TEST_DIR dumpfile=DB10G.dmp logfile=expdpDB10G.log1.
+
+2. SCHEMAS
+Description: Exports all objects within specified schemas.
+Usage: expdp scott/tiger@db10g schemas=SCOTT directory=TEST_DIR dumpfile=SCOTT.dmp logfile=expdpSCOTT.log1.
+
+3. TABLES
+Description: Specifies which tables to export.
+Usage: expdp scott/tiger@db10g tables=EMP,DEPT directory=TEST_DIR dumpfile=EMP_DEPT.dmp logfile=expdpEMP_DEPT.log1.
+
+4. CONTENT
+Description: Determines whether to export only metadata, only data, or both.
+Options: ALL, DATA_ONLY, METADATA_ONLY.
+Usage: expdp username/password DIRECTORY=exp_dir DUMPFILE=mydumpfile.dmp CONTENT=DATA_ONLY LOGFILE=mylogfile.log3.
+
+5. QUERY
+Description: Filters rows exported from a table based on a SQL query condition.
+Usage: expdp username/password DIRECTORY=exp_dir DUMPFILE=mydumpfile.dmp QUERY=table_name:"where_clause" LOGFILE=mylogfile.log3.
+
+6. SAMPLE
+Description: Specifies a percentage of rows to be sampled from tables for export.
+Usage: expdp username/password DIRECTORY=exp_dir DUMPFILE=mydumpfile.dmp SAMPLE=10 LOGFILE=mylogfile.log3.
+
+7. INCLUDE/EXCLUDE
+Description: Used for metadata filtering to include or exclude specific object types.
+Usage:
+Include: INCLUDE=TABLE:"='EMP'"
+Exclude: EXCLUDE=TABLE:"='DEPT'"23.
+
+8. DIRECT
+Description: Enables direct path export, bypassing some SQL processing layers for improved performance.
+Usage: expdp directory=DUMP_DIR DIRECT=y dumpfile=scott_%U.dmp logfile=expdp_SCOTT.log schemas=SCOTT parallel=44.
+
+9. PARALLEL
+Description: Allows multiple processes to work simultaneously, improving performance.
+Usage: parallel=N, where N is the number of parallel processes.
+
+10. CLUSTER
+Description: Determines whether Data Pump can utilize resources across multiple RAC instances. The default is YES, allowing parallelism across instances.
+Usage: expdp system/password@db_name cluster=yes directory=shared_dir dumpfile=my_dump%U.dmp logfile=export.log
+
+
+11. SERVICE_NAME
+Description: Limits the execution of the job to specific instances that provide the specified service.
+Usage: service_name=my_service
+
+
+Import Parameters
+
+1. FULL
+Similar to export, imports the entire database.
+Usage example mirrors the export command with the addition of impdp.
+
+2. SCHEMAS
+Imports objects into specified schemas.
+Usage example mirrors the export command for schemas.
+
+3. TABLES
+Imports specific tables and their dependent objects.
+Usage example mirrors the export command for tables.
+
+
+4. REMAP_SCHEMA
+Allows importing data into a different schema than it was exported from.
+Usage: impdp directory=DUMP_DIR dumpfile=scott_bkp.dmp logfile=imp_schema.log remap_schema='SCOTT:HR'4.
+
+5. TABLE_EXISTS_ACTION
+Defines the action to take if a table already exists during import.
+Options include:
+APPEND: Add data to existing table.
+REPLACE: Replace existing table data.
+SKIP: Skip importing that table.
+
+6. NETWORK_LINK
+Facilitates direct data transfer between databases over a network without creating intermediate dump files.
+Usage example involves creating a database link first.

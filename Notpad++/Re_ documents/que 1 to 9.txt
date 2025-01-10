@@ -1,0 +1,198 @@
+1. What is your total Experience
+
+#####  i have  4 years of Experience in this filed
+
+2. Why looking for change
+
+####
+The question "Why are you looking for a change?" is a common inquiry in job interviews. It seeks to understand the motivation behind your decision to explore new employment opportunities. When responding to this question, it's essential to provide a positive and professional answer. Here are some potential reasons for looking for a change and how you might articulate them:
+
+Career Advancement:
+
+"I am seeking new challenges and opportunities for career growth. I believe that this role aligns well with my skills and ambitions, providing a platform for me to take on more responsibilities and contribute to the success of the team."
+Professional Development:
+
+"I am looking for a role that offers continuous learning and professional development. Your company has a reputation for investing in its employees' growth, and I am eager to be a part of a team where I can enhance my skills and knowledge."
+Company Culture:
+
+"I've done research on your company, and I am impressed by the inclusive and innovative culture you foster. I am seeking a workplace where I can thrive, collaborate with like-minded individuals, and contribute to a positive work environment."
+
+
+3. What is your current location.
+
+
+##### pune
+
+
+4. What is size of DB in your curent project.
+
+##### it is arrount 10tb 
+
+
+
+5. Do you know RAC Environment.
+
+
+######
+Yes, I'm familiar with RAC, which stands for Oracle Real Application Clusters. Oracle RAC is a feature that enables a single Oracle Database to run on multiple interconnected servers, providing high availability and scalability. Here are some key aspects of Oracle RAC:
+
+High Availability:
+
+Oracle RAC is designed to provide high availability by allowing the database to continue running even if one or more nodes (servers) in the cluster fail. This is achieved through shared storage and automatic workload redistribution.
+Scalability:
+
+RAC allows for the horizontal scalability of Oracle databases. Additional nodes can be added to the cluster to handle increased workload, providing scalability as business requirements grow.
+Shared Storage:
+
+RAC relies on shared storage, often in the form of a Storage Area Network (SAN) or Network Attached Storage (NAS). This shared storage allows all nodes in the cluster to access the same database files, ensuring data consistency.
+Cache Fusion:
+
+Cache Fusion is a key feature of Oracle RAC that enables the sharing of in-memory data blocks across multiple nodes. This allows nodes to access and share data blocks without the need for physical I/O, enhancing performance.
+Interconnect:
+
+Nodes in an Oracle RAC environment communicate with each other through a dedicated high-speed network known as the interconnect. The interconnect is crucial for cache fusion and maintaining coordination among the nodes.
+Transparent Application Failover (TAF):
+
+Oracle RAC supports Transparent Application Failover, allowing client applications to automatically reconnect to another surviving node in the event of a node failure. This ensures continuous service availability.
+Oracle Clusterware:
+
+Oracle RAC relies on Oracle Clusterware, which provides the underlying infrastructure for managing the cluster environment. It includes components for node membership, network fencing, and resource management.
+Load Balancing:
+
+RAC provides load balancing across nodes, distributing the database workload evenly. This helps optimize resource utilization and ensures that no single node becomes a bottleneck.
+
+
+
+6. What are technical skills used in day to day activities 
+
+
+Oracle Database Administrators (DBAs) perform a variety of technical tasks to ensure the smooth operation, security, and performance of Oracle databases. Here are some key technical skills used in day-to-day activities as an Oracle DBA:
+
+Database Installation and Configuration:
+
+Ability to install and configure Oracle Database software on various operating systems, including Linux, Windows, and Unix.
+Database Design and Schema Management:
+
+Proficiency in designing database schemas, creating tables, indexes, and other database objects. Managing schema changes and optimizing database structures for performance.
+Backup and Recovery:
+
+Implementing and managing backup and recovery strategies to protect data against loss or corruption. Performing regular backups and testing recovery procedures.
+Performance Tuning:
+
+Monitoring and optimizing database performance. Identifying and resolving performance bottlenecks using tools such as Oracle Enterprise Manager and SQL tuning techniques.
+Security Management:
+
+Implementing and managing database security measures. Configuring user access, roles, and privileges. Ensuring compliance with security best practices and policies.
+Patch and Upgrade Management:
+
+Applying patches and updates to keep the database software up-to-date. Planning and executing database upgrades to newer versions.
+Data Migration and Export/Import:
+
+Performing data migration between databases and environments. Exporting and importing data using Oracle Data Pump or traditional Export/Import utilities.
+High Availability and RAC:
+
+Configuring and managing Oracle Real Application Clusters (RAC) for high availability. Implementing features like Oracle Data Guard for disaster recovery.
+Automation and Scripting:
+
+Writing and maintaining scripts for automating routine tasks and administrative activities. Utilizing tools like SQL*Plus, SQLcl, and scripting languages (e.g., PL/SQL, Shell, or Python).
+Database Monitoring and Alerts:
+
+Setting up monitoring systems to track database performance metrics, resource utilization, and critical events. Configuring alerts for proactive issue identification.
+Troubleshooting:
+
+Diagnosing and resolving database issues, errors, and outages. Analyzing log files, trace files, and using diagnostic tools to troubleshoot problems.
+Capacity Planning:
+
+Monitoring and analyzing database growth trends. Planning for future capacity needs and optimizing resource allocation.
+Data Encryption and Auditing:
+
+Implementing data encryption for sensitive information. Configuring and managing database auditing to track user activities and changes.
+Database Cloning and Refresh:
+
+Creating database clones for testing and development purposes. Refreshing test environments with production data.
+Collaboration and Communication:
+
+Collaborating with development teams, system administrators, and other stakeholders. Communicating effectively to convey technical information and recommendations.
+Cloud Database Management:
+
+As organizations migrate to the cloud, skills in managing Oracle databases in cloud environments, such as Oracle Cloud Infrastructure (OCI) or other cloud platforms.
+These skills represent a comprehensive set of abilities needed for Oracle DBAs to effectively manage, optimize, and secure Oracle databases in various environments. Keeping up-to-date with the latest Oracle technologies and best practices is also crucial for continuous professional development.
+
+
+
+ 7. How frequent you execute cloning of DB
+
+
+####### 
+
+
+
+
+
+8. If DB of 10 TB is compressed what will be the expected size of DB Backup
+
+
+As a rough estimate, assuming a moderate compression ratio of 2:1 (meaning the compressed backup is roughly half the size of the uncompressed data), a 10 TB database might result in a compressed backup of around 5 TB. However, this is a generalization, and actual compression ratios can vary widely.
+
+
+
+9. RAC - Explain RAC architecture.
+
+
+
+######  
+Oracle Real Application Clusters (RAC) is a feature of the Oracle Database that allows a single database to run on multiple servers, forming a cluster. RAC provides high availability and scalability by distributing the database workload across multiple nodes. Below is an overview of the key components and architecture of Oracle RAC:
+
+Nodes:
+
+A RAC environment consists of multiple nodes, which are individual servers or instances that participate in the cluster. These nodes work together to provide a shared database environment.
+Clusterware:
+
+Oracle Clusterware is a fundamental component of RAC. It provides the infrastructure for managing the cluster, including node membership, network communication, and resource coordination. It ensures that all nodes in the cluster are aware of each other's status.
+Interconnect:
+
+Nodes in a RAC cluster communicate with each other through a dedicated high-speed network known as the interconnect. The interconnect is essential for Cache Fusion, a mechanism that allows nodes to share data blocks without the need for physical I/O.
+Shared Storage:
+
+RAC relies on shared storage, such as a Storage Area Network (SAN) or Network Attached Storage (NAS). This shared storage allows all nodes in the cluster to access the same set of database files, ensuring data consistency.
+Database Instances:
+
+Each node in the RAC cluster runs an Oracle Database instance. An instance is the combination of Oracle's background processes and memory structures that manage the database on a specific node.
+Global Cache Services (GCS):
+
+GCS is responsible for Cache Fusion, which allows Oracle RAC instances to share data blocks in the SGA (System Global Area) across multiple nodes. GCS ensures that all nodes have the most up-to-date version of a data block.
+Global Enqueue Services (GES):
+
+GES manages global locks and enqueues to coordinate transactions across the entire cluster. It helps maintain data consistency by preventing conflicts when multiple nodes attempt to access the same resource simultaneously.
+Oracle RAC Database:
+
+The Oracle RAC database is the logical representation of the entire clustered environment. It consists of one or more database instances running on different nodes, all accessing the same set of database files stored on shared storage.
+Cluster Database (Clusterware-managed Database):
+
+In a RAC environment, the database is often referred to as a "cluster database" or "clusterware-managed database." This implies that the database is managed by Oracle Clusterware, ensuring high availability and failover capabilities.
+Services:
+
+RAC allows the creation of services that define how database connections are managed across the cluster. Services can be associated with specific instances or configured for workload balancing and high availability.
+VIP (Virtual IP) Addresses:
+
+Each node in the cluster has a Virtual IP address. VIP addresses are used for client connections and ensure that clients can connect to the database regardless of which node is currently active.
+SCAN (Single Client Access Name):
+
+SCAN is a single entry point for clients to connect to a RAC cluster. It resolves to multiple IP addresses associated with different nodes in the cluster, providing load balancing and transparent failover.
+Understanding the architecture of Oracle RAC is crucial for designing, implementing, and managing a clustered database environment that delivers high availability and scalability.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
