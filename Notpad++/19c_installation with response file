@@ -1,0 +1,119 @@
+
+Version 19.3.0.0.0
+--->>installation with response file
+
+1-ping google.com
+2-yum install -y oracle-database-preinstall-19c  (or) https://oracle-base.com/articles/19c/oracle-db-19c-installation-on-oracle-linux-8
+3-passwd oracle
+4-mkdir -p /u01/app/oracle/product/19c/db_home
+5-chown -R oracle:oinstall /u01
+6-chmod -R 775 /u01
+7-unzip FILE_NAME /u01/app/oracle/product/19c/db_home
+8-cd $ORACLE_HOME/insall/response
+9-cp -p db_install.rsp db_install_rsp.bkp
+10-modify the db_install.rsp file -->> http://www.br8dba.com/install-oracle-19c-database-software-in-silent-mode/
+
+# Fake Oracle Linux 7.
+export CV_ASSUME_DISTID=OEL7.6
+11-./runInstaller -executePrereqs -silent -responseFile /u01/app/oracle/product/19c/db_home/install/response/db_install.rsp
+12-./runInstaller -silent -responseFile /u01/app/oracle/product/19c/db_home/install/response/db_install.rsp
+13-sh root.sh -->>from root
+14-setup .bash_profile
+15-sqlplus / as sysdba
+
+
+--->>DBCA
+1-dbca -silent -createDatabase -templateName General_Purpose.dbc -sid prod -sysPassword oracle -systemPassword oracle -emConfiguration NONE -datafileDestination /u01/app/oracle/oradata -storageType FS -characterSet AL32UTF8
+
+2-create listener through netmgr or netca
+---Listener---
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = prod)
+      (ORACLE_HOME = /u01/app/oracle/product/19c/db_home)
+      (SID_NAME = prod)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+---End---
+3-set hostname (hostnamectl set-hostname oracle1)
+
+4-add tns entry manually
+--TNS--
+prod =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle1)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = oracle1)
+    )
+  )
+
+5-check listener status / start listener
+6-ip set throught ipv4 192.168.1.1
+
+#set Local_listener in database
+ALTER SYSTEM SET LOCAL_LISTENER='(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.2.210)(PORT=1521))' SCOPE=BOTH;
+ALTER SYSTEM REGISTER;
+
+
+
+
+
+http://www.br8dba.com/create-db-19c-dbca-silent/  -->>DBCA
+
+
+--->>installation without response file
+
+1-ping google.com
+2-yum install -y oracle-database-preinstall-19c
+3-passwd oracle
+4-mkdir -p /u01/app/oracle/product/19c/db_home
+5-chown -R oracle:oinstall /u01
+6-chmod -R 775 /u01
+7-unzip FILE_NAME /u01/app/oracle/product/19c/db_home
+8-cd /u01/app/oracle/product/19c/db_home
+9-   ./runInstaller -silent -debug -force \
+oracle.install.option=INSTALL_DB_SWONLY \
+UNIX_GROUP_NAME=oinstall \
+ORACLE_HOME=/u02/app/oracle/product/19c/db_home \
+ORACLE_BASE=/u02/app/oracle \
+oracle.install.db.InstallEdition=EE \
+oracle.install.db.DBA_GROUP=oinstall \
+oracle.install.db.OPER_GROUP=oinstall \
+oracle.install.db.OSBACKUPDBA_GROUP=oinstall \
+oracle.install.db.OSDGDBA_GROUP=oinstall \
+oracle.install.db.OSKMDBA_GROUP=oinstall \
+oracle.install.db.OSRACDBA_GROUP=oinstall \
+DECLINE_SECURITY_UPDATES=true
+10- export ORACLE_HOME=/u02/app/oracle/product/19c/db_home
+echo $ORACLE_HOME
+    export PATH=$ORACLE_HOME/bin:$PATH
+11- sqlplus / as sysdba
+
+
+
+
+
+
+export ORACLE_HOME=/home/oracle/19cclient
+export PATH=$ORACLE_HOME/bin:$PATH
+
+
+
+
+dbca -silent -createDatabase -templateName General_Purpose.dbc -gdbName shyamal -sid shyamal -sysPassword oracle -systemPassword oracle -emConfiguration NONE -datafileDestination /u02/app/oracle/oradata -storageType FS -characterSet AL32UTF8
+
+
+$ORACLE_HOME/bin/dbstart $ORACLE_HOME
+vi /u01/app/oracle/product/19c/db_home/rdbms/log/startup.log
+tail -f /u01/app/oracle/product/19c/db_home/rdbms/log/startup.log
+vi oratab
