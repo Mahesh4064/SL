@@ -1,0 +1,656 @@
+[oracle@test patches]$ ll
+total 2682072
+drwxr-x---.  8 oracle oracle       4096 Jan 13  2022 33509923
+drwxr-x---. 15 oracle oracle       4096 Jan  9  2022 OPatch
+-rw-rw-r--.  1 oracle oracle 2622069290 Jun  8 10:50 p33509923_190000_Linux-x86-64.zip
+-rw-rw-r--.  1 oracle oracle  122883929 Jun  8 10:50 p6880880_122010_Linux-x86-64.zip
+-rw-rw-r--.  1 oracle oracle    1478442 Jan 20  2022 PatchSearch.xml
+[oracle@test patches]$ mv $ORACLE_HOME/OPatch  $ORACLE_HOME/OPatch_old
+[oracle@test patches]$
+[oracle@test patches]$ cd $ORACLE_HOME
+[oracle@test dbhome]$ ll
+total 2988124
+
+[oracle@test patches]$ cp -R  OPatch  $ORACLE_HOME/OPatch
+[oracle@test patches]$
+[oracle@test patches]$ cd $ORACLE_HOME
+[oracle@test dbhome]$ ll
+total 2988128
+
+-rw-rw-r--.  1 oracle oracle 3059705302 Jun  8 10:15 LINUX.X64_193000_db_home.zip
+drwxr-xr-x.  9 oracle oracle         98 Apr 17  2019 md
+drwxr-xr-x.  4 oracle oracle         31 Apr 17  2019 mgw
+drwxr-xr-x. 10 oracle oracle       4096 Apr 17  2019 network
+drwxr-xr-x.  5 oracle oracle         46 Apr 17  2019 nls
+drwxr-xr-x.  8 oracle oracle        101 Apr 17  2019 odbc
+drwxr-xr-x.  5 oracle oracle         42 Apr 17  2019 olap
+drwxr-x---. 15 oracle oracle       4096 Jun  8 11:49 OPatch
+drwxr-x---. 14 oracle oracle       4096 Jun  8 10:21 OPatch_old
+drwxr-xr-x.  7 oracle oracle         65 Apr 17  2019 opmn
+drwxr-xr-x.  4 oracle oracle         34 Apr 17  2019 oracore
+-rw-r-----.  1 oracle oracle         54 Jun  8 10:19 oraInst.loc
+drwxr-xr-x.  6 oracle oracle         52 Apr 17  2019 ord
+drwxr-xr-x.  4 oracle oracle         66 Apr 17  2019 ords
+drwxr-xr-x.  3 oracle oracle         19 Apr 17  2019 oss
+drwxr-xr-x.  8 oracle oracle       4096 Jun  8 10:21 oui
+
+
+[oracle@test dbhome]$ $ORACLE_HOME/OPatch/opatch version
+OPatch Version: 12.2.0.1.29
+
+OPatch succeeded.
+
+[oracle@test dbhome]$ cat /etc/oraInst.loc
+inventory_loc=/u01/app/oraInventory
+inst_group=oracle
+
+
+[oracle@test dbhome]$ cd /u01/app
+[oracle@test app]$ ll
+total 4
+drwxrwxr-x. 10 oracle oinstall 4096 Jun  8 10:24 oracle
+drwxrwx---.  4 oracle oracle     78 Jun  8 11:09 oraInventory
+[oracle@test app]$ tar -pcvf /u01/patches/backup_OraINV.tar oraInventory
+oraInventory/
+oraInventory/logs/
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/installerPatchActions_2024-06-08_10-19-00AM.log
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/installActions2024-06-08_10-19-00AM.log
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/installActions2024-06-08_10-19-00AM.err
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/installActions2024-06-08_10-19-00AM.out
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/time2024-06-08_10-19-00AM.log
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/oraInstall2024-06-08_10-19-00AM.out
+oraInventory/logs/InstallActions2024-06-08_10-19-00AM/oraInstall2024-06-08_10-19-00AM.err
+oraInventory/orainstRoot.sh
+oraInventory/oraInst.loc
+oraInventory/ContentsXML/
+oraInventory/ContentsXML/inventory.xml
+oraInventory/ContentsXML/oui-patch.xml
+oraInventory/ContentsXML/comps.xml
+oraInventory/ContentsXML/libs.xml
+[oracle@test app]$
+[oracle@test app]$ cd $ORACLE_HOME
+[oracle@test dbhome]$ ll
+
+
+
+drwxrwxr-x. 70 oracle oinstall 4096 Jun  8 11:49 dbhome
+[oracle@test 19c]$  tar -pcvf /u01/patches/backup_19c  dbhome
+dbhome/
+dbhome/LINUX.X64_193000_db_home.zip
+
+
+dbhome/drdaas/
+dbhome/drdaas/admin/
+dbhome/drdaas/admin/drdasqtt_translator_setup.sql
+dbhome/drdaas/admin/drdapkg_db2.sql
+dbhome/drdaas/admin/drdasqt_set_profile_dd.sql
+dbhome/drdaas/admin/drdaas.ora
+dbhome/drdaas/lib/
+dbhome/drdaas/lib/s0dpspmain.o
+dbhome/drdaas/lib/s0dpscmain.o
+dbhome/drdaas/lib/s0dpssmain.o
+dbhome/instantclient/
+dbhome/instantclient/libsqlplusic.so
+dbhome/schagent.conf
+dbhome/opmn/
+dbhome/opmn/conf/
+dbhome/opmn/conf/ons.config
+
+
+
+[oracle@test 19c]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /u01/patches/33509923/33515361
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+PREREQ session
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-02-30PM_1.log
+
+Invoking prereq "checkconflictagainstohwithdetail"
+
+Prereq "checkConflictAgainstOHWithDetail" passed.
+
+OPatch succeeded.
+[oracle@test 19c]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /u01/patches/33509923/33529556
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+PREREQ session
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-03-30PM_1.log
+
+Invoking prereq "checkconflictagainstohwithdetail"
+
+Prereq "checkConflictAgainstOHWithDetail" passed.
+
+OPatch succeeded.
+[oracle@test 19c]$ $ORACLE_HOME/OPatch/opatch version
+OPatch Version: 12.2.0.1.29
+
+OPatch succeeded.
+[oracle@test 19c]$ $ORACLE_HOME/OPatch/opatch lsinventory
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-05-11PM_1.log
+
+Lsinventory Output file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/lsinv/lsinventory2024-06-08_12-05-11PM.txt
+--------------------------------------------------------------------------------
+Local Machine Information::
+Hostname: localhost
+ARU platform id: 226
+ARU platform description:: Linux x86-64
+
+Installed Top-level Products (1):
+
+Oracle Database 19c                                                  19.0.0.0.0
+There are 1 products installed in this Oracle Home.
+
+
+Interim patches (2) :
+
+Patch  29585399     : applied on Thu Apr 18 12:51:33 IST 2019
+Unique Patch ID:  22840393
+Patch description:  "OCW RELEASE UPDATE 19.3.0.0.0 (29585399)"
+   Created on 9 Apr 2019, 19:12:47 hrs PST8PDT
+   Bugs fixed:
+     27222128, 27572040, 27604329, 27760043, 27877830, 28302580, 28470673
+     28621543, 28642469, 28699321, 28710663, 28755846, 28772816, 28785321
+     28800508, 28808652, 28815557, 28847541, 28847572, 28870496, 28871040
+     28874416, 28877252, 28881191, 28881848, 28888083, 28911140, 28925250
+     28925460, 28935956, 28940472, 3, 28942694, 28951332, 28963036, 28968779
+     28980448, 28995287, 29003207, 29003617, 29016294, 29018680, 29024876
+     29026154, 29027933, 29047127, 29052850, 29058476, 29111631, 29112455
+     29117337, 29123444, 29125708, 29125786, 29129476, 29131772, 29132456
+     29139727, 29146157, 29147849, 29149170, 29152603, 29152752, 29154631
+     29154636, 29154829, 29159216, 29159661, 29160462, 29161923, 29169540
+     29169739, 29170717, 29173618, 29181568, 29182920, 29183298, 29186091
+     29191827, 29201143, 29201695, 29209545, 29210577, 29210610, 29210624
+     29210683, 29213641, 29219627, 29224294, 29225861, 29229839, 29235934
+     29242906, 29243749, 29244495, 29244766, 29244968, 29248723, 29249583
+     29251564, 29255616, 29260224, 29261695, 29271019, 29273360, 29282090
+     29282666, 29285453, 29285621, 29290235, 29292232, 29293806, 29294753
+     29299830, 29307090, 29307109, 29311336, 29329675, 29330791, 29339299
+     29357821, 29360467, 29360775, 29367971, 29368725, 29379299, 29379381
+     29380527, 29381000, 29382296, 29391301, 29393649, 29402110, 29411931
+     29413360, 29457319, 29465047
+
+Patch  29517242     : applied on Thu Apr 18 12:51:17 IST 2019
+Unique Patch ID:  22862832
+Patch description:  "Database Release Update : 19.3.0.0.190416 (29517242)"
+   Created on 17 Apr 2019, 23:27:10 hrs PST8PDT
+   Bugs fixed:
+     29515240, 14735102, 19697993, 20313356, 21965541, 25806201, 25883179
+     25986062, 26476244, 26611353, 26872233, 27369515, 27423500, 27666312
+     27710072, 27846298, 27957203, 28064977, 28072567, 28129791, 28181021
+     28210681, 28279456, 28313275, 28350595, 28371123, 28379065, 28431445
+     28463226, 28489419, 28502773, 28513333, 28534475, 28561704, 28569897
+     28572533, 28572544, 28587723, 28593682, 28594086, 28597221, 28601957
+     28605066, 28606598, 28625862, 28627033, 28636532, 28643718, 28644549
+     28645570, 28646200, 28646939, 28649388, 28655209, 28663782, 28673945
+     28692275, 28694872, 28696373, 28705231, 28710385, 28710734, 28714461
+     28718469, 28730079, 28740708, 28760206, 28772390, 28774416, 28777214
+     28789531, 28791852, 28795551, 28802734, 28804517, 28810381, 28811560
+     28815123, 28815355, 28819640, 28824482, 28833912, 28835937, 28862532
+     28863432, 28873575, 28876253, 28876639, 28884931, 28888327, 28892794
+     28897512, 28899663, 28901126, 28905457, 28907196, 28912691, 28915561
+     28917080, 28918429, 28919145, 28922227, 28922532, 28922608, 28925634
+     28925880, 28933158, 28936114, 28937717, 28938698, 28940179, 28940281
+     28941901, 28942455, 28945421, 28945994, 28951533, 28952168, 28954762
+     28955606, 28957292, 28957723, 28962775, 28965231, 28966444, 28974083
+     28977322, 28983095, 28983486, 28986326, 28986481, 28988482, 28989306
+     28993295, 28994307, 28996376, 29000000, 29001888, 29002927, 29003738
+     29006318, 29006621, 29007321, 29007775, 29008035, 29011936, 29013475
+     29014076, 29015118, 29017265, 29018655, 29019121, 29021063, 29021352
+     29024552, 29026582, 29026606, 29027456, 29027694, 29027940, 29031575
+     29031600, 29032234, 29032457, 29032607, 29033052, 29033145, 29033200
+     29033280, 29034587, 29037290, 29038528, 29039089, 29039510, 29043554
+     29043651, 29043725, 29044763, 29044954, 29047850, 29048289, 29048498
+     29048605, 29050560, 29050765, 29051702, 29052726, 29053783, 29056024
+     29056270, 29056560, 29059011, 29061959, 29062692, 29062848, 29062860
+     29062868, 29110526, 29110783, 29110790, 29110797, 29110802, 29110805
+     29111598, 29113282, 29113305, 29117526, 29117642, 29119077, 29120223
+     29122224, 29122254, 29123297, 29123432, 29123482, 29124368, 29125380
+     29126345, 29127957, 29128935, 29129450, 29129497, 29129712, 29130219
+     29131539, 29132938, 29134447, 29136111, 29138641, 29141316, 29141341
+     29141685, 29142667, 29144995, 29145214, 29145730, 29149829, 29150338
+     29151520, 29152357, 29155099, 29157389, 29158680, 29158899, 29159909
+     29159936, 29160174, 29162095, 29163415, 29163437, 29163524, 29163567
+     29167111, 29167342, 29167374, 29167940, 29168219, 29168433, 29169073
+     29169215, 29171942, 29172618, 29172826, 29173140, 29173373, 29173817
+     29174004, 29176318, 29177466, 29177543, 29177886, 29178385, 29180313
+     29180455, 29180559, 29180893, 29181153, 29181231, 29181620, 29181743
+     29181923, 29182019, 29183912, 29184297, 29184666, 29185193, 29186456
+     29189302, 29189307, 29189889, 29190235, 29190474, 29190740, 29191541
+     29192419, 29192468, 29192685, 29193207, 29194205, 29194367, 29194493
+     29194827, 29195279, 29195337, 29195758, 29196725, 29199635, 29199733
+     29200316, 29200700, 29201494, 29201539, 29202104, 29202850, 29203122
+     29203166, 29203425, 29203443, 29203604, 29205281, 29205323, 29205419
+     29205463, 29205767, 29205918, 29206109, 29206605, 29207073, 29208260
+     29208732, 29211457, 29211724, 29212012, 29212433, 29212611, 29213351
+     29213775, 29213850, 29213879, 29214561, 29214960, 29216746, 29216984
+     29217294, 29217472, 29217828, 29217848, 29218570, 29219205, 29219273
+     29220079, 29221248, 29221891, 29222031, 29222784, 29223833, 29223859
+     29223967, 29224065, 29224605, 29225076, 29227602, 29228869, 29229164
+     29229754, 29229844, 29229955, 29230252, 29230565, 29231133, 29232117
+     29232154, 29234123, 29237538, 29240307, 29241345, 29242017, 29242884
+     29243958, 29245137, 29245160, 29246163, 29247415, 29247712, 29247906
+     29248552, 29248835, 29248858, 29249991, 29250059, 29251259, 29253184
+     29253871, 29254031, 29254930, 29255178, 29255273, 29255431, 29255435
+     29256426, 29259119, 29259320, 29261906, 29262512, 29262887, 29265448
+     29266248, 29266899, 29267292, 29268412, 29269171, 29270585, 29273539
+     29273735, 29273847, 29274428, 29274564, 29274627, 29275461, 29278218
+     29279658, 29279751, 29279854, 29282898, 29285503, 29285788, 29285956
+     29286037, 29287130, 29287705, 29292837, 29293072, 29297863, 29297915
+     29298220, 29299049, 29299082, 29299844, 29301566, 29302963, 29303918
+     29304781, 29311588, 29312310, 29312734, 29312753, 29313347, 29313417
+     29313525, 29314539, 29318410, 29319441, 29321489, 29323946, 29324568
+     29325087, 29325105, 29325257, 29325993, 29327044, 29329087, 29331209
+     29331380, 29331493, 29332771, 29333500, 29337310, 29338315, 29338453
+     29338780, 29338913, 29339155, 29341209, 29343086, 29346943, 29347620
+     29348176, 29350052, 29351386, 29351716, 29351749, 29352867, 29353271
+     29355654, 29356547, 29356752, 29358828, 29360672, 29361801, 29363151
+     29364171, 29364177, 29367019, 29367561, 29368253, 29373418, 29373588
+     29374179, 29377986, 29378029, 29379978, 29382784, 29385652, 29386502
+     29386635, 29386660, 29387274, 29388094, 29388524, 29388830, 29389889
+     29390435, 29394140, 29394749, 29397954, 29398863, 29399100, 29399121
+     29405012, 29405651, 29412066, 29412269, 29417884, 29423826, 29429264
+     29429566, 29431485, 29435652, 29438736, 29439522, 29450421, 29451386
+     29452576, 29452953, 29457807, 29460252, 29462957, 29486181, 29507616
+     29521748, 29530812, 29531654, 29557336, 29558975, 29601461
+
+
+
+--------------------------------------------------------------------------------
+
+OPatch succeeded.
+[oracle@test 19c]$ cd /u01
+[oracle@test u01]$ ll
+total 4
+drwxrwxr-x. 4 oracle oinstall   40 Jun  8 10:19 app
+drwxrwxr-x. 4 oracle oracle   4096 Jun  8 11:56 patches
+[oracle@test u01]$ cd patches/
+[oracle@test patches]$ ll
+total 13231076
+drwxr-x---.  8 oracle oracle        4096 Jan 13  2022 33509923
+-rw-rw-r--.  1 oracle oracle 10789570560 Jun  8 11:58 backup_19c
+-rw-rw-r--.  1 oracle oracle    12605440 Jun  8 11:56 backup_OraINV.tar
+drwxr-x---. 15 oracle oracle        4096 Jan  9  2022 OPatch
+-rw-rw-r--.  1 oracle oracle  2622069290 Jun  8 10:50 p33509923_190000_Linux-x86-64.zip
+-rw-rw-r--.  1 oracle oracle   122883929 Jun  8 10:50 p6880880_122010_Linux-x86-64.zip
+-rw-rw-r--.  1 oracle oracle     1478442 Jan 20  2022 PatchSearch.xml
+[oracle@test patches]$ cd 33509923/
+[oracle@test 33509923]$ ll
+total 136
+drwxr-x---. 4 oracle oracle     48 Jan 13  2022 33239955
+drwxr-x---. 5 oracle oracle     81 Jan 13  2022 33515361
+drwxr-x---. 5 oracle oracle     62 Jan 13  2022 33529556
+drwxr-x---. 5 oracle oracle     62 Jan 13  2022 33534448
+drwxr-x---. 4 oracle oracle     48 Jan 13  2022 33575402
+drwxr-x---. 2 oracle oracle   4096 Jan 13  2022 automation
+-rw-rw-r--. 1 oracle oracle   5824 Jan 13  2022 bundle.xml
+-rw-r--r--. 1 oracle oracle 123797 Jan 20  2022 README.html
+-rw-r--r--. 1 oracle oracle      0 Jan 13  2022 README.txt
+[oracle@test 33509923]$ cd 33515361
+[oracle@test 33515361]$ ll
+total 84
+drwxr-x---.  3 oracle oracle    21 Jan 13  2022 custom
+drwxr-x---.  3 oracle oracle    20 Jan 13  2022 etc
+drwxr-x---. 35 oracle oracle  4096 Jan 13  2022 files
+-rw-r--r--.  1 oracle oracle 76004 Jan 13  2022 README.html
+-rw-r--r--.  1 oracle oracle    21 Jan 13  2022 README.txt
+[oracle@test 33515361]$ $ORACLE_HOME/OPatch/opatch apply
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-06-47PM_1.log
+
+Verifying environment and performing prerequisite checks...
+Prerequisite check "CheckActiveFilesAndExecutables" failed.
+The details are:
+
+
+Following active executables are not used by opatch process :
+/u01/app/oracle/product/19c/dbhome/bin/oracle
+
+Following active executables are used by opatch process :
+
+UtilSession failed: Prerequisite check "CheckActiveFilesAndExecutables" failed.
+Log file location: /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-06-47PM_1.log
+
+OPatch failed with error code 73
+[oracle@test 33515361]$ $ORACLE_HOME/OPatch/opatch apply
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-10-58PM_1.log
+
+Verifying environment and performing prerequisite checks...
+
+--------------------------------------------------------------------------------
+Start OOP by Prereq process.
+Launch OOP...
+
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-12-05PM_1.log
+
+Verifying environment and performing prerequisite checks...
+OPatch continues with these patches:   33515361
+
+Do you want to proceed? [y|n]
+yes
+User Responded with: Y
+All checks passed.
+
+Please shutdown Oracle instances running out of this ORACLE_HOME on the local system.
+(Oracle Home = '/u01/app/oracle/product/19c/dbhome')
+
+
+Is the local system ready for patching? [y|n]
+y
+User Responded with: Y
+Backing up files...
+Applying interim patch '33515361' to OH '/u01/app/oracle/product/19c/dbhome'
+ApplySession: Optional component(s) [ oracle.network.gsm, 19.0.0.0.0 ] , [ oracle.rdbms.ic, 19.0.0.0.0 ] , [ oracle.rdbms.tg4db2, 19.0.0.0.0 ] , [ oracle.tfa, 19.0.0.0.0 ] , [ oracle.options.olap.api, 19.0.0.0.0 ] , [ oracle.ons.cclient, 19.0.0.0.0 ] , [ oracle.network.cman, 19.0.0.0.0 ] , [ oracle.rdbms.tg4sybs, 19.0.0.0.0 ] , [ oracle.rdbms.tg4msql, 19.0.0.0.0 ] , [ oracle.rdbms.tg4ifmx, 19.0.0.0.0 ] , [ oracle.oid.client, 19.0.0.0.0 ] , [ oracle.rdbms.tg4tera, 19.0.0.0.0 ] , [ oracle.net.cman, 19.0.0.0.0 ] , [ oracle.xdk.companion, 19.0.0.0.0 ] , [ oracle.ons.eons.bwcompat, 19.0.0.0.0 ] , [ oracle.options.olap, 19.0.0.0.0 ] , [ oracle.jdk, 1.8.0.191.0 ]  not present in the Oracle Home or a higher version is found.
+
+
+
+
+Patching component oracle.help.ohj, 11.1.1.7.0...
+
+Patching component oracle.perlint, 5.28.1.0.0...
+
+Patching component oracle.rdbms.locator, 19.0.0.0.0...
+
+Patching component oracle.perlint.expat, 2.0.1.0.4...
+
+Patching component oracle.rdbms.rsf, 19.0.0.0.0...
+
+Patching component oracle.rdbms.util, 19.0.0.0.0...
+
+Patching component oracle.rdbms, 19.0.0.0.0...
+
+Patching component oracle.assistants.acf, 19.0.0.0.0...
+
+Patching component oracle.assistants.deconfig, 19.0.0.0.0...
+
+Patching component oracle.jdk, 1.8.0.201.0...
+Patch 33515361 successfully applied.
+Sub-set patch [29517242] has become inactive due to the application of a super-set patch [33515361].
+Please refer to Doc ID 2161861.1 for any possible further required actions.
+Log file location: /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-12-05PM_1.log
+
+OPatch succeeded.
+[oracle@test 33515361]$
+[oracle@test 33515361]$
+[oracle@test 33515361]$
+[oracle@test 33515361]$ cd ..
+[oracle@test 33509923]$ ll
+total 136
+drwxr-x---. 4 oracle oracle     48 Jan 13  2022 33239955
+drwxr-x---. 5 oracle oracle     81 Jan 13  2022 33515361
+drwxr-x---. 5 oracle oracle     62 Jan 13  2022 33529556
+drwxr-x---. 5 oracle oracle     62 Jan 13  2022 33534448
+drwxr-x---. 4 oracle oracle     48 Jan 13  2022 33575402
+drwxr-x---. 2 oracle oracle   4096 Jan 13  2022 automation
+-rw-rw-r--. 1 oracle oracle   5824 Jan 13  2022 bundle.xml
+-rw-r--r--. 1 oracle oracle 123797 Jan 20  2022 README.html
+-rw-r--r--. 1 oracle oracle      0 Jan 13  2022 README.txt
+[oracle@test 33509923]$ cd 33529556
+[oracle@test 33529556]$ ll
+total 124
+drwxr-x---.  3 oracle oracle     21 Jan 13  2022 custom
+drwxr-x---.  3 oracle oracle     20 Jan 13  2022 etc
+drwxr-x---. 20 oracle oracle   4096 Jan 13  2022 files
+-rw-r--r--.  1 oracle oracle 120875 Jan 13  2022 README.txt
+[oracle@test 33529556]$ $ORACLE_HOME/OPatch/opatch apply
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-19-04PM_1.log
+
+Verifying environment and performing prerequisite checks...
+
+--------------------------------------------------------------------------------
+Start OOP by Prereq process.
+Launch OOP...
+
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2024, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/19c/dbhome
+Central Inventory : /u01/app/oraInventory
+   from           : /u01/app/oracle/product/19c/dbhome/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-19-44PM_1.log
+
+Verifying environment and performing prerequisite checks...
+OPatch continues with these patches:   33529556
+
+Do you want to proceed? [y|n]
+y
+User Responded with: Y
+All checks passed.
+
+Please shutdown Oracle instances running out of this ORACLE_HOME on the local system.
+(Oracle Home = '/u01/app/oracle/product/19c/dbhome')
+
+
+Is the local system ready for patching? [y|n]
+y
+User Responded with: Y
+Backing up files...
+Applying interim patch '33529556' to OH '/u01/app/oracle/product/19c/dbhome'
+ApplySession: Optional component(s) [ oracle.has.crs.cvu, 19.0.0.0.0 ] , [ oracle.has.cvu, 19.0.0.0.0 ] , [ oracle.rhp.crs, 19.0.0.0.0 ] , [ oracle.has.crs, 19.0.0.0.0 ] , [ oracle.xag, 19.0.0.0.0 ]  not present in the Oracle Home or a higher version is found.
+
+Patching component oracle.rdbms, 19.0.0.0.0...
+
+Patching component oracle.has.db.cvu, 19.0.0.0.0...
+
+Patching component oracle.has.db, 19.0.0.0.0...
+
+Patching component oracle.has.common, 19.0.0.0.0...
+
+Patching component oracle.has.rsf, 19.0.0.0.0...
+
+Patching component oracle.rhp.db, 19.0.0.0.0...
+
+Patching component oracle.rhp.common, 19.0.0.0.0...
+
+Patching component oracle.has.common.cvu, 19.0.0.0.0...
+Patch 33529556 successfully applied.
+Sub-set patch [29585399] has become inactive due to the application of a super-set patch [33529556].
+Please refer to Doc ID 2161861.1 for any possible further required actions.
+Log file location: /u01/app/oracle/product/19c/dbhome/cfgtoollogs/opatch/opatch2024-06-08_12-19-44PM_1.log
+
+OPatch succeeded.
+[oracle@test 33529556]$ $ORACLE_HOME/OPatch/opatch lsinventory | grep "applied o                                                                                     n "
+Patch  33529556     : applied on Sat Jun 08 12:20:52 IST 2024
+Patch  33515361     : applied on Sat Jun 08 12:14:58 IST 2024
+[oracle@test 33529556]$ [oracle@test 33529556]$ $ORACLE_HOME/OPatch/opatch lsinventory | grep "applied on "
+bash: [oracle@test: command not found...
+[oracle@test 33529556]$ Patch  33529556     : applied on Sat Jun 08 12:20:52 IST 2024
+bash: Patch: command not found...
+Similar command is: 'patch'
+[oracle@test 33529556]$ Patch  33515361     : applied on Sat Jun 08 12:14:58 IST 2024
+
+
+
+
+[oracle@test ~]$ export ORACLE_SID=HDFC
+[oracle@test ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sat Jun 8 12:47:12 2024
+Version 19.14.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup;
+ORACLE instance started.
+
+Total System Global Area  889191080 bytes
+Fixed Size                  9140904 bytes
+Variable Size             234881024 bytes
+Database Buffers          637534208 bytes
+Redo Buffers                7634944 bytes
+Database mounted.
+Database opened.
+SQL>
+
+SQL> select count(*) from dba_objects where status='invalid';
+
+  COUNT(*)
+----------
+         0
+
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.14.0.0.0
+[oracle@test ~]$
+[oracle@test ~]$ cd $ORACLE_HOME
+[oracle@test dbhome]$ cd OPatch
+
+[oracle@test OPatch]$ nohup ./datapatch &
+[1] 22550
+[oracle@test OPatch]$ nohup: ignoring input and appending output to ‘nohup.out’
+
+[oracle@test OPatch]$ ll
+total 168
+drwxr-x---. 7 oracle oracle    83 Jun  8 11:49 auto
+drwxr-x---. 2 oracle oracle    31 Jun  8 11:49 config
+-rwxr-x---. 1 oracle oracle   589 Jun  8 11:49 datapatch
+-rwxr-x---. 1 oracle oracle   627 Jun  8 11:49 datapatch.bat
+drwxr-x---. 2 oracle oracle    90 Jun  8 11:49 docs
+-rwxr-x---. 1 oracle oracle 23550 Jun  8 11:49 emdpatch.pl
+drwxr-x---. 2 oracle oracle  4096 Jun  8 11:49 jlib
+drwxr-x---. 6 oracle oracle  4096 Jun  8 11:49 jre
+drwxr-x---. 9 oracle oracle  4096 Jun  8 11:49 modules
+-rw-------. 1 oracle oracle  2584 Jun  8 12:54 nohup.out
+drwxr-x---. 5 oracle oracle    58 Jun  8 11:49 ocm
+-rwxr-x---. 1 oracle oracle 49873 Jun  8 11:49 opatch
+-rwxr-x---. 1 oracle oracle  1763 Jun  8 11:49 opatchauto
+-rwxr-x---. 1 oracle oracle   393 Jun  8 11:49 opatchauto.cmd
+-rwxr-x---. 1 oracle oracle 16554 Jun  8 11:49 opatch.bat
+-rwxr-x---. 1 oracle oracle  4290 Jun  8 11:49 opatch_env.sh
+-rw-r-----. 1 oracle oracle  2551 Jun  8 11:49 opatch.pl
+drwxr-x---. 4 oracle oracle    62 Jun  8 11:49 opatchprereqs
+-rwxr-x---. 1 oracle oracle  3159 Jun  8 11:49 operr
+-rwxr-x---. 1 oracle oracle  4218 Jun  8 11:49 operr.bat
+-rw-r-----. 1 oracle oracle  3177 Jun  8 11:49 operr_readme.txt
+drwxr-x---. 2 oracle oracle    19 Jun  8 11:49 oplan
+drwxr-x---. 3 oracle oracle    21 Jun  8 11:49 oracle_common
+drwxr-x---. 3 oracle oracle    24 Jun  8 11:49 plugins
+drwxr-xr-x. 2 oracle oracle    39 Jun  8 11:49 private
+-rw-r-----. 1 oracle oracle  2980 Jun  8 11:49 README.txt
+drwxr-x---. 2 oracle oracle  4096 Jun  8 11:49 scripts
+-rw-r-----. 1 oracle oracle    27 Jun  8 11:49 version.txt
+[oracle@test OPatch]$
+[oracle@test OPatch]$ tail -100f nohup.out
+SQL Patching tool version 19.14.0.0.0 Production on Sat Jun  8 12:53:05 2024
+Copyright (c) 2012, 2021, Oracle.  All rights reserved.
+
+Log file for this invocation: /u01/app/oracle/cfgtoollogs/sqlpatch/sqlpatch_2220                                                                                     4_2024_06_08_12_53_05/sqlpatch_invocation.log
+
+Connecting to database...OK
+Gathering database info...done
+
+Note:  Datapatch will only apply or rollback SQL fixes for PDBs
+       that are in an open state, no patches will be applied to closed PDBs.
+       Please refer to Note: Datapatch: Database 12c Post Patch SQL Automation
+       (Doc ID 1585822.1)
+
+Warning: PDB PDB is in mode MOUNTED and will be skipped.
+Bootstrapping registry and package to current versions...done
+
+Died at /u01/app/oracle/product/19c/dbhome/rdbms/admin/catcon.pm line 18217, <LO                                                                                     GFILE> line 220.
+
+
+Please refer to MOS Note 1609718.1 and/or the invocation log
+/u01/app/oracle/cfgtoollogs/sqlpatch/sqlpatch_22204_2024_06_08_12_53_05/sqlpatch                                                                                     _invocation.log
+for information on how to resolve the above errors.
+
+SQL Patching tool complete on Sat Jun  8 12:53:34 2024
+SQL Patching tool version 19.14.0.0.0 Production on Sat Jun  8 12:53:47 2024
+Copyright (c) 2012, 2021, Oracle.  All rights reserved.
+
+Log file for this invocation: /u01/app/oracle/cfgtoollogs/sqlpatch/sqlpatch_2255                                                                                     6_2024_06_08_12_53_47/sqlpatch_invocation.log
+
+Connecting to database...OK
+Gathering database info...done
+
+Note:  Datapatch will only apply or rollback SQL fixes for PDBs
+       that are in an open state, no patches will be applied to closed PDBs.
+       Please refer to Note: Datapatch: Database 12c Post Patch SQL Automation
+       (Doc ID 1585822.1)
+
+Warning: PDB PDB is in mode MOUNTED and will be skipped.
+Bootstrapping registry and package to current versions...done
+Determining current state...done
+
+Current state of interim SQL patches:
+  No interim patches found
+
+Current state of release update SQL patches:
+  Binary registry:
+    19.14.0.0.0 Release_Update 211225122123: Installed
+  PDB CDB$ROOT:
+    Applied 19.3.0.0.0 Release_Update 190410122720 successfully on 08-JUN-24 10.                                                                                     42.54.508298 AM
+  PDB PDB$SEED:
+    Applied 19.3.0.0.0 Release_Update 190410122720 successfully on 08-JUN-24 10.                                                                                     57.06.603363 AM
+
+Adding patches to installation queue and performing prereq checks...done
+Installation queue:
+  For the following PDBs: CDB$ROOT PDB$SEED
+    No interim patches need to be rolled back
+    Patch 33515361 (Database Release Update : 19.14.0.0.220118 (33515361)):
+      Apply from 19.3.0.0.0 Release_Update 190410122720 to 19.14.0.0.0 Release_U                                                                                     pdate 211225122123
+    No interim patches need to be applied
+
+Installing patches...
+
