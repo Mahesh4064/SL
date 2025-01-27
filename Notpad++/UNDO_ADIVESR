@@ -1,0 +1,100 @@
+set serveroutput on
+DECLARE
+utbsiz_in_MB NUMBER;
+BEGIN
+utbsiz_in_MB := DBMS_UNDO_ADV.RBU_MIGRATION;
+dbms_output.put_line('=================================================================');
+dbms_output.put_line('The Minimum size of the undo tablespace required is : '||utbsiz_in_MB||'
+MB');
+dbms_output.put_line('=================================================================');
+end;
+/
+
+SQL> set serveroutput on
+DECLARE
+utbsiz_in_MB NUMBER;
+BEGIN
+utbsiz_in_MB := DBMS_UNDO_ADV.RBU_MIGRATION;
+dbms_output.put_line('=================================================================');
+dbms_output.put_line('The Minimum size of the undo tablespace required is : '||utbsiz_in_MB||'
+MB');
+dbms_output.put_line('=================================================================');
+end;
+=================================================================
+The Minimum size of the undo tablespace required is : 38 MB
+=================================================================
+PL/SQL procedure successfully completed.
+SQL> 
+
+
+
+set serveroutput on
+DECLARE
+tbs_name VARCHAR2(30);
+tbs_size NUMBER(10);
+tbs_autoextend BOOLEAN;
+tbs_retention NUMBER(5);
+tbs_guarantee BOOLEAN;
+undo_adv BOOLEAN;
+BEGIN
+dbms_output.put_line('=====================================================================');
+undo_adv := dbms_undo_adv.undo_info(tbs_name, tbs_size, tbs_autoextend, tbs_retention, tbs_guarantee);
+If undo_adv=TRUE then
+dbms_output.put_line('UNDO Tablespace Name : ' || tbs_name);
+dbms_output.put_line('UNDO tablespace is '|| CASE WHEN tbs_autoextend THEN 'Auto Extensiable' ELSE 'Fixed Size' END);
+If tbs_autoextend=TRUE then dbms_output.put_line('UNDO Tablespace Maximum size (MB) is : ' || TO_CHAR(tbs_size));
+else dbms_output.put_line('UNDO Tablespace Fixed size (MB) is : ' || TO_CHAR(tbs_size));
+end if;
+dbms_output.put_line('Undo Retention is ' || TO_CHAR(tbs_retention)||' Seconds' ||' Equivelant to ' ||round((tbs_retention/60),2) ||' Minutes');
+dbms_output.put_line('Retention : '||CASE WHEN tbs_guarantee THEN 'Guaranteed ' ELSE 'Not Guaranteed' END);
+else dbms_output.put_line('Function undo_info can only run if parameters undo_management is auto');
+end if;
+dbms_output.put_line('=====================================================================');
+END;
+/
+
+SQL> @/Softwares/11.2.0.4.0/1.txt
+=====================================================================
+UNDO Tablespace Name : UNDOTBS1
+UNDO tablespace is Auto Extensiable
+UNDO Tablespace Maximum size (MB) is : 32768
+Undo Retention is 900 Seconds Equivelant to 15 Minutes
+Retention : Not Guaranteed
+=====================================================================
+PL/SQL procedure successfully completed.
+SQL> 
+
+
+SQL> SELECT 'The Length of the Longest Query in Memory is ' || dbms_undo_adv.longest_query LONGEST_QUERY FROM dual;
+LONGEST_QUERY
+--------------------------------------------------------------------------------
+The Length of the Longest Query in Memory is 1256
+SQL> 
+
+
+SQL> SELECT 'The Length of the Longest Query During This Time Range is ' ||dbms_undo_adv.longest_query(SYSDATE-1/24, SYSDATE) LONGEST_QUERY FROM dual;
+LONGEST_QUERY
+--------------------------------------------------------------------------------
+The Length of the Longest Query During This Time Range is 1293
+SQL> 
+
+
+SQL> SELECT 'The Required undo_retention using Statistics In Memory is ' || dbms_undo_adv.required_retention required_retention FROM dual;
+REQUIRED_RETENTION
+--------------------------------------------------------------------------------
+The Required undo_retention using Statistics In Memory is 1326
+SQL> 
+
+
+SQL> SELECT 'The Required undo_retention During This Time Range is ' ||dbms_undo_adv.required_retention(SYSDATE-1/24, SYSDATE) required_retention FROM dual;
+REQUIRED_RETENTION
+--------------------------------------------------------------------------------
+The Required undo_retention During This Time Range is 1357
+SQL> 
+
+
+SQL> SELECT 'The Required undo tablespace size using Statistics In Memory is ' || dbms_undo_adv.required_undo_size(900) || ' MB' required_undo_size FROM dual;
+REQUIRED_UNDO_SIZE
+--------------------------------------------------------------------------------
+The Required undo tablespace size using Statistics In Memory is 10 MB
+SQL> 
