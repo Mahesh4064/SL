@@ -78,8 +78,8 @@ login to grid user and set .bash_profile :
 
 export TMP=/tmp
 export TMPDIR=$TMP
-export ORACLE_BASE=/u01/app/grid
-export ORACLE_HOME=/u01/app/19c/gridhome_1
+export GRID_BASE=/u01/app/grid
+export GRID_HOME=/u01/app/19c/gridhome_1
 export ORACLE_SID=+ASM1
 export ORACLE_TERM=xterm
 export BASE_PATH=/usr/sbin:$PATH
