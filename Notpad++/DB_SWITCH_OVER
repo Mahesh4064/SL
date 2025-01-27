@@ -1,0 +1,51 @@
+PRIMARY 
+------
+select switchover_status from v$database;
+select name,open_mode,log_mode,database_role from v$database;
+show parameter log_archive_dest_state;
+archive log list;
+
+STANDBY 
+------
+select name,open_mode,log_mode,database_role from v$database;
+select sequence#,first_time,next_time,applied from v$archived_log order by sequence#;
+
+PRIMARY 
+-------
+alter system switch logfile;
+alter database commit to switchover to physical standby; 
+    (or)
+	-- On the primary database:
+ ALTER DATABASE COMMIT TO SWITCHOVER TO STANDBY WITH SESSION SHUTDOWN;
+
+shut immediate
+startup mount
+select name,open_mode,log_mode,database_role from v$database;
+
+STANDBY 
+--------
+select name,open_mode,log_mode,database_role from v$database;
+alter database recover managed standby database cancel;
+select process,sequence#,status from v$managed_standby;
+select switchover_status from v$database;
+
+PRIMARY 
+--------
+alter database recover managed standby database disconnect from session;
+select process,sequence#,status from v$managed_standby;
+
+STANDBY 
+--------
+select switchover_status from v$database;
+alter database commit to switchover to primary with session shutdown;
+alter database open;
+select name,open_mode,log_mode,database_role from v$database;
+archive log list;
+alter system switch logfile;
+/
+/
+archive log list;
+
+PRIMARY
+
+select sequence#,first_time,next_time,applied from v$archived_log order by sequence#;
