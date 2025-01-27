@@ -117,3 +117,28 @@ $ORACLE_HOME/bin/dbstart $ORACLE_HOME
 vi /u01/app/oracle/product/19c/db_home/rdbms/log/startup.log
 tail -f /u01/app/oracle/product/19c/db_home/rdbms/log/startup.log
 vi oratab
+
+
+
+IF INSTANCE NAME CHANGE
+
+create pfile from spfile;
+shut immediate;
+#add below colum in pfile
+INSTANCE_NAME='prod'
+
+#change pfile name
+mv old_pfile.ora new_pfile.ora
+
+#export newSID
+export ORACLE_SID=prod
+
+start nomount pfile='patha/to/pfile';
+create spfile from pfile;
+shut immediate ;
+startup;
+
+orapwd file=$ORACLE_HOME/dbs/orapwORADB1 password=admin@123 entries=20 
+
+
+
