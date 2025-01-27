@@ -1,0 +1,262 @@
+Scenario1:- Export and import the whole orcl database
+
+EXPDP backup
+Step 1:- create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir expdpfull
+Step 2:- create directory in oracle
+Command for oracle:- create directory expdpfull as ‘/u01/expdpfull’;
+
+Step 3:- Login into oracle and create new table and insert data in it. 
+	   This will help user to identify what tables will be imported.
+
+Step  4:- expdp command on os :-
+
+expdp userid=username/password directory=export dumpfile=expdp_export.dmp logfile=expdp_export.log  full=y 
+
+Here,
+Directory= expdpfull(one you created at os and oracle level)
+Dumpfile_name and Logfile_name as per your choice with proper extensions(.dmp and .log)
+Mention full=y for full expdp backup.   You can check for expdp parameters before passing values for “FULL” by expdp help=y.
+
+IMPDP backup
+
+step 1:- Type the impdp command as follows:-
+
+ impdp userid=username/password directory=export  dumpfile=expdp_export.dmp logfile=expdp_export.log  full=y 
+
+Here,
+Directory_name= expdpfull(same directory where your expdp dumpfile is stored)
+Dumpfile_name=expdp_export.dmp(same as expdp dumpfile name)
+Logfile_name= as per your choice with .log extension
+Mention Full=y for full impdp.
+
+Note:- If you have created tables prior to expdp then they will be visible when impdp process is in progress.
+
+
+
+
+
+
+
+Scenario2:-   Export the scott schema from orcl and import into ordb database. While import, exclude some objects(sequence,view,package,cluster,table). Load the objects which came from RES tablespace into USERS tablespace in target database.
+
+EXPDP backup-
+Step 1:- create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir schemaexpdp
+
+Step 2:- create directory in oracle
+Command for oracle:- create directory schemaexpdp  as ‘/u01/schemexpdp’;
+
+Step 3:- expdp command on os
+Expdp userid=system/password dumpfile=schemaexpdp.dmp logfile=schemaexpdp.log directory=dump location schemas=scott
+Here:-  if you want to give username and password as system/sys then
+              \'sys\/sys123 as sysdba \'
+             -directory= dump location is the directory you created in 
+                                  Os (schemaexpdp)
+
+
+IMPDP backup
+
+Step1:- Type the impdp command as follows:-
+
+Impdp userid= system/password dumpfile=schemaexpdp.dmp logfile=schemaimpdp.log directory=dumplocation table_exists_action=replace remap_tablespace=res:users exclude=table:”in(‘LOAD_EXT’)”
+
+Here,                user id=\'sys\/sys123 as sysdba \'
+                          directory=dump location is the directory whicc you created in
+                                             os and where your expdp backup is stored.
+		   Check impdp help=y for parameters like 
+                                                            a)table_exists_action
+                                                            b)remap_tablespace
+					   c)exclude
+
+
+
+
+
+
+
+
+
+Scenario 3:- Export the emp table from scott schema at orcl instance and import into ordb instance
+
+EXPDP backup-
+
+Step 1:- create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir tableexpdp
+
+Step 2:- :- create directory in oracle
+Command for oracle:- create directory tableexpdp  as ‘/u01/tableexpdp’;
+
+Step 3:- expdp command on os
+Expdp user id=\'sys\/sys123 as sysdba \' dumpfile=tableexpdp.dmp logfile=tableexpdp.log  directory=tableexpdp  tables=scott.part_emp
+Here,          directory= tableexpdp is the directory created in os 
+                    Check expdp help=y fro parameter a) tables
+
+
+
+
+
+IMPDP backup
+
+Impdp user id= \'sys\/sys123 as sysdba \'  dumpfile=tableexpdp.dmp logfile=tableimpdp.log  directory=tableexpdp  table_exists_action=REPLACE
+
+Here,            dumpfile = tableexpdp.dmp is the dumpfile in which expdp backup
+                                           Is stored.
+                       directory=tableexpdp is the directory created in os.
+                        Check impdp help = y for parameter table_exists_action
+
+Table_exists_action = REPLACE   when existing table columns do not match the imported table columns.
+
+
+
+
+
+
+
+
+
+
+
+
+Scenario 4:- Export only specific partition in emp table from scott schema at orcl and import into ordb database.
+
+Step1:-
+
+CREATE TABLE sales_range 
+(salesman_id  NUMBER(5), 
+salesman_name VARCHAR2(30), 
+sales_amount  NUMBER(10), 
+sales_date    DATE)
+TABLESPACE "EXPORT"
+PARTITION BY RANGE(sales_date) 
+(
+PARTITION sales_jan2000 VALUES LESS THAN(TO_DATE('02/01/2000','MM/DD/YYYY')),
+PARTITION sales_feb2000 VALUES LESS THAN(TO_DATE('03/01/2000','MM/DD/YYYY')),
+PARTITION sales_mar2000 VALUES LESS THAN(TO_DATE('04/01/2000','MM/DD/YYYY')),
+PARTITION sales_apr2000 VALUES LESS THAN(TO_DATE('05/01/2000','MM/DD/YYYY'))
+);
+
+EXPDP backup
+expdp directory=expdprow dumpfile=partexpdb1.dmp logfile=partexpdb1.log tables=anang.sales_range:SALES_FEB2000,anang.sales_range:SALES_JAN2000
+
+IMPDP backup
+impdp directory=expdprow dumpfile=partexpdb1.dmp logfile=partimpdb.log table_exists_action=append
+
+
+
+
+
+
+
+
+
+
+
+Scenario 5:-  Export only tables in scott schema at orcl and import into ordb database
+EXPDP backup
+Step 1:-   create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir schemaexpdp
+
+Step 2:- :- create directory in oracle
+Command for oracle:- create directory schemaexpdp  as ‘/u01/schemaexpdp’;
+
+Step 3:- expdp command on os
+Expdp user id= \'sys\/sys123 as sysdba \'  dumpfile=schemaexp.dmp  logfile=schemaexp.log directory=schemaexpdp  include=table schemas=scott
+
+Here,      check expdp help=y for “include”
+                When we provide include=table for schemas=scott then while
+                Exporting only tables of scott will be exported.
+
+IMPDP backup
+
+Impdp  user id= \'sys\/sys123 as sysdba \'  directory=schemaexpdp   dumpfile=schemaexp.dmp logfile=schemaimp.log  table_exists_action=REPLACE
+Scenario 6:- Export only rows belonging to department 10 and 20 in emp and dept table from orcl database. Import the dump file in ordb database. While importing, load only deptno 10 in target database.
+
+EXPDP backup
+Step 1:-   create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir datafilterexpdp
+
+Step 2:- :- create directory in oracle
+Command for oracle:- create directory datafilterexpdp  as ‘/u01/datafilterexpdp’;
+
+Step 3:- expdp command on os
+Expdp user id= \'sys\/sys123 as sysdba \'   directory=datafilterexpdp dumpfile=datafilterexp.dmp logfile=datafilterexp.log  content=data_only  schemas=scott  include=table:”in(‘EMP’,DEPT’)” query=”where deptno in(10,20)”
+IMPDP backup
+Impdp user id=\'sys\/sys123 as sysdba \' directory=datafilterexpdp dumpfile=datafilterexp.dmp logfile=datafilterimp.log  schemas=scott query=”where deptno=10” table_exists_action=APPEND
+
+Scenario 7:- Export the scott schema from orcl database and split the dump file into 50M sizes. Import the dump file into ordb database.
+EXPDP backup
+Step 1:-   create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir splitexp
+Step 2:- :- create directory in oracle
+Command for oracle:- create directory splitexp  as ‘/u01/ splitexp’;
+
+Step 3:- expdp command on os
+Expdp user id=\'sys\/sys123 as sysdba \'   directory=splitexp dumpfile=splitexp.dmp logfile=splitexp.log  filesize=50m schemas=scott include=table
+Here,     initially splitexp1.dmp file will be created .once the file is 50mb then next file called splitexp2.dmp will be created. If total file size is 500mb then it will create 10 dump files each of size 50mb.
+
+IMPDP backup
+Impdp user id=\'sys\/sys123 as sysdba \'   directory=splitexp  dumpfile=splitexp.dmp  logfile=splitimp.log table_exists_action=REPLACE  remap_tablespace=res:users exclude=grant
+
+
+Scenario 8:- Export the scott schema from orcl database and split the dump file into four files. Import the dump file into ordb datbase.
+EXPDP backup
+Step 1:-   create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir splitfileexp
+
+Step 2:- :- create directory in oracle
+Command for oracle:- create directory splitfileexp  as ‘/u01/ splitfileexp’;
+
+Step 3:- expdp command on os
+Expdp user id= \'sys\/sys123 as sysdba \' directory=splitfile dumpfile=splitfileexp_%U.dmp  logfile= splitfileexp.log   parallel=4 schemas=scott include=table
+Here,  
+Initially four files will be created splitfileexp1.dmp splitfileexp2.dmp splitfileexp3.dmp splitfileexp3.dmp.  As filesize is not mentioned only four files will be created.
+
+IMPDP backup
+Impdp user id= \'sys\/sys123 as sysdba \'  directory=splitfile dumpfile=splitfileexp_%U.dmp  logfile= splitfileimp.log table_exists_action=REPLACE  remap_tablespaces=res:users  exclude=grant
+SCENARIO 9:- Export the scott schema from orcl database and split the dump file into three files. The dump files will be stored in three different location. This method is especially useful if you do not have enough space in one file system to perform the complete expdp job. After export is successful, import the dump file into ordb database
+EXPDP backup
+Step 1:-   create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir splitfileexp
+Step 2:- :- create directory in oracle
+Command for oracle:- create directory schemasplit  as ‘/u01/ schemasplit’
+Step 3:- expdp command on os
+Expdp  user id= \'sys\/sys123 as sysdba \' directory= schemasplit dumpfile=dump1:schemasplit_%u.dmp, dump2:schemasplit_%U.dmp dump3:schemasplit_%U.dmp  logfile= schemasplitexp.log  filesize=50m schemas=scott include=table
+
+IMPDP backup
+Impdp user id= \'sys\/sys123 as sysdba \' directory= schemasplit dumpfile=dump1:schemasplit_%u.dmp, dump2:schemasplit_%U.dmp dump3:schemasplit_%U.dmp  logfile=schemasplitimp.log table_exists_action=REPLACE
+Scenario 12:- Expdp scott schema in ordb and impdp the dump file in training schema in ordb database.
+
+EXPDP backup
+
+Step 1:-   create a directory in os as well as in oracle.
+Command for os- go to the folder where you want to create directory 
+			$cd /u01
+			$/u01 mkdir splitfileexp
+Step 2:- :- create directory in oracle
+Command for oracle:- create directory schemasplit  as ‘/u01/ schemasplit’
+Step 3:- expdp command on os
+Expdp user id= \'sys\/sys123 as sysdba \’  directory= networkexp dumpfile=networkexp.dmp  logfile=networkexp.log schemas=scott  include=table
+
+
+IMPDP backup
+Impdp user id= \'sys\/sys123 as sysdba \’  directory= networkexp  dumpfile=networkexp.dmp   logfile=networkimp.log  table_exists_action=REPLACE  remap_schemascott:training
+
+
+
