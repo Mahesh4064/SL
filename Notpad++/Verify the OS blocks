@@ -1,0 +1,21 @@
+Verify the OS blocks:
+======================
+
+ubuntu:
+tune2fs -l /dev/sda1 | grep Block
+
+OS X:
+diskutil info / | grep "Block Size"
+Device Block Size: 512 Bytes
+
+HP-UX:
+mkfs -m /dev/vg00/lvol5
+or
+fstyp -v /dev/vg00/lvol5 | grep f_frsize
+
+AIX:
+lsfs -q /dev/hd1
+
+Solaris : 
+perl -e '$a=(stat ".")[11]; print $a'
+8192
