@@ -1,0 +1,187 @@
+
+
+DB bounce activity for OBIEEE
+===============================
+[oracle@chaprdbn01-cgpch-kxyvq1 -1$ source RAPRD.env 
+[oracle@chaprdbn01-cgpch-kxyvql -15 sqlplus/ as sysdba
+
+
+select NAME, OPEN_MODE, LOG_MODE, PROTECTION_MODE, CREATED from gv$database;
+
+
+col HOST NAME for a32
+col "Startup Time" for a35
+col Now for a40
+col INSTANCE_NAME for a18
+col OPEN MODE for a15
+col STATUS for a12
+
+
+set echo on;
+set sqlblankline on;
+set lines 200 pages 3000
+select b.instance_name, b.host_name,b.logins, b.status, a.open_mode, to_char (b.startup_time, 'MM-DD-YYYY HH24:MI:SS') 
+"Startup Time", to_char (sysdate, 'MM-DD-YYYYHH24:MI:SS') "Now" from v$database a, gv$instance b, dual; .
+
+
+sho parameter local
+select name, open_mode from gv$database;
+
+
+select INST_ID, name from gv$active_services;
+
+set lines 200 pages 1000;
+col WRL PARAMETER for a50;
+select from gvşencryption_wallet;
+
+
+
+
+AFTER GETTING THE CONFIRMATION WE CAN START THE BOUNCE BY THE BELOW COMMANDS
+******************************************************************************
+ oracle@chaprdbn01-cgpch-kxyvql -15 srvctl stop database -d RAPRD
+
+
+ [oracle@chaprdbn01-cgpch-kxyvql -1 srvctl start database -d RAPRD
+ 
+AFTER CHECK THE STATUS DB BY THE BELOW COMMANDS
+**************************************************
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl status database -d RAPRD 
+
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl status service -d RAPRD
+
+AND THESE COMMANDS TO BE DONE AFTER THE BOUNCE ACTIVITY
+*********************************************************
+SQL> sho parameter local
+
+SQL> select name, open_mode from gv$database;
+
+SQL> select INST_ID, name from gvsactive_services;
+
+SQL>
+set lines 200 pages 1000;
+col WRL PARAMETER for a50;
+select from gvsencryption_wallet;
+
+SEND THE MAIL
+**************
+ Hi Team,
+ 
+RAPRD DB bounce activity has been completed please bring up the relevant applications. Thanks
+
+
+
+
+
+DB bounce activity for AIA&WM (AIA--WM--WM--AIA)
+===========================================================
+
+Hi Team,
+
+WM and AIA DB bounce activity is completed and please bring up the relevant applications. Thanks
+***************************************************************************************************
+
+[oracle@chaprdbn01-cgpch-kxyvql -1$ source AIAPRD.env 
+[oracle@chaprdbn01-cgpch-kxyvql -] sqlplus as sysdba
+
+SQL> sho parameter local
+
+SQL> select name, open_mode from gvsdatabase;
+
+SQL> select INST_ID, name from gv$active_services;
+
+SQL>
+set lines 200 pages 1000;
+col WRL PARAMETER for a50;
+select from gvsencryption_wallet;
+
+AFTER GETTING THE CONFIRMATION WE CAN START THE BOUNCE BY THE BELOW COMMANDS
+=============================================================================
+[oracle@chaprdbn01-cgpch-kxývq1 -15 srvctl stop database -d ALAPRD
+
+ [oracle@chaprdbn01-cgpch-kxyvql -15 srvctl start database -d AIAPRD
+ 
+AFTER BOUNCE CHECK THE STATUS OF THE DB BY THE BELOW COMMANDS
+
+
+
+
+
+
+AFTER BOUNCE CHECK THE STATUS OF THE DB BY THE BELOW COMMANDS
+=================================================================
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl status database -d AIAPRD 
+
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl status service -d AIAPRD
+
+SAND THESE COMMANDS TO BE CHECKED AFTER THE DB BOUNCE
+=======================================================
+SQL> sho parameter local
+
+SQL> select name, open_mode from gv$database;
+
+SQL> select INST_ID, name from gv$active_services;
+
+SQL>
+set lines 200 pages 1000;
+col WRL PARAMETER for a50;
+select from gvşencryption_wallet;
+
+============================================================================
+check GG EXRACT (E_WMWH) proces need to stop and start
+
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ source WMPRD.env 
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ sqlplus/ as sysdba
+
+SQL> sho parameter local
+
+SQL> select name, open_mode from gv$database;
+
+
+SQL> select name, open_mode from gv$database;
+
+
+SQL> select INST_ID, name from gv$active_services;
+
+
+SQL>
+set lines 200 pages 1000;
+col WRL PARAMETER for a50;
+select *from gvşencryption_wallet;
+
+AFTER GETTING THE CONFIRMATION WE CAN START THE BOUNCE BY THE BELOW COMMANDS 
+=============================================================================
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl stop database -d WMPRD 
+
+[oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl start database -d WMPRD
+
+ AFTER BOUNCE CHECK THE STATUS OF THE DB BY THE BELOW COMMANDS
+===================================================================
+
+ [oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl status database -d WMPRD 
+ 
+ [oracle@chaprdbn01-cgpch-kxyvql ~]$ srvctl status service -d WMPRD
+ 
+AND THESE COMMANDS TO BE CHECKED AFTER THE BOUNCE ACTIVITY
+=========================================================
+SQL> sho parameter local
+
+
+SQL> select name, open_mode from gv$database;
+
+
+SQL> select INST_ID, name from gv$active_services;
+
+
+SQL>
+set lines 200 pages 1000;
+col WRL PARAMETER for a50;
+select from gvşencryption_wallet;
+
+
+
+
+
+101952946471
+
+
