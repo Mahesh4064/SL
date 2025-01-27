@@ -1,0 +1,36 @@
+
+
+
+
+-------------Windows Patching Command------------
+
+
+
+[11:05 am, 30/12/2023] dheeraj Tiwari: %ORACLE_HOME%/OPatch/opatch version
+
+[11:05 am, 30/12/2023] dheeraj Tiwari: %ORACLE_HOME%/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -ph ./
+
+[11:05 am, 30/12/2023] dheeraj Tiwari: %ORACLE_HOME%/OPatch/opatch prereq CheckActiveFilesAndExecutables -ph ./
+
+[11:06 am, 30/12/2023] dheeraj Tiwari: %ORACLE_HOME%/OPatch/opatch apply
+
+[11:07 am, 30/12/2023] dheeraj Tiwari: datapatch -verbose
+
+
+
+----------------Linux Patching---------------
+
+[oracle@ol8-19 OPatch]$ $ORACLE_HOME/OPatch/opatch version
+
+[oracle@ol8-19 34765931]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -ph ./
+
+[oracle@ol8-19 34765931]$ $ORACLE_HOME/OPatch/opatch prereq CheckActiveFilesAndExecutables -ph ./
+
+[oracle@ol8-19 34765931]$ $ORACLE_HOME/OPatch/opatch apply
+
+connect database run command
+
+ datapatch -verbose
+
+
+
