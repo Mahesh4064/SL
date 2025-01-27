@@ -1,0 +1,112 @@
+
+pre requisite========================>>>>
+
+
+
+PATH=$ORACLE_HOME/OPatch:$PATH:$HOME/bin:$ORACLE_HOME/bin =====================>>>we can set on bash_profile so that we call pacth utility 
+
+
+1)TAKE dba_registry_sqlpatch DATA THROUGHT COMMAND
+
+spool pre_JULY_2023_patch_check.out
+
+set time on timing on echo on verify on feed on lines 200 pages 5000 long 50000 longchunksize 9999
+select INSTALL_ID||'|'||PATCH_ID||'|'||ACTION||'|'||STATUS||'|'||ACTION_TIME||'|'||DESCRIPTION from dba_registry_sqlpatch order by action_time;
+select comp_id||'|'||comp_name||'|'||version||'|'||status from dba_registry;
+select owner, count(*) from dba_objects where status='INVALID' group by owner order by 1;
+select owner||'|'||object_name||'|'||object_type||'|'||status from dba_objects where status='INVALID' and owner in ('SYS','SYSTEM');
+spool off
+
+
+2)$ORACLE_HOME/OPatch/opatch lsinventory
+
+ ========================>>read  Readme file according  increase opatch version  we download this support patch  6880880
+
+check version 
+
+3)$ORACLE_HOME/OPatch/opatch version
+
+
+4)cd $ORACLE_HOME
+
+mv OPatch/ OPatch_bkp
+
+
+unzip p6880880_122010_Linux-x86-64.zip -d $ORACLE_HOME         =====>it will increase the version 
+
+$ORACLE_HOME/OPatch/opatch version        =======>>check version upgraded or not 
+
+5)Check the opatch lsinventory
+
+$ORACLE_HOME/OPatch/opatch lsinventory
+
+ps -ef|grep pmon
+ps -ef |grep smon
+ps -ef |grep tns
+
+
+lsnrctl stop lisner_name
+
+ 
+step 6) shut immediate
+
+ps -ef |grep ora           =====>>check after shutdown all oracle componant
+
+7)Step :- Take Backup of ORACLE_HOME (Rollback plan) 
+
+
+nohup tar -zcvf /backup/patch_july24/db_home_bkpjuly2024.tar.gz /19c_home/app/oracle/product/19.0.0/dbhome_1 >/backup/patch_july24/db_home_bkp.log &
+
+
+
+tar -cvf oracle_home_Sep22_2018.tar $ORACLE_HOME
+
+8)Check conflict and active file and system space==============>>
+
+[oracle@POVSLTFLINEODB 35042068]$opatch prereq CheckConflictAgainstOHWithDetail -ph ./
+
+[oracle@POVSLTFLINEODB 35042068]$opatch prereq CheckActiveFilesAndExecutables -ph ./
+
+/oracle19chome/app/oracle/product/19.0.0/dbhome_1/OPatch/opatch prereq CheckSystemSpace -ph /DBbackup/july_24/36582781  ==============oracle space check
+
+
+9)cd /u01/Patch_april2023/
+
+unzip patch_file              =======>>it will create directory with patch number 
+
+cd 89075486        =======>>just go to the directory 
+
+[oracle@POVSLTFLINEODB 35042068]$ opatch apply -silent 
+
+
+nohup /oracle19chome/app/oracle/product/19.0.0/dbhome_1/OPatch/opatch apply -oh /oracle19chome/app/oracle/product/19.0.0/dbhome_1 -local /DBbackup/july_24/36582781 -silent &
+
+
+
+10) $ORACLE_HOME/OPatch/opatch lsinventory           ========>check inventory
+
+11) startup;
+
+12)#if there is more then one database Please set sid then run datapatch verbose like we have 2 database so two time run datapatch verbose with set diffent diffrent sid 
+
+cd $ORACLE_HOME/OPatch 
+
+ nohup ./datapatch -verbose &         ================>>>verbose==>> it will show activity on screen whatever it will do for every database we have perform like 2 db so 2 time
+
+
+13) select PATCH_ID,STATUS,ACTION_TIME from dba_registry_sqlpatch;         =================>check 
+
+
+14) lsnrctl status listener 
+
+Please check DATABASE SHOULD BE UP WITH SPFILE
+
+==============================================================FOR ROLLBACKUP PATCH ==============================
+
+opatch rollback -id 29585399
+
+fuser -c $ORACLE_HOME    to check active file on database.
+
+apps-fileview.texmex_20241010.01_p2
+DB_PATCH.txt
+Displaying Grid Patch LTFS.txt.
