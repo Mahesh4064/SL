@@ -69,6 +69,7 @@ http://www.br8dba.com/create-db-19c-dbca-silent/  -->>DBCA
 
 --> Oracle does not allow special characters like @
 The @ symbol is often interpreted as the start of a TNS alias in Oracle.
+--> If you've forgotten the SYS password and cannot log in, you can create a new password file with a new password.
 
 #If your geting error like tns related while connecting bellow command
 sqlplus sys/sys@PROD as sysdba
