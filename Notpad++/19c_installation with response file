@@ -65,12 +65,25 @@ ALTER SYSTEM SET LOCAL_LISTENER='(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.2.210)(POR
 ALTER SYSTEM REGISTER;
 
 
-
-
-
 http://www.br8dba.com/create-db-19c-dbca-silent/  -->>DBCA
 
+#If your geting error like tns related while connecting bellow command
+sqlplus sys/sys@PROD as sysdba
 
+#like tns releted
+
+1.tns ping PROD
+2.lsnrctl status PROD
+3.orapwd file=$ORACLE_HOME/dbs/orapwPROD password=Admin#123 entries=100 
+4. conn normal like sqlplus / as sysdba
+5.ALTER SYSTEM SET REMOTE_LOGIN_PASSWORDFILE='EXCLUSIVE' SCOPE=SPFILE;
+6. alter user sys identified by  sys
+shutdown immediate;
+startup;
+
+
+
+========================================================================================================================
 --->>installation without response file
 
 1-ping google.com
@@ -98,9 +111,6 @@ DECLINE_SECURITY_UPDATES=true
 echo $ORACLE_HOME
     export PATH=$ORACLE_HOME/bin:$PATH
 11- sqlplus / as sysdba
-
-
-
 
 
 
