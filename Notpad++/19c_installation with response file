@@ -67,6 +67,9 @@ ALTER SYSTEM REGISTER;
 
 http://www.br8dba.com/create-db-19c-dbca-silent/  -->>DBCA
 
+--> Oracle does not allow special characters like @
+The @ symbol is often interpreted as the start of a TNS alias in Oracle.
+
 #If your geting error like tns related while connecting bellow command
 sqlplus sys/sys@PROD as sysdba
 
