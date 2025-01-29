@@ -80,7 +80,7 @@ sqlplus sys/sys@PROD as sysdba
 2.lsnrctl status PROD
 3.orapwd file=$ORACLE_HOME/dbs/orapwPROD password=Admin#123 entries=100 
 4. conn normal like sqlplus / as sysdba
-5.ALTER SYSTEM SET REMOTE_LOGIN_PASSWORDFILE='EXCLUSIVE' SCOPE=SPFILE;
+5. ALTER SYSTEM SET REMOTE_LOGIN_PASSWORDFILE='EXCLUSIVE' SCOPE=SPFILE;
 6. alter user sys identified by  sys
 shutdown immediate;
 startup;
@@ -152,7 +152,7 @@ create spfile from pfile;
 shut immediate ;
 startup;
 
-orapwd file=$ORACLE_HOME/dbs/orapwORADB1 password=admin@123 entries=20 
+
 
 
 
