@@ -284,6 +284,8 @@ cd $ORACLE HOME
 
 ./gridSetup.sh -applyRU /u01/LATEST_PATCH/32$45008
 
+#RUN root.sh scrept on db1 and db2
+
 Once Grid Installation done, Install RDBMS Software through oracle user and create RAC database prod (check our previous video's for more detail)
 
  ./runInstaller -applyRU /u01/LATEST PATCH/32545008
