@@ -344,3 +344,34 @@ Launching Oracle Grid Infrastructure Setup Wizard...
 
 
 
+
+
+[root@db1 GridSetupActions2025-01-31_12-05-02PM]# echo $DISPLAY
+
+[root@db1 ~]# export DISPLAY=:0
+[root@db1 ~]# echo $DISPLAY
+:0
+[root@db1 ~]# xhost +SI:localuser:oracle
+localuser:oracle being added to access control list
+
+
+echo $DISPLAY
+export DISPLAY=:0
+export DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-oEA2H9Dc5c,guid=4ab09dde0525787abf115ac3679c697c
+[root@db1 ~]# xhost +SI:localuser:grid
+xhost +SI:localuser:oracle
+localuser:grid being added to access control list
+
+--------------------------------------------------
+#delete oracleasm disks
+
+oracleasm deletedisk ASM_DATA
+oracleasm deletedisk ASM_OCR
+oracleasm deletedisk ASM_RECO
+
+
+
+oracleasm scandisks
+oracleasm listdisks
+
+
