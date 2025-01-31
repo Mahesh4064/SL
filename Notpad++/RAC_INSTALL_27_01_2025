@@ -83,33 +83,70 @@ Set bash_profile for grid and oracle user login to grid user and set .bash_profi
 
 nano .bash_profile
 
+[grid@db1 ~]$ cat .bash_profile
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+# Set temporary directories
+export TMP=/tmp
+export TMPDIR=$TMP
+
+# Oracle Grid Infrastructure environment
 export GRID_BASE=/u01/app/grid
 export GRID_HOME=/u01/app/19c/gridhome_1
-export ORACLE_BASE=/u02/app/oracle
-export ORACLE_HOME=/u02/app/oracle/product/19c/dbhome_1
-export ORACLE_SID=prodl
+export ORACLE_HOME=$GRID_HOME
+export ORACLE_SID=+ASM1
+export ORACLE_TERM=xterm
+
+# Set PATH
 export BASE_PATH=/usr/sbin:$PATH
-export PATH=$ORACLE_HOME/bin:$BASE PATH
+export PATH=$ORACLE_HOME/bin:$BASE_PATH
+
+# Set LD_LIBRARY_PATH and CLASSPATH
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
 export CLASSPATH=$ORACLE_HOME/JRE:$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
-export PATH=/bin:/usr/bin:/usr/sbin:$PATH
+
+
 
 
 . .bash_profile
 
 login to oracle user and set .bash_profile :
+[oracle@db1 ~]$ cat .bash_profile
+# .bash_profile
 
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+# Set temporary directories
 export TMP=/tmp
 export TMPDIR=$TMP
+
+# Oracle Database environment
 export ORACLE_BASE=/u02/app/oracle
 export ORACLE_HOME=/u02/app/oracle/product/19c/dbhome_1
-export ORACLE_SID=prodl
-export ORACLE TERM=xterm
+export ORACLE_SID=prod
+export ORACLE_TERM=xterm
+
+# Set PATH
 export BASE_PATH=/usr/sbin:$PATH
-export PATH=$ORACLE_HOME/bin:$BASE PATH
+export PATH=$ORACLE_HOME/bin:$BASE_PATH
+
+# Set LD_LIBRARY_PATH and CLASSPATH
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
 export CLASSPATH=$ORACLE_HOME/JRE:$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
-export PATH=/bin:/usr/bin:/usr/sbin:$PATH
+[oracle@db1 ~]$
+
 
 . .bash_profile
 
