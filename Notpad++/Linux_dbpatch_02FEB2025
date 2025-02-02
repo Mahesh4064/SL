@@ -1,0 +1,224 @@
+https://ocptechnology.com/patching-in-19c/
+
+
+
+
+You must go throw the README file
+Download Patch p34133642_19.16.00_Linux-x86-64
+Make sure the minimum OPATCH version is 12.2.0.1.30
+
+##YOU NEED TO Download OPATCH VERSTION AND OPATCH ZIP
+
+Steps to applying Patching 19.3 to 19.16
+
+Step 1. Update OPATCH utility
+Check OPATCH version
+###Before updating the OPATCH version, you should check the current version of OPATCH.
+
+$cd $ORACLE_HOME/OPatch
+$./opatch version
+OPatch Version: 12.2.0.1.17
+OPatch succeeded.
+
+##In my case the OPATCH version is 12.2.o.1.17 and we need the minimum OPATCH version to be 12.2.0.1.30.
+$ cd $ORACLE_HOME/
+$mv OPatch OPatch_bkp
+
+Upgrade OPATCH
+
+[oracle@db3 patches]$ ll
+total 2680620
+-rw-r--r--. 1 oracle oinstall 2622069290 Feb  2 12:35 p33509923_190000_Linux-x86-64.zip
+-rw-r--r--. 1 oracle oinstall  122883929 Feb  2 12:32 p6880880_122010_Linux-x86-64.zip
+
+$unzip /u01/patches/p6880880_122010_Linux-x86-64.zip -d $ORACLE_HOME/
+
+$ ./opatch version
+OPatch Version: 12.2.0.1.35
+OPatch succeeded.
+
+Step 2. Verify the Database Current version
+SQL> select BANNER_FULL from v$version;
+BANNER_FULL
+--------------------------------------------------------------------------------
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+Check dba_registry status
+SQL>col comp_id for a10
+SQL>col version for a11
+SQL>col status for a10
+SQL>col comp_name for a37
+SQL>select comp_id,comp_name,version,status from dba_registry;
+COMP_ID    COMP_NAME                             VERSION     STATUS
+---------- ------------------------------------- ----------- ----------
+CATALOG    Oracle Database Catalog Views         19.0.0.0.0  VALID
+CATPROC    Oracle Database Packages and Types    19.0.0.0.0  VALID
+RAC        Oracle Real Application Clusters      19.0.0.0.0  OPTION OFF
+JAVAVM     JServer JAVA Virtual Machine          19.0.0.0.0  VALID
+XML        Oracle XDK                            19.0.0.0.0  VALID
+CATJAVA    Oracle Database Java Packages         19.0.0.0.0  VALID
+APS        OLAP Analytic Workspace               19.0.0.0.0  VALID
+XDB        Oracle XML Database                   19.0.0.0.0  VALID
+OWM        Oracle Workspace Manager              19.0.0.0.0  VALID
+CONTEXT    Oracle Text                           19.0.0.0.0  VALID
+ORDIM      Oracle Multimedia                     19.0.0.0.0  VALID
+SDO        Spatial                               19.0.0.0.0  VALID
+XOQ        Oracle OLAP API                       19.0.0.0.0  VALID
+OLS        Oracle Label Security                 19.0.0.0.0  VALID
+DV         Oracle Database Vault                 19.0.0.0.0  VALID
+15 rows selected.
+
+Step 3. Rollback Plan
+Take Oracle Home backup
+$cd $ORACLE_HOME
+$tar -cvf oracle_home_15jan2023.tar $ORACLE_HOME
+
+Step 3. Unzip the Patch
+$unzip /u01/patches/p33509923_190000_Linux-x86-64.zip -d /u01/patches/
+
+Note:
+Yes, check the prerequisites before applying the patch using the following command.
+
+Step 4. Check prerequisites
+
+$cd /u01/patches//33509923
+$cd 33515361  ---> read redmi file which patch your appleying
+
+$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -ph ./
+
+Oracle Interim Patch Installer version 12.2.0.1.35
+Copyright (c) 2023, Oracle Corporation.  All rights reserved.
+PREREQ session
+Oracle Home       : /u02/app/oracle/product/19.3.0/db_home
+Central Inventory : /u01/app/oraInventory
+   from           : /u02/app/oracle/product/19.3.0/db_home/oraInst.loc
+OPatch version    : 12.2.0.1.35
+OUI version       : 12.2.0.7.0
+Log file location : /u02/app/oracle/product/19.3.0/db_home/cfgtoollogs/opatch/opatch2023-01-12_23-58-36PM_1.log
+Invoking prereq "checkconflictagainstohwithdetail"
+Prereq "checkConflictAgainstOHWithDetail" passed.
+OPatch succeeded.
+
+Step 5. Stop all Database services
+$ ps -ef|grep pmon
+oracle    3027 30927  0 00:00 pts/3    00:00:00 grep --color=auto pmon
+oracle    3376     1  0 Jan12 ?        00:00:01 ora_pmon_orcl
+
+$ ps -ef|grep tns
+root        14     2  0 Jan12 ?        00:00:00 [netns]
+oracle    3035 30927  0 00:00 pts/3    00:00:00 grep --color=auto tns
+oracle    6197     1  0 Jan12 ?        00:00:01 /u02/app/oracle/product/19.3.0/db_home/bin/tnslsnr LISTENER -inherit
+
+
+$ lsnrctl stop LISTENER
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 13-JAN-2023 00:00:55
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=noida)(PORT=1521)))
+TNS-12543: TNS:destination host unreachable
+ TNS-12560: TNS:protocol adapter error
+  TNS-00513: Destination host unreachable
+   Linux Error: 113: No route to host
+   
+   
+   Note:
+Make sure 7 GB of disk space is free in your binary location otherwise the patch will be failed.
+
+Step 6. Execute opatch apply
+
+$cd /u01/patches//33509923/33515361
+$ORACLE_HOME/OPatch/opatch apply
+
+Patching component oracle.jdk, 1.8.0.201.0...
+Patch 33515361 successfully applied.
+Sub-set patch [29517242] has become inactive due to the application of a super-set patch [33515361].
+Please refer to Doc ID 2161861.1 for any possible further required actions.
+Log file location: /u01/app/oracle/product/19c/db_home/cfgtoollogs/opatch/opatch2025-02-02_13-17-55PM_1.log
+
+OPatch succeeded.
+
+Start All database services
+
+$ lsnrctl start
+
+$ sqlplus / as sysdba
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Jan 13 00:33:15 2023
+Version 19.16.0.0.0
+Copyright (c) 1982, 2022, Oracle.  All rights reserved.
+Connected to an idle instance.
+
+SQL> startup
+ORACLE instance started.
+Total System Global Area 2466250360 bytes
+Fixed Size                  9137784 bytes
+Variable Size             570425344 bytes
+Database Buffers         1879048192 bytes
+Redo Buffers                7639040 bytes
+Database mounted.
+Database opened.
+
+####Post PATCH steps
+Now it's time to run datapatch -verbose which updates the patch information at the database binary & dictionary level as well as binary files.
+Run datapatch -verbose
+cd $ORACLE_HOME/OPatch
+./datapatch -verbose
+
+Execute utlrp.sql
+Once datapatch -verbose is completed then execute the utlrp script to validate the invalid objects.
+
+SQL> @?/rdbms/admin/utlrp.sql
+Session altered.
+
+Verify the PATCH
+Check applied patch details using lsinventory command.
+
+[oracle@db3 OPatch]$ ./opatch lsinventory
+Oracle Interim Patch Installer version 12.2.0.1.29
+Copyright (c) 2025, Oracle Corporation.  All rights reserved.
+
+
+Oracle Home       : /u01/app/oracle/product/19c/db_home
+Central Inventory : /u01/app/oracle
+   from           : /u01/app/oracle/product/19c/db_home/oraInst.loc
+OPatch version    : 12.2.0.1.29
+OUI version       : 12.2.0.7.0
+Log file location : /u01/app/oracle/product/19c/db_home/cfgtoollogs/opatch/opatch2025-02-02_15-00-26PM_1.log
+
+
+Verify at the Database Level
+SQL> select patch_uid,patch_id,SOURCE_VERSION, TARGET_VERSION, action, status,action_time,description from dba_registry_sqlpatch;
+
+Check Invalid Objects
+SQL>COLUMN object_name FORMAT A30
+SQL>SELECT owner,object_type,object_name,status FROM dba_objects
+WHERE status = 'INVALID'
+ORDER BY owner, object_type, object_name;
+no rows selected
+
+Check dba_registry
+SQL>col comp_id for a10
+SQL>col version for a11
+SQL>col status for a10
+SQL>col comp_name for a37
+SQL>select comp_id,comp_name,version,status from dba_registry;
+COMP_ID    COMP_NAME                             VERSION     STATUS
+---------- ------------------------------------- ----------- ----------
+CATALOG    Oracle Database Catalog Views         19.0.0.0.0  VALID
+CATPROC    Oracle Database Packages and Types    19.0.0.0.0  VALID
+RAC        Oracle Real Application Clusters      19.0.0.0.0  OPTION OFF
+JAVAVM     JServer JAVA Virtual Machine          19.0.0.0.0  VALID
+XML        Oracle XDK                            19.0.0.0.0  VALID
+CATJAVA    Oracle Database Java Packages         19.0.0.0.0  VALID
+APS        OLAP Analytic Workspace               19.0.0.0.0  VALID
+XDB        Oracle XML Database                   19.0.0.0.0  VALID
+OWM        Oracle Workspace Manager              19.0.0.0.0  VALID
+CONTEXT    Oracle Text                           19.0.0.0.0  VALID
+ORDIM      Oracle Multimedia                     19.0.0.0.0  VALID
+SDO        Spatial                               19.0.0.0.0  VALID
+XOQ        Oracle OLAP API                       19.0.0.0.0  VALID
+OLS        Oracle Label Security                 19.0.0.0.0  VALID
+DV         Oracle Database Vault                 19.0.0.0.0  VALID
+15 rows selected.
+
+
+
