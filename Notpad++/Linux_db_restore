@@ -1,0 +1,98 @@
+
+create pfile from spfile;
+
+==>drop the privies database
+SQL> SHUTDOWN IMMEDIATE;
+STARTUP MOUNT EXCLUSIVE RESTRICT;
+    drop database;
+    
+ ==> Tack pfile and see directories are existiong or not if not just create it.
+    
+    startup nomount pfile='/path/pfile';
+    
+==> connect to rman target 
+    !rman target /
+    
+  
+RMAN> restore controlfile from '/u01/backup/PROD/autobackup/2024_12_18/o1_mf_s_1188053879_mp55f0gp_.bkp';
+
+Starting restore at 18-DEC-24
+allocated channel: ORA_DISK_1
+
+
+
+RMAN> alter database mount;
+
+released channel: ORA_DISK_1
+Statement processed
+
+
+
+RMAN> catalog start with '/u01/backup/PROD';
+
+Starting implicit crosscheck backup at 18-DEC-24
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=258 de
+
+
+
+RUN {
+  # Allocate channels for the restore and recovery operations
+  ALLOCATE CHANNEL ch1 DEVICE TYPE DISK;
+  ALLOCATE CHANNEL ch2 DEVICE TYPE DISK;
+  ALLOCATE CHANNEL ch3 DEVICE TYPE DISK;
+  ALLOCATE CHANNEL ch4 DEVICE TYPE DISK;
+  ALLOCATE CHANNEL ch5 DEVICE TYPE DISK;
+
+  # Set new name for datafiles to change their location
+  SET NEWNAME FOR DATABASE TO '/u01/app/oracle/oradata/TEST/%b';   ========> It will change the datafiles location and provide a placeholder for the file name(meance same db file name)
+  
+  # Restore the database
+  RESTORE DATABASE;
+  
+  # Switch all datafiles to their new names
+  SWITCH DATAFILE ALL;
+  
+  # Switch all tempfile locations (if applicable)
+  SWITCH TEMPFILE ALL;
+  
+  # Recover the database
+  RECOVER DATABASE;
+
+  # Release the allocated channels
+  RELEASE CHANNEL ch1;
+  RELEASE CHANNEL ch2;
+  RELEASE CHANNEL ch3;
+  RELEASE CHANNEL ch4;
+  RELEASE CHANNEL ch5;
+  
+  
+}
+
+
+
+## If db files location change from prod to uat then you can use SWITCH DATAFILE all and TEMP If not change it is not requred
+## It is besicaly update the controlfile for the newlocation
+
+
+SQL> alter database open RESETLOGS;
+
+Database altered.
+
+====IF DB NAME CHANGE====
+
+SQL> SHUTDOWN IMMEDIATE;
+Database closed.
+
+     startup mount;
+     
+use below command in OS 
+nid TARGET=sys/sys123 DBNAME=uat4    
+
+after done 
+
+change dbname in pfile one line only remaining same then start db then check db name 
+
+ *.db_name='prod'
+ 
+ startup;
