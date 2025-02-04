@@ -74,6 +74,10 @@ RUN {
 ## If db files location change from prod to uat then you can use SWITCH DATAFILE all and TEMP If not change it is not requred
 ## It is besicaly update the controlfile for the newlocation
 
+#IF REQURED YOU CAN DO BELLOW STEP
+select member from v$logfile;
+alter database rename file '/u01/app/oracle/oradata/PROD/redo01.log' to '/u01/app/oracle/oradata/TEST/redo01.log';
+
 
 SQL> alter database open RESETLOGS;
 
@@ -84,14 +88,14 @@ Database altered.
 SQL> SHUTDOWN IMMEDIATE;
 Database closed.
 
-     startup mount;
+startup mount;
      
 use below command in OS 
 nid TARGET=sys/sys123 DBNAME=uat4    
 
-after done 
+After done 
 
-change dbname in pfile one line only remaining same then start db then check db name 
+Change dbname in pfile one line only remaining same then start db then check db name 
 
  *.db_name='prod'
  
