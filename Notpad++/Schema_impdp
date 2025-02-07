@@ -1,0 +1,70 @@
+
+set ORACLE_SID=UAT_4
+
+sqlplus sys/sys as sysdba
+
+select username from dba_users where username='DFHI';
+
+SELECT SID,SERIAL#,USERNAME FROM V$SESSION WHERE USERNAME LIKE 'DFHI';
+
+kill the processes which ever running(alter system )
+
+alter system kill session 'sid,serial#' immediate;
+
+drop user DFHI cascade; -->
+
+
+
+physical location where we run the command level
+
+select * from dba_directories;
+
+than create manaully -->
+
+create directory <directory name> as 'physical location';
+
+create user username identified by password;
+
+
+ cd location where import dmp file is present
+ 
+ 
+impdp directory=EXPDP dumpfile=<dmpfilename> logfile=<logfilename> schemas=<schemaname>
+
+conn to user = sys as sysdba
+        password = sys
+
+exec dbms_utility.compile_schema(schema=>'DFHI',compile_all => TRUE);
+
+
+impdp directory=EXPDP dumpfile= logfile=<logfilename> schemas=<schemaname>
+
+
+==============================================2ND=====================
+
+select name,open_mode,log_mode,database_role from v$database;
+
+select username from dba_users where username='DFHI';
+
+select SID,SERIAL#,USERNAME FROM v$session where username like 'DFHI';
+
+DROP USER DFHI CASCAD;
+
+create username dfhi identified by dfhi;
+
+grant connect,create session,resource to dfhi;
+
+-- Create a new directory if necessary:
+CREATE OR REPLACE DIRECTORY EXPDP AS 'C:\path\to\your\dump\files';
+GRANT READ, WRITE ON DIRECTORY DATA_PUMP_DIR TO your_user;
+
+IMPDP directory=EXPDP dumpfile=sbi_01.dmp logfile=06022025  schemas=DFHI
+
+
+set ORACLE_SID=uat4
+
+sqlplus / as sysdba
+
+select count(*) from dba_objects where owner='DFHI';
+
+
