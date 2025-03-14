@@ -1,0 +1,194 @@
+
+
+-----------------------------------
+==>DROP THE PRIVIES DATABASE
+
+SQL> SHUTDOWN IMMEDIATE;
+STARTUP MOUNT EXCLUSIVE RESTRICT;
+    drop database;
+    
+ ==> Tack pfile and see directories are existiong or not if not just create it.
+    
+    startup nomount pfile='/path/pfile';
+    
+==> connect to rman target 
+    !rman target /
+    
+  
+RMAN> restore controlfile from '/u01/backup/PROD/autobackup/2024_12_18/o1_mf_s_1188053879_mp55f0gp_.bkp';
+
+Starting restore at 18-DEC-24
+allocated channel: ORA_DISK_1
+
+
+
+RMAN> ALTER DATABASE MOUNT;
+
+released channel: ORA_DISK_1
+Statement processed
+
+
+
+RMAN> catalog start with '/u01/backup/PROD';
+
+Starting implicit crosscheck backup at 18-DEC-24
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=258 de
+
+
+
+RUN {
+  SET NEWNAME FOR DATABASE TO '/u01/app/oracle/oradata/TEST/%U';   ========> It will change the datafiles location and provide datafile unic name
+  RESTORE DATABASE;
+  SWITCH DATAFILE ALL;
+  RECOVER DATABASE;
+}
+
+
+
+
+
+
+SQL> ALTER DATABASE OPEN RESETLOGS;
+
+Database altered.
+
+============================================IF DB NAME CHANGE===========================================
+
+SQL> SHUTDOWN IMMEDIATE;
+Database closed.
+
+     startup mount;
+	 
+use below command in OS 
+nid TARGET=SYS/SYS DBNAME=test	 
+
+after done 
+
+change dbname in pfile one line only remaining same then start db then check db name 
+
+ *.db_name='prod'
+ 
+ sqlplus / as sysdba
+ 
+ startup nomount pfile='pfile';
+ create spfile from pfile;
+ shu abort ;
+ startup;
+ 
+
+
+============================================================================================
+
+ RECOVER DATABASE;
+
+Starting recover at 19-DEC-24
+using channel ORA_DISK_1
+
+starting media recovery
+
+archived log for thread 1 with sequence 14 is already on disk as file /u01/backup/o1_mf_1_14_mp7gljqv_.arc
+archived log file name=/u01/backup/o1_mf_1_14_mp7gljqv_.arc thread=1 sequence=14
+unable to find archived log
+archived log thread=1 sequence=15
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of recover command at 12/19/2024 13:04:56
+RMAN-06054: media recovery requesting unknown archived log for thread 1 with sequence 15 and starting SCN of 2891257
+
+RMAN> validate database;
+
+Starting validate at 19-DEC-24
+using channel ORA_DISK_1
+channel ORA_DISK_1: star
+
+
+
+RMAN> LIST FAILURE;
+
+Database Role: PRIMARY
+
+List of Database Failures
+=========================
+
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+22         CRITICAL OPEN      18-DEC-24     Control file needs media recovery
+
+RMAN> advise  failure;
+
+Database Role: PRIMARY
+
+List of Database Failures
+=========================
+
+Failure ID Priority Status    Time Detected Summary
+---------- -------- --------- ------------- -------
+22         CRITICAL OPEN      18-DEC-24     Control file needs media recovery
+
+analyzing automatic repair options; this may take some time
+using channel ORA_DISK_1
+analyzing automatic repair options complete
+
+
+
+
+RMAN> REPAIR FAILURE;
+
+Strategy: The repair includes point-in-time recovery with some data loss
+Repair script: /u01/app/oracle/diag/rdbms/prod/prod/hm/reco_3947394312.hm
+
+contents of repair script:
+   # database point-in-time recovery until a missing log
+   restore database until scn 2891257;
+   recover database until scn 2891257;
+   alter database open resetlogs;
+
+Do you really want to execute the above repair (enter YES or NO)? yes
+executing repair script
+
+Starting restore at 19-DEC-24
+using channel ORA_DISK_1
+
+
+====================================== DATABASE INCARNATION ========== INGNORE THE ERROR ========================================
+
+RMAN> RECOVER DATABASE;
+
+Starting recover at 19-DEC-24
+using channel ORA_DISK_1
+
+starting media recovery
+
+archived log for thread 1 with sequence 29 is already on disk as file /u01/backup/o1_mf_1_29_mp7sld77_.arc
+archived log file name=/u01/backup/o1_mf_1_29_mp7sld77_.arc thread=1 sequence=29
+unable to find archived log
+archived log thread=1 sequence=30
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of recover command at 12/19/2024 15:19:55
+RMAN-06054: media recovery requesting unknown archived log for thread 1 with sequence 30 and starting SCN of 3000924
+
+RMAN> ALTER DATABASE OPEN RESETLOGS;
+
+
+=================================INCREMENTAL SCN BACKUP======================
+
+BACKUP INCREMENTAL FROM SCN 3000924 DATABASE 
+TAG 'INCREMENTAL_FROM_SCN_3000924' 
+FORMAT '/u01/backup/incr_%U.bkp';
+
+
+ CATALOG BACKUPPIECE '/u01/backup/incr_7d3d3bq9_1_1.bkp';
+ CATALOG BACKUPPIECE '/u01/backup/incr_7e3d3brn_1_1.bkp';
+ 
+ RESTORE INCREMENTAL FROM '/u01/backup/incr_7d3d3bq9_1_1.bkp';
+ 
+ 
+ 
+ BACKUP ARCHIVELOG FROM SEQUENCE 25 UNTIL SEQUENCE 31;
+ 
+ 
+ BACKUP CURRENT CONTROLFILE FORMAT '/u01/backup/controlfile_%U.bkp';
