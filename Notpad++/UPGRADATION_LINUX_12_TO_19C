@@ -1,0 +1,195 @@
+explain step by step upgradation 12c to 19c in oracle
+======================================================
+1. Pre-Upgrade Preparation
+    Check Compatibility:Ensure that the 12c database version is compatible with 19c.,Run the preupgrd.sql script
+   Backup Your Database:Perform a full backup of your Oracle 12c database using RMAN or other backup tools
+   Install Required Patches:Ensure that the Oracle 12c database is patched to the latest version (e.g., 12.2.0.x) to avoid compatibility issues
+   Check Space Requirements:Ensure sufficient space for the new Oracle 19c software and upgraded database files.
+
+
+2. Install Oracle 19c Software:
+     ->Download the Oracle 19c Software
+	 ->Install Oracle 19c:During installation, do not create a new database; just install the software.
+	 
+3. Prepare the Database for Upgrade:
+   ->Stop the 12c Database:SHUTDOWN IMMEDIATE;
+   
+4. Perform the Upgrade
+            ->Set the environment variables to point to the new Oracle 19c home
+        Upgrade Using DBUA (Database Upgrade Assistant):from 19c home($ORACLE_HOME/bin/dbua)			
+		
+==>	(Upgrade Using Command-Line (Manual Method):	
+    SQL> STARTUP UPGRADE;
+SQL> SPOOL upgrade.log;
+SQL> @?/rdbms/admin/catctl.pl -n 4 -l /tmp -d /tmp dbupgrade.sql;
+SQL> SPOOL OFF;
+)
+
+
+5. Post-Upgrade Tasks
+   ->Recompile all invalid objects in the database:
+   ->Run any additional post-upgrade fixups using the postupgrade_fixups.sql script.
+   
+   
+   Post-Upgrade: No automatic change in redo log paths.
+Manual Intervention: Required only if you wish to relocate redo logs to a new path after the upgrade
+---------------------------------------------------STEP BY STEP-------------------------------------------------------------------------------------------
+
+yum install -y oracle-database-preinstall-19c
+mkdir -p /u01/app/oracle/product/19c/dbhome
+chown -R oracle:oinstall /u01
+chmod -R 775 /u01
+
+==>install 19c software only not database
+
+1. Recompile Invalid Objects
+ select count(*) from dba_objects where status='INVALID';
+@$ORACLE_HOME/rdbms/admin/utlrp.sql
+
+2. Gather Statistics
+EXECUTE DBMS_STATS.GATHER_DICTIONARY_STATS;
+EXECUTE DBMS_STATS.GATHER_FIXED_OBJECTS_STATS;
+
+3. Purge Full Recycle Bin
+PURGE DBA_RECYCLEBIN;
+
+4.Tack RMAN Full Backup
+
+
+set lines 200
+set pages 1000
+col NAME for a20;
+col GUARANTEE_FLASHBACK_DATABASE for a9;
+col TIME for a40;
+
+CREATE RESTORE POINT PRE_UPGRADE_19C GUARANTEE FLASHBACK DATABASE;
+
+
+SELECT NAME, GUARANTEE_FLASHBACK_DATABASE, TIME FROM V$RESTORE_POINT;
+
+
+mkdir -p /u02/PREUPGRADE/
+##You must run the script from Oracle 19c binaries, but it should be executed against the 12c database. set 12C environment
+1. /u02/app/oracle/product/19c/dbhome/jdk/bin/java -jar \
+   /u02/app/oracle/product/19c/dbhome/rdbms/admin/preupgrade.jar FILE DIR /u02/PREUPGRADE/
+   
+## above command generete preupgred screpts and postupgrade screpts on this locaton /u02/PREUPGRADE/
+   
+    (or)
+/u02/app/oracle/product/19c/dbhome/jdk/bin/java -jar \
+/u02/app/oracle/product/19c/dbhome/rdbms/admin/preupgrade.jar TERMINAL TEXT
+
+
+##reade the preupgred.sql scrept for any action we need to tack so heare change tablespace size
+ALTER DATABASE DATAFILE '/u01/app/oracle/oradata/test/system01.dbf' RESIZE 1G;
+ALTER DATABASE DATAFILE '/u01/app/oracle/oradata/test/sysaux01.dbf' RESIZE 1G;
+ALTER DATABASE DATAFILE '/u01/app/oracle/oradata/test/users01.dbf' RESIZE 1G;
+ALTER DATABASE DATAFILE '/u01/app/oracle/oradata/test/undotbs01.dbf' RESIZE 1G;
+ALTER DATABASE TEMPFILE '/u01/app/oracle/oradata/test/temp01.dbf' RESIZE 1G;
+
+
+
+##Then connect db on 12c run preupgrd scrept
+/u02/PREUPGRADE/preupgrade_fixups.sql
+
+##STOP 12c LISTENER
+lsnrctl stop listener
+
+##shut down the database
+shut immediate;
+
+
+copy config file 12c to 19c like(password file & parameter file spfile)
+copy networking file 12c to 19c like (sqlnet.ora and listener.ora)
+
+##start database in upgradation mode (IN 19C)
+
+export ORACLE_HOME=/u02/app/oracle/product/19c/dbhome
+export ORACLE_BASE=/u02/app/oracle
+export ORACLE_SID=TEST
+
+sqlplus / as sysdba
+startup upgrade;
+exit;
+
+upgradation 2options
+------------------
+
+1.Using Perl Script
+
+cd $ORACLE_HOME/rdbms/admin
+$ORACLE_HOME/perl/bin/perl catctl.pl catupgrd.sql
+   (or)
+
+2.Using dbupgrade Utility
+$ORACLE_HOME/bin/dbupgrade
+
+
+vi /etc/oratab
+change new db location
+
+Steps to Upgrade the Time Zone in Oracle:
+------------------------------------------
+SQL> SELECT version FROM v$timezone_file;
+
+   VERSION
+----------
+        26
+
+  ( we need 32)
+
+@$ORACLE_HOME/rdbms/admin/utltz_countstats.sql;
+@$ORACLE_HOME/rdbms/admin/utltz_countstar.sql;
+@$ORACLE_HOME/rdbms/admin/utltz_upg_check.sql;
+@$ORACLE_HOME/rdbms/admin/utltz_upg_apply.sql; ## it is restart database 2 time withou confarmation
+
+
+SELECT version FROM v$timezone_file;
+
+Run post upgrade screpts
+-------------------------
+@/u02/PREUPGRADE/postupgrade_fixups.sql
+
+
+Verify Component Status in DBA_REGISTRY
+
+
+set lines 200
+set pages 1000
+
+col COMP_ID for a15
+col COMP_NAME for a50
+col VERSION for a20
+SELECT COMP_ID, COMP_NAME, VERSION, STATUS FROM DBA_REGISTRY;
+
+##Check Flashback Restore Points
+select NAME, GUARANTEE_FLASHBACK_DATABASE, TIME from V$restore_point;
+
+##Drop Pre-Upgrade Restore Point
+drop restore point PRE_UPGRADE_19C;
+
+
+ ##Change COMPATIBLE Parameter to 19.0.0
+ 
+ show parameter COMPATIBLE;
+
+ALTER SYSTEM SET COMPATIBLE = '19.0.0' SCOPE=SPFILE;
+shut immediate;
+startup;
+
+show parameter COMPATIBLE;
+select NAME, OPEN_MODE, VERSION from v$database, v$instance;
+
+
+select count(*) from dba_objects where status='INVALID';
+@$ORACLE_HOME/rdbms/admin/utlrp.sql;
+
+##Gather Statistics
+EXECUTE DBMS_STATS.GATHER_DICTIONARY_STATS;
+EXECUTE DBMS_STATS.GATHER_FIXED_OBJECTS_STATS;
+
+start listener 
+lsnrctl start
+
+
+ALTER SYSTEM SET LOCAL_LISTENER='(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.1.117)(PORT=1521))' SCOPE=BOTH;
