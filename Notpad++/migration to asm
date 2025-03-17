@@ -1,0 +1,153 @@
+
+oracleasm
+oracleasm configure -i
+oraleasm init
+
+grid oinstall y
+
+unzip the grid zip file
+install the grid software
+./gridSetup.sh -applyRU /patchlocation
+
+
+----------------------Data and redo disk creation------------------------------------
+/usr/sbin/asmtool -C -l /dev/oracleasm -n NEOCOLLDB/ -s /dev/sdm -a force=yes
+
+/usr/sbin/asmtool -C -l /dev/oracleasm -n NEOCOLLUAT -s /dev/sdn -a force=yes
+
+/usr/sbin/asmtool -C -l /dev/oracleasm -n REDO01 -s /dev/sdp -a force=yes
+
+/usr/sbin/asmtool -C -l /dev/oracleasm -n REDO02 -s /dev/sdq -a force=yes
+
+cd /grid/app/19.0.0/grid/bin
+asmca
+
+
+------------------------------------------------------------------------------
+
+select name from v$datafile;
+
+/datafile/NEOCOLLDB/datafile/o1_mf_system_l5b5zfz7_.dbf
+/NEOCOLLDB/datafile/USERS_05.dbf
+/datafile/NEOCOLLDB/datafile/o1_mf_sysaux_l5b5zg21_.dbf
+/datafile/NEOCOLLDB/datafile/o1_mf_undotbs1_l5b5zfwr_.dbf
+/NEOCOLLDB/datafile/USERS_02.dbf
+/NEOCOLLDB/datafile/USERS_04.dbf
+/NEOCOLLDB/datafile/users06.dbf
+/NEOCOLLDB/datafile/users07.dbf
+
+
+select name from v$controlfile;
+
+/datafile/NEOCOLLDB/controlfile/control_01_c.ctl
+
+select member from v$logfile;
+
+/redo2/NEOCOLLDB/redo07.log
+/redo2/NEOCOLLDB/redo08.log
+/redo1/NEOCOLLDB/redo09.log
+/redo1/NEOCOLLDB/redo10.log
+
+
+alter system set control_files='+NEOCOLLDB','+REDO2' scope=spfile;
+
+alter system set db_create_file_dest='+NEOCOLLDB' scope=spfile;
+
+alter system set  db_recovery_file_dest_size='60G' scope=spfile;
+
+alter system se db_recovery_file_dest='+NEOCOLLDB' scope=spfile;
+
+shut immediate;
+
+startup nomount;
+
+restore controlfile from '/datafile/NEOCOLLDB/controlfile/control_01_c.ctl';
+
+startup mount;
+
+run
+{
+allocate channel c1 device type disk;
+allocate channel c2 device type disk;
+allocate channel c3 device type disk;
+allocate channel c4 device type disk;
+allocate channel c5 device type disk;
+allocate channel c6 device type disk;
+backup as copy database format '+NEOCOLLDB';
+}
+
+switch database to copy;
+
+alter database open;
+
+alter tablespace TEMP add tempfile '+NEOCOLLDB' size 1g autoextend on next 3g;
+
+alter tablespace TEMP_NEW add tempfile '+NEOCOLLDB' size 1g autoextend on next 3g;
+
+alter tablespace TEMP_NEW add tempfile '+NEOCOLLDB' size 1g autoextend on next 3g;
+
+alter tablespace TEMPSERV add tempfile '+NEOCOLLDB' size 1g autoextend on next 3g;
+
+
+alter database tempfile '/datafile/NEOCOLLDB/datafile/temp.dbf' drop;
+
+alter database tempfile '/datafile/NEOCOLLDB/datafile/temp_01.dbf' drop;
+
+alter database tempfile '/datafile/NEOCOLLDB/datafile/temp_03.dbf' drop;
+
+alter database tempfile '/datafile/NEOCOLLDB/datafile/temp_04.dbf' drop;
+
+
+alter database add logfile group 1 ('+REDO1' ,'+REDO2') size 1G;
+alter database add logfile group 2 ('+REDO1' ,'+REDO2') size 1G;
+alter database add logfile group 3 ('+REDO1' ,'+REDO2') size 1G;
+
+
+alter database drop logfile group 4;
+alter database drop logfile group 5;
+alter database drop logfile group 6;
+alter database drop logfile group 7;
+
+
+
+
+FILE_NAME
+--------------------------------------------------------------------------------
+TABLESPACE_NAME
+------------------------------
+/datafile/NEOCOLLDB/datafile/temp.dbf
+TEMP
+
+/datafile/NEOCOLLDB/datafile/temp_01.dbf
+TEMP_NEW
+
+/datafile/NEOCOLLDB/datafile/temp_03.dbf
+TEMP_NEW
+
+
+FILE_NAME
+--------------------------------------------------------------------------------
+TABLESPACE_NAME
+------------------------------
+/datafile/NEOCOLLDB/datafile/temp_04.dbf
+TEMPSERV
+
+create pfile from spfile;
+
+create spfile='NEOCOLLDB' from pfile;
+
+shut immediate;
+
+spfile='+NEOCOLLDB/NEOCOLLDB/PARAMETERFILE/spfile.270.1157901275'
+
+srvctl add database -d NEOCOLL -dbname NEOCOLL1 -o /u01/app/oracle/product/12.1.0.2/dbhome_1 -p +DATA/PRODDB/parameterfile/spfilePRODDB.ora
+
+srvctl config database
+
+startup
+
+
+
+apps-fileview.texmex_20250227.00_p1
+migration to asm.txt
+Displaying migration to asm.txt.
