@@ -1,0 +1,73 @@
+1.Adaptive Query Optimization in Oracle
+-------------------------------------
+✅ It enables the optimizer to adjust execution plans based on real-time runtime statistics.
+✅ Oracle may monitor runtime statistics using a Statistics Collector.
+✅ If it detects a bad plan, it switches join methods or execution paths.
+✅ This helps avoid poor performance due to incorrect estimates.
+✅ Use DBMS_XPLAN to check if an Adaptive Plan was used.
+
+Scenario: Slow Query in an E-commerce Database
+-----------------------------------------------
+Imagine you are an Oracle DBA managing a database for an e-commerce platform. There is a table called ORDERS with millions of rows, and a query is running slowly when users search for shipped orders.
+
+SELECT * FROM ORDERS WHERE STATUS = 'SHIPPED';
+
+The Oracle Optimizer estimates that only a few rows will match 'SHIPPED' (based on outdated statistics).
+So, it chooses an index scan, assuming it will be faster.
+
+In reality, 50% of orders are 'SHIPPED', not just a few!
+The index scan retrieves too many rows, making it slower than a full table scan.
+The query runs for minutes instead of seconds!
+
+How Adaptive Query Optimization Fixes It
+------------------------------------------
+ Step 1: Oracle Detects the Mistake
+
+While executing, Oracle compares estimated vs. actual rows.
+It notices that many more rows were retrieved than expected.
+
+🛠 Step 2: Oracle Adjusts the Execution Plan
+
+Instead of sticking to the bad index scan, Oracle switches to a full table scan dynamically.
+A full scan is faster in this case because Oracle can read large chunks of data efficiently.
+
+✅ Index scan is efficient when:
+
+A small percentage of rows match the condition (e.g., 1-5%).
+The query fetches only a few columns (covered by the index).
+
+✅ Full table scan is efficient when:
+
+A large percentage of rows are retrieved (e.g., > 20-30%).
+Oracle can take advantage of parallel execution.
+Index lookups cause excessive I/O due to too many table fetches.
+-------------------------------------------------------------------
+
+2.Optimizer Statistics in Oracle 
+----------------------------------------------------
+Optimizer Statistics are metadata about database objects (tables, indexes, partitions) that Oracle’s query optimizer uses to decide the best way to execute a SQL query
+
+ What is a Histogram?
+A histogram in Oracle is a special type of optimizer statistics that helps Oracle understand data distribution in a column.
+
+
+🔹 Without Histogram (Wrong Estimation)
+Suppose we run the query:
+
+
+SELECT * FROM ORDERS WHERE STATUS = 'PENDING';
+Oracle assumes that all values in STATUS are evenly distributed.
+
+The table has 100,000 rows and 4 distinct STATUS values. meance unic values (distinct)
+So Oracle estimates 100,000 / 4 = 25,000 rows for 'PENDING', even though only 500 rows exist
+
+
+
+
+📌 What is Incremental Statistics?
+Incremental statistics in Oracle allow efficient statistics gathering for partitioned tables by updating only the changed partitions instead of scanning the entire table.
+
+✅ Incremental statistics improve performance for partitioned tables.
+✅ Only changed partitions are updated, avoiding full table scans.
+✅ Enabled at the table or global level (ALTER TABLE or DBMS_STATS.SET_GLOBAL_PREFS).
+✅ Reduces query optimization delays for frequently updated partitions.
