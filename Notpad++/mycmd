@@ -1,0 +1,389 @@
+Basic Table Statistics:
+----------------------
+SELECT table_name, num_rows, blocks, empty_blocks, avg_row_len, last_analyzed
+FROM dba_tables
+WHERE table_name = 'YOUR_TABLE_NAME';
+
+Detailed Table Statistics:
+--------------------------
+SELECT table_name, partition_name, num_rows, blocks, empty_blocks, avg_row_len, last_analyzed
+FROM dba_tab_statistics
+WHERE table_name = 'YOUR_TABLE_NAME';
+
+Column Statistics:
+-------------------
+SELECT table_name, column_name, num_distinct, low_value, high_value, density, num_nulls, avg_col_len, histogram, last_analyzed
+FROM dba_tab_col_statistics
+WHERE table_name = 'YOUR_TABLE_NAME';
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+If you want to reclime space and remove the fragmentation to the table on thes time you shued  do this  bellow steps
+
+## This process ensures that specific rows are moved from the local table to the remote table using Db_link and then removed from the local table 
+
+## Then We need to enable the row movement becouse if partitioned table is ther it is essy to move rows to partitioned table 
+
+## Then move the table from same tablespace online and update the index
+
+## Then gather_table_stats 
+
+INSERT INTO BCI_EMLAP_APPLS@DB_LINK_EMLAP_EMLAPHST
+  SELECT  *  FROM BCI_EMLAP_APPLS A
+   WHERE EXISTS (SELECT 'X' FROM EMLAP_APPLS B WHERE B.APPL_NO = A.APPL_NO
+             AND B.SN_TRANSFERED IN ('R1', 'R2', 'R9', 'R10'));
+
+commit;
+			 DELETE FROM BCI_EMLAP_APPLS A
+ WHERE EXISTS (SELECT 'X'
+          FROM EMLAP_APPLS B WHERE B.APPL_NO = A.APPL_NO
+           AND B.SN_TRANSFERED IN ('R1', 'R2', 'R9', 'R10'));
+
+commit;
+
+alter table BCI_EMLAP_APPLS enable row movement;
+alter table mfslate.BCI_EMLAP_APPLS move tablespace MFSLATE_DATA online update indexes;
+alter table BCI_EMLAP_APPLS disable row movement;
+EXEC DBMS_STATS.gather_table_stats('mfslate','BCI_EMLAP_APPLS',cascade=>TRUE,method_opt=>'FOR ALL COLUMNS SIZE AUTO');
+
+
+### ALTER TABLE table_name ENABLE ROW MOVEMENT 
+
+Why use ENABLE ROW MOVEMENT?
+Partitioned Tables: When a table is partitioned, rows might need to move between partitions.
+Enabling row movement allows these rows to be moved automatically as needed
+
+* It is used when the table is partitioned becouse that rows will move the partitioned tables. thats why we are enableing the row movement
+  After its  you need to disable  the row movement
+  
+Flashback Table: This feature allows you to revert a table to a previous state. Enabling row movement is necessary for this operation because 
+rows might need to be moved to their previous locations.
+  
+#### alter table table_name disable the row movement;
+
+
+=================================================
+query is running very slow bellow steps we can do 
+-------------------------------------------------
+1.Identify the Query: Use V$SQL to find the query.
+2.Check Execution Plan: Use EXPLAIN PLAN to see how Oracle executes it.
+3.Gather Statistics: Ensure statistics for the employees table are up-to-date.
+4.Review Indexes: Check if there's an index on department_id.
+5.Analyze Wait Events: Use V$SESSION_WAIT to see if there are any wait events.
+6.Check System Resources: Ensure the system has enough CPU and memory.
+7.Use AWR and ADDM Reports: Generate reports for deeper insights.
+8.Optimize the Query: Rewrite the query or add an index if necessary.
+9.Test and Monitor: Test the query again and monitor its performance.
+
+unusable index cheking 
+SELECT index_name, table_name, status
+FROM dba_indexes
+WHERE status = 'UNUSABLE';
+
+
+checking table_size
+SELECT SUM(bytes)/1024/1024 AS total_size_mb
+FROM dba_segments
+WHERE owner = 'MMFDBA' AND segment_name = 'CC_CONTRACT_MASTER';
+
+-- checking fragmentation of the table
+
+
+SELECT table_name, avg_row_len,
+       ROUND((blocks * 8 / 1024), 2) AS total_size_mb,
+       ROUND((num_rows * avg_row_len / 1024 / 1024), 2) AS actual_size_mb,
+       ROUND(((blocks * 8 / 1024) - (num_rows * avg_row_len / 1024 / 1024)), 2) AS fragmented_space_mb,
+       ROUND(((blocks * 8 / 1024) - (num_rows * avg_row_len / 1024 / 1024)) / (blocks * 8 / 1024) * 100, 2) AS fragmentation_percentage
+FROM dba_tables
+WHERE owner = 'MMFDBA' AND table_name = 'DRAWEE_BANK_MASTER';
+
+
+ALTER TABLE MMFDBA.CC_CONTRACT_MASTER MOVE;  
+-- No, you don't need to create a new table manually when you run the  command. 
+-- This command automatically handles the process of moving the table to a new segment, effectively defragmenting it.
+
+alter table SA_CUSTOMER_MASTER enable row movement;
+alter table MMFDBA.BCI_EMLAP_APPLS move tablespace MMFDATA online update indexes;
+alter table SA_CUSTOMER_MASTER disable row movement;
+EXEC DBMS_STATS.gather_table_stats('MMFDATA','BCI_EMLAP_APPLS',cascade=>TRUE,method_opt=>'FOR ALL COLUMNS SIZE AUTO');
+
+
+   SELECT event, wait_time, seconds_in_wait
+   FROM v$session_wait
+   WHERE sid = (SELECT sid FROM v$session WHERE username = 'your_username');
+   
+   
+----------------------------------------------------------------------------------
+   --Provide hints to the Oracle optimizer 
+   --you can use the INDEX hint to force the use of an index.
+   
+   SELECT /*+ INDEX(table_name index_name) */ ...
+
+
+ --Provide hints to the Oracle optimizer to parallel excution
+SELECT /*+parallel(table_name,10)*/ *
+
+
+
+
+
+--FINDING HAS VALUE OF LASTfF DAY using sql_id 	
+
+SELECT 
+    SQL_ID, 
+    PLAN_HASH_VALUE, 
+    EXECUTIONS_TOTAL, 
+    PARSE_CALLS_TOTAL, 
+    DISK_READS_TOTAL, 
+    BUFFER_GETS_TOTAL, 
+    CPU_TIME_TOTAL, 
+    ELAPSED_TIME_TOTAL, 
+    SNAP_ID, 
+    INSTANCE_NUMBER 
+FROM 
+    DBA_HIST_SQLSTAT 
+WHERE 
+    SQL_ID = '1ty00w3hy9z64' 
+    AND SNAP_ID IN (
+        SELECT SNAP_ID 
+        FROM DBA_HIST_SNAPSHOT 
+        WHERE BEGIN_INTERVAL_TIME >= TRUNC(SYSDATE) - 1
+        AND BEGIN_INTERVAL_TIME < TRUNC(SYSDATE)
+    );
+	
+	
+-----------------------High cpu consuming qureys--------------------
+	WITH total_cpu AS (
+    SELECT SUM(cpu_time) AS total_cpu_time
+    FROM v$sqlstats
+)
+SELECT 
+    s.sql_id,  
+    s.cpu_time, 
+    s.elapsed_time, 
+    s.executions, 
+    s.buffer_gets, 
+    s.disk_reads,
+    ROUND((s.cpu_time / t.total_cpu_time) * 100, 2) AS cpu_utilization,
+     s.sql_text
+FROM 
+    v$sqlstats s,
+    total_cpu t
+ORDER BY 
+    s.cpu_time DESC
+FETCH FIRST 10 ROWS ONLY;
+
+
+
+
+
+------------Generate the plan using sql_id---------------------------------------------
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR('6j8r06wj0bc4m', NULL, 'ALLSTATS LAST'));
+
+EXPLAIN PLAN FOR
+SELECT * FROM EMP;
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY); -- IT IS NOT GIVEN BEST PLAN INSTED OF THAT YOU CAN USE THIS (DBMS_XPLAN.DISPLAY_CURSOR)
+
+-------------------------------------------------------------------------------------------------------------
+-- Step 1: Create a tuning task
+DECLARE
+  l_task_id VARCHAR2(100);
+BEGIN
+  l_task_id := DBMS_SQLTUNE.create_tuning_task(
+    sql_id => '2uk59gc9z08mp',
+    scope => DBMS_SQLTUNE.scope_comprehensive,
+    time_limit => 60, -- Time limit in seconds
+    task_name => 'tune_sql_2uk59gc9z08mp',
+    description => 'Tuning task for SQL ID 2uk59gc9z08mp'
+  );
+  DBMS_OUTPUT.PUT_LINE('Task ID: ' || l_task_id);
+END;
+/
+
+-- Step 2: Execute the tuning task
+BEGIN
+  DBMS_SQLTUNE.execute_tuning_task('tune_sql_2uk59gc9z08mp');
+END;
+/
+
+-- Step 3: Review the recommendations
+SELECT DBMS_SQLTUNE.report_tuning_task('tune_sql_2uk59gc9z08mp') AS recommendations
+FROM DUAL;
+
+
+-------------------------Check the table treggers------------------------------------------
+SELECT 
+  trigger_name, 
+  table_name, 
+  trigger_type, 
+  triggering_event, 
+  status, 
+  trigger_body
+FROM 
+  all_triggers
+WHERE 
+  owner = 'STAGING_DB' 
+  AND table_name = 'COL_ACCOUNT_DTL_STG';
+
+---------------------------------------------- Chek MV ---------------------------------------------
+SELECT 
+    MVIEW_NAME, 
+    COMPILE_STATE, 
+    LAST_REFRESH_TYPE, 
+    LAST_REFRESH_DATE, 
+    REFRESH_METHOD, 
+    BUILD_MODE, 
+    STALENESS
+FROM 
+    DBA_MVIEWS
+WHERE 
+    MVIEW_NAME = 'mv_ecs_bank_master';
+	
+	
+	
+======================================================== Current session check ====================
+SELECT SID, SERIAL#, INST_ID 
+FROM GV$SESSION 
+WHERE SID = (SELECT SID FROM v$mystat WHERE ROWNUM = 1);
+====================================================================================================
+
+--------------------GET SQL FULL TEXT-------------------
+SELECT SQL_FULLTEXT FROM V$SQL WHERE SQL_ID = '48wt7fbhgkhhk';
+
+
+
+
+----------------- CHECK qurey excution time --------------------------------------
+
+    SELECT
+    sql_id,
+    executions,
+    TRUNC(SUM(ELAPSED_TIME) / SUM(EXECUTIONS) / 1000000, 2) AS avg_elapsed_time_seconds,
+    TRUNC(SUM(CPU_TIME) / SUM(EXECUTIONS) / 1000000, 2) AS avg_cpu_time_seconds,
+    TRUNC(SUM(buffer_gets) / SUM(executions), 2) AS avg_buffer_gets,
+    TRUNC(SUM(disk_reads) / SUM(executions), 2) AS avg_disk_reads,
+    TRUNC(SUM(fetches) / SUM(executions), 2) AS avg_fetches
+FROM 
+    V$SQL
+WHERE 
+    sql_id IN ('')
+    AND elapsed_time <> 0
+GROUP BY 
+    sql_id,executions;
+	
+	
+	
+------------ function Index created  ------------------------
+CREATE INDEX IDX_FN_CAN_HDRKEY_KRA ON AUTOFIN.REC_CAN_FORM_REMAR(TO_NUMBER(CANCEL_HEADER_KEY)) ONLINE;
+
+------ check table column distinct values ----------
+select * from dba_tab_col_statistics where table_name='T_MF_COM_SETTLEMENT_UPLOAD'  order by num_distinct desc;
+
+
+----REMOUNT SIDE USING DB_LINK-----
+SELECT *
+FROM dba_tab_col_statistics@DB_LINK_REPORT_TO_DEDUPE
+WHERE table_name = 'CONTRACT_CUST_CLUSTER_ID_LINK'
+  AND owner = 'PRIMEAPP'
+ORDER BY num_distinct DESC;
+
+---Check the table where it is using ------------------------------
+select * from dba_source where upper(text) like '%OPNG_RECO_CURRENT%';  
+
+---Column statistics check----
+select * from dba_tab_col_statistics where table_name = 'BANK_STMT' and owner = 'OFASMMFSL' ORDER BY NUM_DISTINCT DESC;
+
+----table index check----------
+SELECT * FROM DBA_INDEXES WHERE TABLE_NAME = 'BANK_STMT';
+
+--------check qurey where it is TRIGGER-------------
+select * from v$session where sid = 2134;
+
+select * from dba_objects where object_id = 509291;  --PLSQL_ENTRY_OBJECT_ID
+
+ofasmmfsl.SP_FORCE_RECO_SAVE4
+
+------CHECK REMOUNT DB INDEXES------------
+SELECT index_name, table_name, column_name, column_position
+FROM all_ind_columns@DB_LINK_REPORT_TO_DEDUPE
+WHERE table_name = 'CONTRACT_CUST_CLUSTER_ID_LINK'
+AND table_owner = 'PRIMEAPP'
+ORDER BY index_name, column_position;
+
+-------------clear the plan table and view the plan-----------
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY); 
+DELETE FROM PLAN_TABLE;
+
+
+
+
+check blocking session ID
+--------------------------
+/*Live sessions on database after 10G*/
+SELECT DISTINCT s.username, s.SID, osuser, s.machine, last_call_et,s.blocking_session,
+                s.event,s.module,s.sql_id,q.hash_value, s.logon_time, s.row_wait_obj#, s.status, sql_text
+           FROM  v$sql q, v$session s--, v$process p, v$session_wait sw
+          WHERE s.sql_hash_value=q.hash_value(+)
+        -- and s.username='VBD'
+           -- AND s.paddr = p.addr
+            --AND s.sql_address = q.address(+)
+            AND s.status = 'ACTIVE'
+            AND s.username IS NOT NULL
+       ORDER BY 5 DESC;
+	   
+	   
+	   
+	   
+----------------------------------------------------------------
+select  distinct last_call_et,s.username,seq#,s.sid,s.program,MACHINE,s.sql_id,event,sql_text from v$session s,v$sql q
+where s.sql_hash_value=q.hash_value(+)
+and s.status='ACTIVE'
+and s.username is not null
+order by 1 ASC; 
+
+SELECT * FROM V$parameter WHERE NAME LIKE '%session%'; --16560 
+
+
+SELECT * FROM V$parameter WHERE NAME LIKE '%process%'; --11000 
+
+SELECT * FROM V$SESSION WHERE SID = 5634;
+
+SELECT * FROM V$SQLAREA WHERE SQL_ID = '9zg9qd9bm4spu';
+
+select count(*),status,username from v$session where username is not null group by status,USERNAME;
+
+SELECT COUNT(*),STATUS FROM V$SESSION WHERE USERNAME IS NOT NULL GROUP BY STATUS;
+
+
+select USERNAME, MACHINE, MODULE, STATUS, count(*)session_count from v$session where username is not null group by USERNAME, MACHINE, MODULE, STATUS;
+
+SELECT SID, SERIAL#, USERNAME, STATUS,LOGON_TIME, MACHINE
+FROM V$SESSION WHERE STATUS='INACTIVE' and username = 'UNIVERSAL'
+ORDER BY LOGON_TIME asc fetch first 20 rows only;
+
+
+=================================================================================================
+
+
+QUREY TO CHECK MV-CREATION SCREPT
+----------------------------------
+
+SELECT DBMS_METADATA.GET_DDL('MATERIALIZED_VIEW', 'MV_EMLAP_ASSET_PARAM', 'MMFDBA') FROM DUAL;
+
+
+
+check oracle job and PROCEDURE(job_action)
+--------------------------------------------
+SELECT job_name, program_name, job_action
+FROM dba_scheduler_jobs
+WHERE job_name = 'BRD_MAIN_SP_JOB_1';
+
+
+
+
+
+
+
+
