@@ -1,0 +1,210 @@
+SELECT /*+parallel(w,10)*/ * FROM adg_report.WHEELS_DEDUPE_EXCEPTION W
+WHERE  EXISTS (SELECT 'X' FROM MMFDBA.CONTRACT_CUST_CLUSTER_ID_LINK@DB_LINK_REPORT_TO_SN_ADG L
+                  WHERE L.REFERENCE_NUMBER = W.CONTRACT_NUMBER
+                  AND L.ENTITY_TYPE = W.ENTITY_TYPE
+                  AND L.ENTITY_CODE = W.CUSTOMER_CODE
+                  AND L.CLUSTER_ID <> W.CLUSTER_ID);
+
+
+
+                  
+alter table wheels_dedupe_exception enable row movement;
+                 
+alter table wheels_dedupe_exception move tablespace adg PARALLEL 4; -- WE ARE NOT USE (ONLINE) HEARE BECOUSE COMPATABLTY PARAMETER WAS NOT SET. AND ADG TABLESPACES IS DEFAULT ONLY
+
+alter table wheels_dedupe_exception disable row movement; 
+
+alter index WE_ENTITY_TYPE rebuild online parallel 4;
+
+alter index WE_ENTITY_TYPE noparallel;
+---------------------------------------------------------------------------------
+
+-- ##### Table is inserting from sql db to oracle db it geeting slow insert on target db
+-- Disable indexes and constraints to improve performance
+-- Insert the collected rows into the target table using direct path  USE /*+ APPEND */
+  -- Re-enable indexes and constraints
+   -- Gather statistics to ensure the optimizer has up-to-date information
+    -- Commit the final changes
+	
+DECLARE
+  TYPE ref_cursor_type IS REF CURSOR;
+  src_cursor ref_cursor_type;
+  TYPE t_source IS TABLE OF STAGING_DB.COL_ADDL_ACCOUNT_DTL_STG%ROWTYPE;
+  l_source t_source;
+  l_batch_size NUMBER := 1000;
+
+  -- Define the cursor to select data from the source table
+  CURSOR c_source IS
+    SELECT 
+      ID, 
+      BOD_UPLOAD, 
+      CUSTOMER_DTL_ID, 
+      ELIGIBLE_RECORD, 
+      HOST_ID, 
+      HOST_NAME, 
+      LINE_NUMBER, 
+      NEW_RECORD, 
+      OLD_RECORD_ID, 
+      ADDL_STR_FLD51, 
+      ADDL_STR_FLD52, 
+      ADDL_STR_FLD53, 
+      ADDL_STR_FLD54, 
+      ADDL_STR_FLD55, 
+      ADDL_AMT_FLD21
+    FROM source_table;
+
+BEGIN
+  -- Disable indexes and constraints to improve performance
+ -- ALTER TABLE STAGING_DB.COL_ADDL_ACCOUNT_DTL_STG DISABLE ALL TRIGGERS;
+  ALTER INDEX INDX_ACC_ACCOUNT_NO UNUSABLE;
+
+  OPEN c_source;
+  LOOP
+    FETCH c_source BULK COLLECT INTO l_source LIMIT l_batch_size;
+    EXIT WHEN l_source.COUNT = 0;
+
+    -- Insert the collected rows into the target table using direct path
+    FORALL i IN 1..l_source.COUNT
+      INSERT INTO STAGING_DB.COL_ADDL_ACCOUNT_DTL_STG VALUES l_source(i);
+
+    -- Commit the transaction after each batch
+    COMMIT;
+  END LOOP;
+  CLOSE c_source;
+
+  -- Re-enable indexes and constraints
+  --ALTER TABLE STAGING_DB.COL_ADDL_ACCOUNT_DTL_STG ENABLE ALL TRIGGERS;
+  ALTER INDEX INDX_ACC_ACCOUNT_NO REBUILD;
+
+  -- Gather statistics to ensure the optimizer has up-to-date information
+  EXEC DBMS_STATS.GATHER_TABLE_STATS(
+    ownname => 'STAGING_DB',
+    tabname => 'COL_ADDL_ACCOUNT_DTL_STG',
+    estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE,
+    method_opt => 'FOR ALL COLUMNS SIZE AUTO'
+  );
+
+  -- Commit the final changes
+  COMMIT;
+END;
+/
+
+--------------------/*+DRIVING_SITE(VD)*/ -----------------------------------
+--DRIVING_SITE() It  is featch data from remount db thorugh dblink 
+--what is our requredment based on that above hint will  do calucaltion on remount side and send data what we need (D.BATCH_NUMBER = M.BATCH_NUMBER)
+  BEGIN
+      SELECT/*+DRIVING_SITE(VD)*/ COUNT(*)
+        INTO VAL_CNT
+        FROM MMFDBA.DC_RECEIPT_VOUCHER_DETAILS@db_link_report_to_adg VD
+       WHERE EXISTS (SELECT 'X'
+                FROM MMFDBA.ECS_CHEQUE_DETAILS@db_link_report_to_adg D,
+                     MMFDBA.ECS_BATCH_MASTER@db_link_report_to_adg   M
+               WHERE D.BATCH_NUMBER = M.BATCH_NUMBER
+                 AND M.CONTRACT_NUMBER = IV_CONTRACT_NUMBER
+                 AND VD.HEADER_KEY = D.RECEIPT_HEADER_KEY)
+         AND VD.REALISATION_IND = 'U';
+      IF VAL_CNT > 0 THEN
+        OV_ERROR_MSG := 'REALISATION STILL PENDING';
+        INSERT INTO adg_report.VALIDATION_TEMP_TABLE
+          (SESSION_ID, ERROR_NUMBER, ERROR_MESSAGE, TXN_DATE)
+        VALUES
+          (LV_SESSION_ID, 18, OV_ERROR_MSG, SYSDATE);
+      END IF;
+    END;
+    ------------------------------------------------------------------------
+	
+Use of USE_HASH Hint
+===================
+Hash Join Operation:
+How It Works: A hash join works by building a hash table from the smaller table (or the table with the fewer rows) and then probing this hash table with the rows from the larger table to find matches.
+Efficiency: Hash joins are particularly efficient for large data sets because they can process large volumes of data quickly. They are often faster than nested loops joins for large tables.
+
+When to Use USE_HASH:
+Large Data Sets: When joining large tables, especially when one table is significantly larger than the other.
+Equi-Joins: When the join condition is an equality condition (e.g., A = B).
+Avoiding Nested Loops: When the optimizer might choose a nested loops join, but you believe a hash join would be more efficient.
+
+Syntax:
+The USE_HASH hint can be applied to a specific join operation in the query. The syntax is /*+ USE_HASH(table1 table2) */, where table1 and table2 are the tables being joined.
+
+--Specify the Join Method:
+The USE_HASH hint forces the optimizer to use a hash join for the specified join operation. In this case, it specifies that the join between C (CC_CONTRACT_MASTER) and WH (WHEELS_DEDUPE_EXCEPTION) should use a hash join.
+
+SELECT /*+DRIVING_SITE(C) USE_HASH(C WH) USE_HASH(C MN) USE_HASH(C T) PARALLEL(C, 4) PARALLEL(WH, 4) PARALLEL(MN, 4) PARALLEL(T, 4)*/ C.CONTRACT_NUMBER
+FROM MMFDBA.CC_CONTRACT_MASTER@DB_LINK_REPORT_TO_SN_ADG C
+WHERE C.CONTRACT_STATUS <> '3'
+AND NOT EXISTS (SELECT /*+DRIVING_SITE(WH) INDEX(WH IND_WHEELS_DEDUPE_EXCEPTION)*/ 'X' FROM WHEELS_DEDUPE_EXCEPTION WH
+                WHERE WH.CONTRACT_NUMBER = C.CONTRACT_NUMBER)
+AND NOT EXISTS (SELECT /*+DRIVING_SITE(MN) INDEX(MN IND_MN_CUSTOMER_MODIFY_SUMMARY)*/ 'X' FROM AUTOFIN.MN_CUSTOMER_MODIFY_SUMMARY@DB_LINK_REPORT_TO_SN_ADG MN
+                WHERE MN.CONTRACT_NUMBER = C.CONTRACT_NUMBER
+                AND MN.STATUS = 'A')
+AND EXISTS (SELECT /*+DRIVING_SITE(T) INDEX(T IND_SA_TRANSACTION_DETAILS)*/ 'X' FROM MMFDBA.SA_TRANSACTION_DETAILS@DB_LINK_REPORT_TO_SN_ADG T
+            WHERE T.TD_TXN_ID = C.TXN_ID
+            AND TRUNC(T.TD_TXN_DATE) = TRUNC(SYSDATE-1))
+UNION
+SELECT /*+DRIVING_SITE(C) USE_HASH(C MN) USE_HASH(C WH) PARALLEL(C, 4) PARALLEL(MN, 4) PARALLEL(WH, 4)*/ C.CONTRACT_NUMBER
+FROM MMFDBA.CC_CONTRACT_MASTER@DB_LINK_REPORT_TO_SN_ADG C
+WHERE C.CONTRACT_STATUS <> '3'
+AND EXISTS (SELECT /*+DRIVING_SITE(MN) INDEX(MN IND_MN_CUSTOMER_MODIFY_SUMMARY)*/ 'X' FROM AUTOFIN.MN_CUSTOMER_MODIFY_SUMMARY@DB_LINK_REPORT_TO_SN_ADG MN
+            WHERE MN.CONTRACT_NUMBER = C.CONTRACT_NUMBER
+            AND MN.STATUS = 'A'
+            AND TRUNC(MN.VERIFIED_DATE) = TRUNC(SYSDATE-1))
+AND (NOT EXISTS (SELECT 'X' FROM WHEELS_DEDUPE_EXCEPTION WH
+                 WHERE WH.CONTRACT_NUMBER = C.CONTRACT_NUMBER)
+     OR EXISTS (SELECT 'X' FROM WHEELS_DEDUPE_EXCEPTION WH
+                WHERE WH.CONTRACT_NUMBER = C.CONTRACT_NUMBER));
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+
+--------------------------------------------------------
+SELECT /*+ DRIVING_SITE(C) USE_HASH(W C) PARALLEL(W, 4) PARALLEL(C, 4) */
+       DISTINCT W.CONTRACT_NUMBER
+FROM WHEELS_DEDUPE_EXCEPTION W
+JOIN PRIMEAPP.CONTRACT_CUST_CLUSTER_ID_LINK@DB_LINK_REPORT_TO_DEDUPE C
+ON C.REFERENCE_NUMBER = W.CONTRACT_NUMBER
+AND C.ENTITY_TYPE = W.ENTITY_TYPE
+AND C.ENTITY_CODE = W.CUSTOMER_CODE
+AND C.CLUSTER_ID <> W.CLUSTER_ID
+LEFT JOIN WHEELS_EXPTION_ONETIME K
+ON K.TOTAL_COUNT = W.CONTRACT_NUMBER 
+WHERE K.TOTAL_COUNT IS NULL;
+
+
+ /*After LEFT JOIN on K.TOTAL_COUNT = W.CONTRACT_NUMBER it is print matched data and unmatched data(null), then print only null valuse like unmatched data from w table 
+-- hear So overall, the query is excluding matched data and returning only unmatched records from WHEELS_DEDUPE_EXCEPTION.*/
+
+
+
+===========================================================================================================================================
+AWR (Automatic Workload Repository)
+----------------------------------
+What it is: A repository that collects, processes, and maintains performance statistics.
+Purpose: To provide a historical view of database performance.
+Data Collected:
+Wait events
+SQL execution statistics
+System statistics
+Active session history (ASH)
+Usage:
+Generate AWR reports to analyze performance over time.
+Compare snapshots to identify performance degradation.
+Manual or Automatic: Snapshots are taken automatically (default every hour), but you can also take them manually.
+
+🔹 ADDM (Automatic Database Diagnostic Monitor)
+-----------------------------------------------
+What it is: A diagnostic tool that analyzes AWR data.
+Purpose: To identify root causes of performance problems and suggest solutions.
+How it works:
+Runs automatically after each AWR snapshot.
+Analyzes the data between two snapshots.
+Output:
+Recommendations to improve performance (e.g., SQL tuning, adding indexes, memory adjustments).
+Impact analysis of performance issues.
+
+
+
+
+
+
+24.4 acrs patching night
