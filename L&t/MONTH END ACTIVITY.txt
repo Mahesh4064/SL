@@ -1,0 +1,1055 @@
+MONTH END ACTIVITY
+
+LTFP02 EOM 10.3.27.79
+
+PRE EOM (end of month )                                                                                                                                             
+
+One day before EOM 
+mail subject --> LTF EOM | MAR 2023
+Mail come from : Legacy EOD/BOD support Team to disable jobs, rman backups and stat gather.
+
+login LTFP02  10.3.27.79   database using PIM. 
+
+
+1. For disable job and rman and stats gather.
+
+	Disable rman and stats gather cronjob.
+	Before disable jobs check status
+
+
+col OWNER for a23
+col JOB_NAME for a35
+select OWNER,JOB_NAME,STATE,ENABLED from dba_scheduler_jobs where JOB_NAME in('P_POSIDEX_DAILY_DATA1');
+
+
+
+
+conn FINONE_READ/FINONE_READ
+
+
+EXEC DBMS_SCHEDULER.DISABLE('P_POSIDEX_DAILY_DATA1');
+commit;
+
+
+conn FINNCOMM/FINNCOMM
+
+
+EXEC DBMS_JOB.BROKEN(31066,true);
+
+
+conn FINLEA_PROD/FINLEA_PROD
+
+
+EXEC DBMS_JOB.BROKEN(20136,True);
+EXEC DBMS_JOB.BROKEN(3491,true);
+EXEC DBMS_JOB.BROKEN(7676,true);
+EXEC DBMS_JOB.BROKEN(27365,true);
+EXEC DBMS_JOB.BROKEN(10457,true);
+commit;
+
+
+
+
+EXEC DBMS_JOB.BROKEN(294,true);
+commit;
+EXEC DBMS_JOB.BROKEN(30206,true);
+commit;
+EXEC DBMS_JOB.BROKEN(30207,true);
+EXEC DBMS_JOB.BROKEN(30208,true);
+EXEC DBMS_JOB.BROKEN(1481062,true);
+commit;
+
+
+select job,schema_user,broken,failures from dba_jobs where job in (294,3491,10457,20136,27365,30206,30207,30208,31006,1481062);
+
+
+alter profile default limit failed_login_attempts unlimited;
+Day of EOM                                                                                                                                                          
+
+login LTFP02 10.3.27.79    database using PIM. 
+
+Database Bounce before EOM start 
+
+mail subject  :: Database Bounce of LTF EOM_MAR 2023 || LTFP02 (10.3.27.79)
+
+We Will get mail from legacy EOD BOD : Database Bounce of LTF EOM	(before EOM Start)
+
+Bounce 10.3.27.79 Database
+
+shut immediate
+startup
+
+THEN Compile the INVALID Objects.
+
+@?/rdbms/admin/utlrp
+
+Give DR SYNC after EOM completed.
+
+Mail Subject :: Confirmation of LTF FARM EOM Completed || MAR-2023
+
+Switch 5-6 logfile on production just after mail comes,Take max sequence number from production.
+
+alter system switch logfile; ---- (5-6 times)
+select thread#,max(sequence#) from gv$archived_log group by thread#;
+
+Login to DR : 172.30.86.36 || and give the sip of below commands.
+
+
+set lines 200 pages 2000
+col host_name for a20
+select name,open_mode,log_mode,database_role,instance_name,host_name from v$database,v$instance;
+
+
+select sequence#,thread#,to_char(FIRST_TIME,'DD-MON-YYYY HH24:MI:SS') from v$archived_log where sequence#='&seq';
+
+
+!hostname -i
+
+STOP MRP on DR
+
+Stop the mrp  after DR SYNC confirmation has been sent to the EDW team.
+
+alter database recover managed standby database cancel;
+
+
+5. - Start  backup from DR    (Night )                                                                                                                           
+	
+We will received mail from EDW Team like :
+ FinnoneDailyLoad Prestaging step completed successfully.Please proceed your activity.
+
+172.30.86.36 :: run in nohup utility This is RMAN FULL Backup.
+
+nohup sh /DB_backup/RMAN_BACKUP_POST_EOM/RMAN_FULL_BACKUP_LTFP02.sh &
+
+6.  POST EOM                                                                                                                                                              
+
+Enable the JOBS
+
+conn FINONE_READ/FINONE_READ
+
+
+EXEC DBMS_SCHEDULER.enable('P_POSIDEX_DAILY_DATA1');
+commit;
+
+
+conn FINNCOMM/FINNCOMM
+
+
+EXEC DBMS_JOB.BROKEN(31066,false);
+commit;
+
+
+conn FINLEA_PROD/FINLEA_PROD
+
+
+EXEC DBMS_JOB.BROKEN(20136,false);
+EXEC DBMS_JOB.BROKEN(3491,false);
+EXEC DBMS_JOB.BROKEN(7676,false);
+EXEC DBMS_JOB.BROKEN(27365,false);
+EXEC DBMS_JOB.BROKEN(10457,false);
+EXEC DBMS_JOB.BROKEN(294,false);
+EXEC DBMS_JOB.BROKEN(30206,false);
+EXEC DBMS_JOB.BROKEN(30207,false);
+EXEC DBMS_JOB.BROKEN(30208,false);
+EXEC DBMS_JOB.BROKEN(1481062,false);
+
+
+commit;
+
+
+alter profile default limit failed_login_attempts 10;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TCS EOM 10.3.27.177
+
+PRE-EOM 
+
+Disable ON TAPE backup scheduler  (Morning before EOM starts)
+
+Drop a mail to backup team to disable the tape backup scheduler until next confirmation/EOM activities completion.
+
+Check Tablespace free space on UAT
+
+Mail Subject :: Check tablespace T012BAND_HA @31-MAR-2023
+
+Check tablespace free space on UAT 10.32.11.97 server,Free space should be under threshold.
+
+Disable RMAN backup
+
+Mail Subject :: TCS EOM ||31 - MAR-2023|| Disable TCS Bancs RMAN backup
+
+Disable the rman backup,export backup from crontab
+
+crontab -l
+cromtab -e
+   Put # before the backup scripts .
+   Save the file using below keywords.
+:wq!
+crontab -l
+
+PRE EOM Backup                                                                                                                                                      
+
+Mail Subject :: TCS EOM || MAR- 2023 || TCS Bancs PRE & POST EOM Backup of 30-MAR- 2023
+
+Take full export backup of all five databases on 10.3.27.177 sevrer, 
+Scripts are has follows :
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=PREEOM DUMPFILE=t012band_MAR_01_PRE_%U.dmp LOGFILE=t012band_MAR_01_PRE.log full=y EXCLUDE=STATISTICS parallel=4 compression=all
+
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=PREEOM DUMPFILE=t013bans_MAR_01_PRE_%U.dmp LOGFILE=t013bans_MAR_01_PRE.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=PREEOM DUMPFILE=t014banr_MAR_01_PRE_%U.dmp LOGFILE=t014banr_MAR_01_PRE.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=PREEOM DUMPFILE=fedb_MAR_01_PRE_%U.dmp LOGFILE=fedb_MAR_01_PRE.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+ 
+expdp  \'sys/sys as sysdba\' DIRECTORY=PREEOM DUMPFILE=LOSDB_MAR_01_PRE_%U.dmp LOGFILE=LOSDB_MAR_01_PRE.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+
+
+STOP MRP 
+
+
+After EOM completed stop mrp from DR , 
+We will get message on EOD BOD Process gmail chat group.
+
+
+Infrom sushant sir about the same.
+
+ POST EOM BACKUP 
+
+Mail Subject :: TCS EOM || MAR- 2023 || TCS Bancs POST EOM Backup of 31-MAR- 2023
+
+Take full export backup of all five databases on 10.3.27.177 sevrer, 
+Scripts are has follows :
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=POSTEOM DUMPFILE=t012band_MAR_01_POST_%U.dmp LOGFILE=t012band_MAR_01_POST.log full=y EXCLUDE=STATISTICS parallel=4 compression=all
+
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=POSTEOM DUMPFILE=t013bans_MAR_01_POST_%U.dmp LOGFILE=t013bans_MAR_01_POST.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=POSTEOM DUMPFILE=t014banr_MAR_01_POST_%U.dmp LOGFILE=t014banr_MAR_01_POST.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+
+
+expdp  \'sys/sys as sysdba\' DIRECTORY=POSTEOM DUMPFILE=fedb_MAR_01_POST_%U.dmp LOGFILE=fedb_MAR_01_POST.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+ 
+expdp  \'sys/sys as sysdba\' DIRECTORY=POSTEOM DUMPFILE=LOSDB_MAR_01_POST_%U.dmp LOGFILE=LOSDB_MAR_01_POST.log full=y EXCLUDE=STATISTICS  parallel=4 compression=all
+
+
+Enable Backups 
+
+Mail Subject :: TCS EOM ||31 - MAR- 2023|| Enable TCS Bancs Rman backup
+
+Enable the hashed the backup from crontab 
+crontab -l
+crontab -e
+
+
+Remove # which is before the backup scripts .
+      Save the file using below keywords.
+:wq!
+crontab -l
+
+MRP
+ 
+Do not start MRP until we get confirmation either from Sushant sir or Manoj Sir
+Continuously ask them when to start the MRP on DR 172.20.86.43
+
+
+SLMS EOM 10.3.27.159/160/161
+
+
+EOM MAILS                                                                                                                                                                         
+
+Mail From Digital EOD BOD 
+Kindly stop any planned backup activity on OneLMSML || Mar-2023 EOM
+
+Mail From Legacy EOD BOD 
+Kindly stop any planned backup activity on ONELMSFR || MAR-2023 EOM
+
+Mail From Digital EOD BOD
+Kindly stop any planned backup activity(RMAN) on ONELMS and ONELMSCL || EOM-March-2023
+
+
+
+Hi ,
+
+
+We have stopped the backup schedule and there is not any backup running .
+
+
+Regards,
+
+Also enable ON TAPE backup scheduler with the help of backup team
+Drop a reply on same mail which is used to disable the backups on tape.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ONELMS                                                                                                                                                                       
+
+Mail Subject --> Kindly Disable TWHL Auto closure Job and Health check || EOM-March-2023
+
+set lines 234 pages 300
+col OWNER for a23
+col job_name for a23
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('HEALTHCHECK','AUTOCLOSURE_NEW');
+
+
+conn LTF_LEA/m$X_M2z8K$
+
+
+exec dbms_scheduler.disable ( 'HEALTHCHECK' ) ;
+exec dbms_scheduler.disable ( 'AUTOCLOSURE_NEW' ) ;
+commit;
+
+
+Conn / as sysdba
+
+
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('HEALTHCHECK','AUTOCLOSURE_NEW');
+
+
+
+
+
+Database :- ONELMS                                                                                                                     
+
+Mail SUbject :- Anyrecon in ONELMS || MAR-2023
+
+set lines 234 pages 300
+col OWNER for a23
+col job_name for a34
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('RECEIPT_ANYRECON_OL_HOST');
+
+
+
+conn LTF_LEA/m$X_M2z8K$
+
+
+exec dbms_scheduler.disable ( 'RECEIPT_ANYRECON_OL_HOST');
+
+
+Conn / as sysdba
+
+
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('RECEIPT_ANYRECON_OL_HOST');
+
+
+
+ONELMSML                                                                                                                                                                               
+
+Mail Subject --> Anyrecon in ONELMSML || EOM-March-2023
+
+set lines 234 pages 300
+col OWNER for a23
+col job_name for a23
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('HEALTHCHECK','AUTOCLOSE');
+OWNER                JOB_NAME                                 STATE
+-------------------- ---------------------------------------- ------------------------------
+LTF_EOD_MIL          AUTOCLOSE                                SCHEDULED
+LTF_LEA_MIL          HEALTHCHECK                            SCHEDULED
+
+
+Conn LTF_EOD_MIL/MW$P638s_5
+
+
+exec dbms_scheduler.disable ( 'AUTOCLOSE' ) ;
+Commit;
+
+
+Conn LTF_LEA_MIL/m$X_M2z8K$
+
+
+exec dbms_scheduler.disable ( 'HEALTHCHECK' ) ;
+Commit;
+
+
+Conn / as sysdba
+
+
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('HEALTHCHECK','AUTOCLOSE');
+
+
+OWNER                JOB_NAME                                 STATE
+-------------------- ---------------------------------------- ------------------------------
+LTF_EOD_MIL          AUTOCLOSE                             DISABLED
+LTF_LEA_MIL          HEALTHCHEC                            DISABLED
+
+
+
+
+
+
+NOTE :- Continuously Monitor the Archive log mount points,disks from Production,NDR
+and DR                                                                                                                                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+POST EOM                                                                                                                                                
+
+ONELMSML  POST EOM                                                                                                                                           
+
+Mail Subject :- Confirmation of MFI EOM Completed || EOM March-2023
+
+Check sync from NDR (10.3.27.3) and send sync status till mentioned timestamp on mail.
+
+Switch 2-3 logfiles from production and take sequence.
+
+ALTER SYSTEM SWITCH ALL LOGFILE;
+
+
+select thread#, sequence#,to_char(FIRST_TIME,'DD-MON-YYYY HH24:MI:SS') "TIME" from v$archived_log where sequence# in (select max(sequence#) sequence from gv$archived_log where applied='YES' group by thread#) order by thread#;
+
+
+
+
+
+After Sync stop MRP and RFS for Each Database (as per EOM confirmation)
+
+Now stop MRP from 10.3.27.3
+Alter database recover managed standby database cancel;
+
+ Now stop RFS from Production 10.3.27.159
+ALTER SYSTEM SET log_archive_dest_state_2='DEFER' SCOPE=BOTH;
+
+
+
+Once DELHI DR be in sync till EOM time then stop MRP for respective database.
+
+Now stop MRP from 172.20.86.54
+
+Alter database recover managed standby database cancel;
+
+
+
+
+
+
+
+
+
+
+ONELMS POST EOM 
+
+Mail Subject :- Confirmation of TWHL EOM Completed || EOM March-2023
+
+Check sync from NDR (10.3.27.3) , DR (172.30.86.36) 
+And send sync status till mentioned timestamp on mail.
+
+Switch 2-3 logfiles from production and take sequecne.
+
+ALTER SYSTEM SWITCH ALL LOGFILE;
+
+select thread#, sequence#,to_char(FIRST_TIME,'DD-MON-YYYY HH24:MI:SS') "TIME" from v$archived_log where sequence# in (select max(sequence#) sequence from gv$archived_log where applied='YES' group by thread#) order by thread#;
+
+
+
+
+
+
+
+
+After Sync stop MRP and RFS for Each Database (as per EOM confirmation)
+
+Now stop MRP from 10.3.27.3
+
+Alter database recover managed standby database cancel;
+
+ Now stop RFS from Production 10.3.27.159
+
+ALTER SYSTEM SET log_archive_dest_state_2='DEFER' SCOPE=BOTH;
+
+Once DELHI DR be in sync till EOM time then stop MRP for respective database.
+
+Now stop MRP from 172.20.86.54
+
+Alter database recover managed standby database cancel;
+
+
+
+
+
+
+
+
+
+
+POST EOM
+
+Enable the jobs
+
+ONELMS   POST EOM                                                                                                                                                  
+
+select owner,JOB_NAME,STATE  from dba_scheduler_jobs where JOB_NAME in ('HEALTHCHECK','AUTOCLOSURE_NEW');
+
+OWNER                JOB_NAME                                
+-------------------- ----------------------------------------
+LTF_LEA              HEALTHCHECK                             
+LTF_LEA              AUTOCLOSURE_NEW                         
+
+ Conn LTF_LEA/m$X_M2z8K$
+
+
+exec dbms_scheduler.enable ( 'HEALTHCHECK' ) ;
+exec dbms_scheduler.enable ( 'AUTOCLOSURE_NEW' ) ;
+
+
+Commit;
+
+set lines 234 pages 300
+col OWNER for a23
+col job_name for a34
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('RECEIPT_ANYRECON_OL_HOST');
+
+ conn LTF_LEA/m$X_M2z8K$
+
+
+exec dbms_scheduler.enable( 'RECEIPT_ANYRECON_OL_HOST');
+
+
+
+
+ONELMSML   POST EOM                                                                                                                                  
+
+Col owner for a23
+Col job_name for a34
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('HEALTHCHECK','AUTOCLOSE',’AUTOCLOSURE_NEW’);
+                            
+
+conn  LTF_EOD_MIL/MW$P638s_5
+
+
+exec dbms_scheduler.enable ( 'AUTOCLOSE' ) ;
+
+
+conn  LTF_LEA_MIL/m$X_M2z8K$
+
+
+exec dbms_scheduler.enable ( 'HEALTHCHECK' ) ;
+
+
+select owner,JOB_NAME,STATE from dba_scheduler_jobs where JOB_NAME in ('RECEIPT_ANYRECON_OL_HOST');
+
+conn LTF_LEA_MIL/m$X_M2z8K$
+
+
+exec dbms_scheduler.enable ( 'RECEIPT_ANYRECON_OL_HOST');
+
+ONELMSFR POST EOM 
+
+
+Mail Subject :- Confirmation of ONELMS FARM EOM Completed || EOM MAR-2023
+
+Check sync from NDR (10.3.27.3) , DR (172.30.86.36)
+And send sync status till mentioned timestamp on mail.
+
+select thread#, sequence#,to_char(FIRST_TIME,'DD-MON-YYYY HH24:MI:SS') "TIME" from v$archived_log where sequence# in (select max(sequence#) sequence from gv$archived_log where applied='YES' group by thread#) order by thread#;
+
+
+After sync till mentioned timestamp immediately
+STOP MRP & RFS on NDR (10.3.27.3)
+STOP MRP on DR  (172.30.86.36)
+
+
+ON NDR & DR :
+alter  database recover managed standby database cancel;
+
+ON Production (10.3.27.159):
+Check log_archive_dest service name and then stop the RFS process.
+
+alter system set log_archive_dest_state_3='DEFER' sid='*' scope=both;
+
+
+ NDR (10.3.27.3)
+
+ DR (172.20.86.54)
+
+
+
+
+
+
+
+
+
+
+Backup 
+
+We have to Start Backups of ONELMS , ONELMSML , ONELMSFR and ONELMSCL 
+After completion of LOADS,
+
+We have to ask EDW/OPRATION Team about LOAD status.
+
+After confirmation from EDW/OPRATION Team
+Take confirmation from Manoj/Sushant Sir.
+And Start the Backup FROM NDR.(10.3.27.3)
+
+
+RFS 
+
+Start the RFS process after EOM backups gets completed on NDR 10.3.27.3
+
+Login 10.3.27.159
+
+alter system set log_archive_dest_state_3=’ENABLE’ sid='*' scope=both;
+
+
+MRP
+ 
+   Take confirmation from  Manoj/Sushant Sir 
+
+To start the MRP from GCP DR 172.30.86.36
+To start MRP and RFS from NDR 10.3.27.3
+                                                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+STEPS TO RESTORE DATABASE
+
+
+BEFORE THIS GET THE DB_LINKS DDL OF THAT DATABASE:
+
+
+Set long 1000
+SELECT DBMS_METADATA.GET_DDL('DB_LINK',db.db_link,db.owner) from dba_db_links db;
+SELECT DBMS_METADATA.GET_DDL('DB_LINK',SYS_HUB,SYS) from dba_db_links db;
+
+
+
+
+SET LINESIZE 150 pages 300
+
+
+COLUMN owner FORMAT A30
+COLUMN db_link FORMAT A30
+COLUMN username FORMAT A30
+COLUMN host FORMAT A30
+
+
+SELECT owner,db_link,username,host FROM dba_db_links ORDER BY owner, db_link;
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+(SET THE SID OF GIVEN DATABASE)IMPORTANT 
+
+
+export ORACLE_SID=ONELMSMLUAT
+
+
+TAKE THE CURRENT DB PFILE IN BACKUP LOCATION
+
+
+CREATE PFILE = '/Backup/ONELMS_RESTORE_02MARCH2023/initONELMSMLUAT.ora' FROM SPFILE;
+
+
+**********************************************************
+GET THE DATAFILE, LOGFILE,CONTROLFILE AND TEMPFILE LOCATION
+
+
+select file_name from v$dba_data_files;
+select * from v$logfile;
+show parameter control_files;
+
+
+**********************************************************
+
+
+SHUTDOWN THE DATABASE
+
+
+shutdown immediate;
+startup mount exclusive restrict;
+drop database;
+**********************************************************
+
+
+OPEN THE PFILE AND REMOVE ABOVE CODES IN WHITE AND SAVE IT 
+ ---> hidden parameters
+
+
+**********************************************************
+
+
+
+
+
+
+FROM BACKUP LOCATION TAKE THE PATH (PWD) AND START THE DATABASE:
+
+
+startup nomount pfile='/Backup/ONELMS_RESTORE_02MARCH2023/initONELMSMLUAT.ora';
+
+
+
+
+EXIT THE CONSOLE
+              
+                   exit       
+
+
+CHECK THE SID
+               
+echo $ORACLE_SID
+
+
+
+
+FORM BACKUP LOCATION GO TO RMAN CONSOLE
+
+
+rman target /
+restore controlfile from '/Backup/INCR_LVL_ZERO/ONELMSML/ONELMSML_backup_control_sg1kn92u_1_1_20230217';
+
+
+
+
+AFTER RESTORE IS SUCCESSFULL MOUNT THE DATABASE FROM RMAN PROMPT
+
+
+ALTER DATABASE MOUNT;
+
+
+exit the console
+sqlplus / as sysdba
+
+
+select name from v$datafile;
+select count(*) from v$datafile;
+select 'SET NEWNAME FOR DATAFILE  '||file#||'  TO '''||name||''';' from v$datafile;
+
+
+<<<<<<<<<<<<  CATALOG THE BACKUP_LOCATION >>>>>>>>>>>>>>>>
+
+
+catalog start with '/Backup/INCR_LVL_ZERO/ONELMSML/';                    
+   -->  then start with restoration;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE RMAN RESTORE FILE TO SET NEW NAME AND PUT IT BACKUP LOCATION
+
+
+(CHOOSE CHANNEL ACCORDING TO CPUS lscpu)
+(save it with resotre.sh file.)
+
+
+rman target=/ nocatalog log="/Backup/ONELMS_RESTORE_02MARCH2023/ONELMSML_full_Restore_02march2023.log" <<EOF
+RUN {
+allocate channel c1 device type disk;
+allocate channel c2 device type disk;
+allocate channel c3 device type disk;
+allocate channel c4 device type disk;
+allocate channel c5 device type disk;
+allocate channel c6 device type disk;
+allocate channel c7 device type disk;
+allocate channel c8 device type disk;
+SET NEWNAME FOR DATAFILE 1 TO '/data1/ONELMSMLUAT/DATAFILE/onelmsmlfdr/datafile/system.507.1126052319';
+.
+.
+.
+.
+.
+
+
+restore database;
+switch datafile all;
+release channel c1;
+release channel c2;
+release channel c3;
+release channel c4;
+release channel c5;
+release channel c6;
+release channel c7;
+release channel c8;
+}
+EXIT;
+EOF
+
+
+
+
+AFTER SUCCESSFULL RESTORE CHECK THE REDOLOG INFO
+
+
+SELECT * FROM V$LOGFILE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+IF THERE ARE STANDBY FILE DROP THEM FIRST
+
+
+alter database drop standby logfile group 11;
+alter database drop standby logfile group 12;
+alter database drop standby logfile group 13;
+alter database drop standby logfile group 14;
+alter database drop standby logfile group 15;
+alter database drop standby logfile group 16;
+alter database drop standby logfile group 17;
+
+
+(IF THEY DONT DROP USE BELOW METHOD THEN TRY AGAIN TO DROP)
+alter database clear unarchived logfile group 12
+alter database clear unarchived logfile group 13
+alter database clear unarchived logfile group 14
+alter database clear unarchived logfile group 15
+alter database clear unarchived logfile group 16
+alter database clear unarchived logfile group 17
+
+
+(AFTER DROP CHECK AGAIN IF NO STND_BY REDOLOG IS THERE)
+
+
+SELECT * FROM V$LOGFILE;
+**********************************************************
+		 
+RENAME THE REDLOG FILES
+
+
+(JUST REPLACE OLD LOCATION WITH NEW LOCATION DONT TOUCH ANYHTING ELSE) 
+ 
+ALTER DATABASE RENAME FILE '' TO '';
+ 
+ 
+ALTER DATABASE RENAME FILE '/OLD_LOCATION/ONELMSCL/onlinelog/group_2.258.1041707055' to '/NEW_LOCATION/ONELMSCL/group_2.258.1041707055';
+ALTER DATABASE RENAME FILE '/lms_redo04/ONELMSCL/onlinelog/group_2.258.1041707055' to '/redo1/ONELMSCL/group_2.258.1041707055';
+ALTER DATABASE RENAME FILE '/lms_redo03/ONELMSCL/onlinelog/group_1.257.1041707055' to '/redo2/ONELMSCL/group_1.257.1041707055';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CHECK THE CONTROLFILE TYPE
+
+
+select CONTROLFILE_TYPE from v$database;
+
+
+(NOTE:IF THE CONTROLFILE IS STANDBY JUST DO THIS)
+
+
+ALTER DATABASE ACTIVATE PHYSICAL STANDBY DATABASE;
+
+
+Then Open The Database
+
+
+ALTER DATABASE OPEN;
+
+
+(NOTE:IF THE CONTROLFILE IS CURRENT JUST DO THIS)-
+
+
+ALTER DATABASE RECOVER DATABASE;
+
+
+ALTER DATABASE OPEN RESETLOGS;
+
+
+
+
+AFTER SUCCESSFULL ACTIVITY MAKE THE DB IN NO ARCHIVELOG MODE
+
+
+CREATE SPFILE FROM PFILE='BACKUP_LOCATION/INIT_DBNAME.ORA';
+SHUT IMMEDIATE;
+STARTUP MOUNT;
+Alter database noarchivelog;
+ALTER DATABASE OPEN;
+
+
+CHECK ARCHIVE LOG MODE 
+
+
+ARCHIVE LOG LIST;
+
+
+CREATE TEMPFILE BUT DROP THE OLDER TEMPFILE FIRST
+
+
+SELECT PROPERTY_VALUE
+FROM DATABASE_PROPERTIES
+WHERE PROPERTY_NAME = 'DEFAULT_TEMP_TABLESPACE';
+
+
+
+
+ALTER DATABASE TEMPFILE '/onelmsFR_data01/ONELMSFRDR/datafile/temp01.dbf' DROP;
+
+
+ALTER DATABASE TEMPFILE '/onelmsFR_data01/ONELMSFRDR/datafile/o1_mf_temp_hkxl5dnb_.tmp' DROP;
+
+
+TEMPORARY TABLESPACE
+
+
+ALTER TABLESPACE TEMP ADD TEMPFILE '/onelmsfr_data/tempfile/temp01.dbf' SIZE 100M AUTOEXTEND ON;
+
+
+ALTER TABLESPACE TEMP ADD TEMPFILE '/onelmsfr_data/tempfile/temp02.dbf' SIZE 100M AUTOEXTEND ON;
+
+
+
+
+
+
+crosscheck archivelog all;
+
+
+delete expired archivelog all;
+
+
+CROSSCHECK BACKUP;
+delete expired BACKUP;
+delete expired backup;
+
+Thank You !

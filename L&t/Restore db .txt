@@ -1,0 +1,383 @@
+
+1. SET SID  
+
+
+export ORACLE_SID=TESTCL
+export ORACLE_HOME=/oracle19c/app/product/19.0.0/dbhome1
+export PATH=$ORACLE_HOME/bin:$PATH
+
+
+-------==============================================
+2. Create directories as per pfile
+
+
+mkdir -p /DATACL/TESTCL/CONTROLFILE/
+mkdir -p /DATACL/TESTCL/DATAFILE/CONTROLFILE/
+mkdir -p /DATACL/TESTCL/DATAFILE/
+mkdir -p /DATACL/TESTCL/TEMPFILE/
+mkdir -p /backup1/RECOVERY_DEST/TESTCL/
+mkdir -p /DATACL/TESTCL/ARCHIVELOG/
+mkdir -p /DATACL/TESTCL/ONLINELOG/REDO1/
+mkdir -p /DATACL/TESTCL/ONLINELOG/REDO2/
+
+
+-------==============================================
+3. Take Backup location
+
+
+/backup4/EOM_JUN_CL
+
+-------==============================================
+
+4. Verify SID 
+
+
+env|grep ORA
+
+sqlplus / as sysdba
+
+
+startup nomount pfile='/home/oracle/sldba/pfiles/initTESTCL.ora';
+
+
+-------==============================================
+
+5. RESTORE CONTROLFILE
+
+
+rman target /
+
+
+restore controlfile from '/backup4/EOM_JUN_CL/ONELMSCL_backup_CURRENT_CONTROL_nl2ur6fq_69365_1_1_20240701';
+
+
+alter database mount ;
+
+
+
++++++++++++++++++++ OUTPUT FOR REFERENCE +++++++++++++++++++++++++++++
+
+
+
+SQL> startup nomount pfile='/home/oracle/sldba/pfiles/initTESTCL.ora';
+ORACLE instance started.
+
+Total System Global Area 3.2212E+10 bytes
+Fixed Size                 37356664 bytes
+Variable Size            3892314112 bytes
+Database Buffers         2.8186E+10 bytes
+Redo Buffers               96858112 bytes
+SQL>
+SQL>
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.24.0.0.0
+[oracle@ltpol7plmsdbo01 ~]$
+[oracle@ltpol7plmsdbo01 ~]$ rman target /
+
+Recovery Manager: Release 19.0.0.0.0 - Production on Wed Sep 4 19:59:05 2024
+Version 19.24.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: ONELMSCL (not mounted)
+
+RMAN>
+
+RMAN>
+
+RMAN> restore controlfile from '/backup4/EOM_JUN_CL/ONELMSCL_backup_CURRENT_CONTROL_nl2ur6fq_69365_1_1_20240701';
+
+Starting restore at 04-SEP-24
+using target database control file instead of recovery catalog
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=1921 device type=DISK
+
+channel ORA_DISK_1: restoring control file
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:01
+output file name=/DATACL/TESTCL/CONTROLFILE/control_01.ctl
+output file name=/DATACL/TESTCL/DATAFILE/CONTROLFILE/control_02.ctl
+Finished restore at 04-SEP-24
+
+RMAN>
+
+RMAN>
+
+RMAN> alter database mount ;
+
+released channel: ORA_DISK_1
+Statement processed
+
+
+-------==============================================
+
+
+6.  SET BELOW PARAMETER 
+
+ALTER SYSTEM SET STANDBY_FILE_MANAGEMENT=MANUAL;
+
+-------===============================================
+
+AFTER RESTORING CONTROLEFILE RENAME THE REDOLOG FILES and TEMPFILE AS SAME DATABASES ARE PRESENT ON THE SERVER .
+
+
+A. FIRST RENAME ONLY 1 STANDBY REDOLOG FILE
+
+col member for a79
+select * from v$logfile;
+
+ 
+B. CHECK RESPECTIVE NDR DATABASE VALUE CHANGEG OR NOT
+
+col member for a79
+select * from v$logfile;
+
+
+IF NO FILE GET CHANGED THEN ONLY PROCEED FOR RENAME OTHER FILES
+
+
+----------====================================================
+7. RENAME REDOLOG FILE
+
+
+SELECT 'ALTER DATABASE RENAME FILE ' ||MEMBER || ' TO ''' || '/DATACL/TESTCL/ONLINELOG/REDO1/' || substr(MEMBER,instr(MEMBER,'/',-1)+1) || ''';' FROM v$logfile;
+
+-----------============= FOR TEMPFILE ===============
+
+8. RENAME TEMPFILE
+
+ SELECT 'ALTER DATABASE RENAME FILE ' ||name || ' TO ''' || '/DATACL/TESTCL/TEMPFILE/' || substr(name,instr(name,'/',-1)+1) || ''';' FROM v$tempfile;
+
+-----------========== FOR SH FILE =================
+
+9. CREATE SH FILE 
+
+
+
+SELECT 'SET NEWNAME FOR DATAFILE '||  FILE# || ' TO ''' || '/DATACL/TESTCL/DATAFILE/' || substr( name,instr( name,'/',-1)+1) || ''';' FROM V$DATAFILE;
+
+
+------------============ SH FILE A BELOW ============
+
+
+export ORACLE_SID=TESTCL
+export ORACLE_HOME=/oracle19c/app/product/19.0.0/dbhome1
+export PATH=$ORACLE_HOME/bin:$PATH
+export tdt=`date "+%d%m%Y"`
+
+rman target=/ nocatalog log="/home/oracle/sldba/ONELMSCL_RESTORE_$tdt.log" <<EOF
+RUN {
+allocate channel c1 device type disk;
+allocate channel c2 device type disk;
+allocate channel c3 device type disk;
+allocate channel c4 device type disk;
+allocate channel c5 device type disk;
+allocate channel c6 device type disk;
+allocate channel c7 device type disk;
+allocate channel c8 device type disk;
+allocate channel c9 device type disk;
+allocate channel c10 device type disk;
+allocate channel c11 device type disk;
+allocate channel c12 device type disk;
+allocate channel c13 device type disk;
+allocate channel c14 device type disk;
+allocate channel c15 device type disk;
+allocate channel c16 device type disk;
+allocate channel c17 device type disk;
+allocate channel c18 device type disk;
+allocate channel c19 device type disk;
+allocate channel c20 device type disk;
+allocate channel c21 device type disk;
+allocate channel c22 device type disk;
+allocate channel c23 device type disk;
+allocate channel c24 device type disk;
+allocate channel c25 device type disk;
+SET NEWNAME FOR DATAFILE 1 TO '/DATACL/TESTCL/DATAFILE/system.332.1171176225';
+SET NEWNAME FOR DATAFILE 2 TO '/DATACL/TESTCL/DATAFILE/undotbs3.268.1171175875';
+SET NEWNAME FOR DATAFILE 3 TO '/DATACL/TESTCL/DATAFILE/sysaux.329.1171176155';
+SET NEWNAME FOR DATAFILE 4 TO '/DATACL/TESTCL/DATAFILE/undotbs1.302.1171176003';
+SET NEWNAME FOR DATAFILE 5 TO '/DATACL/TESTCL/DATAFILE/undotbs2.294.1171175979';
+SET NEWNAME FOR DATAFILE 7 TO '/DATACL/TESTCL/DATAFILE/users.259.1171175739';
+SET NEWNAME FOR DATAFILE 8 TO '/DATACL/TESTCL/DATAFILE/default_tbs.316.1171176007';
+SET NEWNAME FOR DATAFILE 9 TO '/DATACL/TESTCL/DATAFILE/users.257.1171175739';
+SET NEWNAME FOR DATAFILE 10 TO '/DATACL/TESTCL/DATAFILE/users.260.1171175739';
+SET NEWNAME FOR DATAFILE 11 TO '/DATACL/TESTCL/DATAFILE/users.261.1171175739';
+SET NEWNAME FOR DATAFILE 12 TO '/DATACL/TESTCL/DATAFILE/users.262.1171175859';
+SET NEWNAME FOR DATAFILE 13 TO '/DATACL/TESTCL/DATAFILE/staging.273.1171175875';
+SET NEWNAME FOR DATAFILE 14 TO '/DATACL/TESTCL/DATAFILE/staging.287.1171175879';
+SET NEWNAME FOR DATAFILE 15 TO '/DATACL/TESTCL/DATAFILE/users.330.1171176225';
+SET NEWNAME FOR DATAFILE 16 TO '/DATACL/TESTCL/DATAFILE/users.309.1171176007';
+SET NEWNAME FOR DATAFILE 17 TO '/DATACL/TESTCL/DATAFILE/users.274.1171175877';
+SET NEWNAME FOR DATAFILE 18 TO '/DATACL/TESTCL/DATAFILE/users.307.1171176007';
+SET NEWNAME FOR DATAFILE 19 TO '/DATACL/TESTCL/DATAFILE/users.258.1171175739';
+SET NEWNAME FOR DATAFILE 20 TO '/DATACL/TESTCL/DATAFILE/users.266.1171175859';
+SET NEWNAME FOR DATAFILE 21 TO '/DATACL/TESTCL/DATAFILE/users.328.1171176121';
+SET NEWNAME FOR DATAFILE 22 TO '/DATACL/TESTCL/DATAFILE/users.279.1171175879';
+SET NEWNAME FOR DATAFILE 23 TO '/DATACL/TESTCL/DATAFILE/users.289.1171175893';
+SET NEWNAME FOR DATAFILE 24 TO '/DATACL/TESTCL/DATAFILE/users.267.1171175875';
+SET NEWNAME FOR DATAFILE 25 TO '/DATACL/TESTCL/DATAFILE/users.300.1171176003';
+SET NEWNAME FOR DATAFILE 26 TO '/DATACL/TESTCL/DATAFILE/sysaux.343.1171176355';
+SET NEWNAME FOR DATAFILE 27 TO '/DATACL/TESTCL/DATAFILE/sysaux.338.1171176241';
+SET NEWNAME FOR DATAFILE 28 TO '/DATACL/TESTCL/DATAFILE/users.288.1171175893';
+SET NEWNAME FOR DATAFILE 29 TO '/DATACL/TESTCL/DATAFILE/ltf_castrans_vfd_data.317.1171176007';
+SET NEWNAME FOR DATAFILE 30 TO '/DATACL/TESTCL/DATAFILE/ltf_clr_vfd_data.351.1171176391';
+SET NEWNAME FOR DATAFILE 31 TO '/DATACL/TESTCL/DATAFILE/ltf_comm_vfd_data.269.1171175875';
+SET NEWNAME FOR DATAFILE 32 TO '/DATACL/TESTCL/DATAFILE/ltf_cps_vfd_data.282.1171175879';
+SET NEWNAME FOR DATAFILE 33 TO '/DATACL/TESTCL/DATAFILE/ltf_dep_vfd_data.277.1171175877';
+SET NEWNAME FOR DATAFILE 34 TO '/DATACL/TESTCL/DATAFILE/ltf_eod_vfd_data.303.1171176003';
+SET NEWNAME FOR DATAFILE 35 TO '/DATACL/TESTCL/DATAFILE/ltf_fa_vfd_data.344.1171176355';
+SET NEWNAME FOR DATAFILE 36 TO '/DATACL/TESTCL/DATAFILE/ltf_fas_vfd_data.284.1171175879';
+SET NEWNAME FOR DATAFILE 37 TO '/DATACL/TESTCL/DATAFILE/ltf_int_vfd_data.339.1171176241';
+SET NEWNAME FOR DATAFILE 38 TO '/DATACL/TESTCL/DATAFILE/ltf_lea_vfd_data.331.1171176225';
+SET NEWNAME FOR DATAFILE 39 TO '/DATACL/TESTCL/DATAFILE/ltf_mas_stage_vfd_data.318.1171176007';
+SET NEWNAME FOR DATAFILE 40 TO '/DATACL/TESTCL/DATAFILE/ltf_pdc_vfd_data.352.1171176391';
+SET NEWNAME FOR DATAFILE 41 TO '/DATACL/TESTCL/DATAFILE/ltf_sdb_vfd_data.340.1171176241';
+SET NEWNAME FOR DATAFILE 42 TO '/DATACL/TESTCL/DATAFILE/ltf_sec_vfd_data.278.1171175877';
+SET NEWNAME FOR DATAFILE 43 TO '/DATACL/TESTCL/DATAFILE/ltf_stage_vfd_data.324.1171176119';
+SET NEWNAME FOR DATAFILE 44 TO '/DATACL/TESTCL/DATAFILE/ltf_tlr_vfd_data.297.1171175979';
+SET NEWNAME FOR DATAFILE 45 TO '/DATACL/TESTCL/DATAFILE/ltf_cms_data.291.1171175893';
+SET NEWNAME FOR DATAFILE 46 TO '/DATACL/TESTCL/DATAFILE/pim_db_admin_data.304.1171176003';
+SET NEWNAME FOR DATAFILE 47 TO '/DATACL/TESTCL/DATAFILE/ltfadminsecurity_data.346.1171176355';
+SET NEWNAME FOR DATAFILE 48 TO '/DATACL/TESTCL/DATAFILE/edw_read_data.326.1171176119';
+SET NEWNAME FOR DATAFILE 49 TO '/DATACL/TESTCL/DATAFILE/it_read_data.295.1171175979';
+SET NEWNAME FOR DATAFILE 50 TO '/DATACL/TESTCL/DATAFILE/anunta_readonly_data.264.1171175859';
+SET NEWNAME FOR DATAFILE 51 TO '/DATACL/TESTCL/DATAFILE/ltf_datamart_crp_data.313.1171176007';
+SET NEWNAME FOR DATAFILE 52 TO '/DATACL/TESTCL/DATAFILE/ltf_castrans_crp_data.271.1171175875';
+SET NEWNAME FOR DATAFILE 53 TO '/DATACL/TESTCL/DATAFILE/ltf_clr_crp_data.285.1171175879';
+SET NEWNAME FOR DATAFILE 54 TO '/DATACL/TESTCL/DATAFILE/ltf_cms_crp_data.319.1171176007';
+SET NEWNAME FOR DATAFILE 55 TO '/DATACL/TESTCL/DATAFILE/ltf_comm_crp_data.353.1171176391';
+SET NEWNAME FOR DATAFILE 56 TO '/DATACL/TESTCL/DATAFILE/ltf_cps_crp_data.335.1171176225';
+SET NEWNAME FOR DATAFILE 57 TO '/DATACL/TESTCL/DATAFILE/ltf_dep_crp_data.341.1171176241';
+SET NEWNAME FOR DATAFILE 58 TO '/DATACL/TESTCL/DATAFILE/ltf_eod_crp_data.280.1171175879';
+SET NEWNAME FOR DATAFILE 59 TO '/DATACL/TESTCL/DATAFILE/ltf_fa_crp_data.298.1171175979';
+SET NEWNAME FOR DATAFILE 60 TO '/DATACL/TESTCL/DATAFILE/ltf_fas_crp_data.292.1171175893';
+SET NEWNAME FOR DATAFILE 61 TO '/DATACL/TESTCL/DATAFILE/ltf_gcd_crp_data.305.1171176003';
+SET NEWNAME FOR DATAFILE 62 TO '/DATACL/TESTCL/DATAFILE/ltf_int_crp_data.347.1171176355';
+SET NEWNAME FOR DATAFILE 63 TO '/DATACL/TESTCL/DATAFILE/ltf_lea_crp_data.327.1171176119';
+SET NEWNAME FOR DATAFILE 64 TO '/DATACL/TESTCL/DATAFILE/ltf_mas_crp_data.265.1171175859';
+SET NEWNAME FOR DATAFILE 65 TO '/DATACL/TESTCL/DATAFILE/ltf_mas_stage_crp_data.315.1171176007';
+SET NEWNAME FOR DATAFILE 66 TO '/DATACL/TESTCL/DATAFILE/ltf_pdc_crp_data.272.1171175875';
+SET NEWNAME FOR DATAFILE 67 TO '/DATACL/TESTCL/DATAFILE/ltf_sdb_crp_data.286.1171175879';
+SET NEWNAME FOR DATAFILE 68 TO '/DATACL/TESTCL/DATAFILE/ltf_sec_crp_data.320.1171176007';
+SET NEWNAME FOR DATAFILE 69 TO '/DATACL/TESTCL/DATAFILE/ltf_sso1_crp_data.354.1171176391';
+SET NEWNAME FOR DATAFILE 70 TO '/DATACL/TESTCL/DATAFILE/ltf_stage_crp_data.336.1171176225';
+SET NEWNAME FOR DATAFILE 71 TO '/DATACL/TESTCL/DATAFILE/ltf_tlr_crp_data.342.1171176241';
+SET NEWNAME FOR DATAFILE 72 TO '/DATACL/TESTCL/DATAFILE/protovoti_read_data.281.1171175879';
+SET NEWNAME FOR DATAFILE 73 TO '/DATACL/TESTCL/DATAFILE/it_change_release_data.299.1171175979';
+SET NEWNAME FOR DATAFILE 74 TO '/DATACL/TESTCL/DATAFILE/appd_monitor_data.293.1171175893';
+SET NEWNAME FOR DATAFILE 75 TO '/DATACL/TESTCL/DATAFILE/digi_servicing_data.306.1171176003';
+SET NEWNAME FOR DATAFILE 76 TO '/DATACL/TESTCL/DATAFILE/ltfsdb_ro_data.348.1171176355';
+SET NEWNAME FOR DATAFILE 77 TO '/DATACL/TESTCL/DATAFILE/ltf_int_vfd_idx.333.1171176225';
+SET NEWNAME FOR DATAFILE 78 TO '/DATACL/TESTCL/DATAFILE/ltf_comm_vfd_idx.350.1171176391';
+SET NEWNAME FOR DATAFILE 79 TO '/DATACL/TESTCL/DATAFILE/ltf_cps_vfd_idx.283.1171175879';
+SET NEWNAME FOR DATAFILE 80 TO '/DATACL/TESTCL/DATAFILE/ltf_stage_vfd_idx.290.1171175893';
+SET NEWNAME FOR DATAFILE 81 TO '/DATACL/TESTCL/DATAFILE/ltf_fa_vfd_idx.323.1171176119';
+SET NEWNAME FOR DATAFILE 82 TO '/DATACL/TESTCL/DATAFILE/ltf_lea_vfd_idx.310.1171176007';
+SET NEWNAME FOR DATAFILE 83 TO '/DATACL/TESTCL/DATAFILE/cl_nbfc_data.308.1171176007';
+SET NEWNAME FOR DATAFILE 84 TO '/DATACL/TESTCL/DATAFILE/cl_nbfc_idx.312.1171176007';
+SET NEWNAME FOR DATAFILE 85 TO '/DATACL/TESTCL/DATAFILE/lea_stmtac_ta_tmp_data.296.1171175979';
+SET NEWNAME FOR DATAFILE 86 TO '/DATACL/TESTCL/DATAFILE/lea_stmtac_ta_tmp_idx.345.1171176355';
+SET NEWNAME FOR DATAFILE 87 TO '/DATACL/TESTCL/DATAFILE/los_ws_err_log_data.349.1171176391';
+SET NEWNAME FOR DATAFILE 88 TO '/DATACL/TESTCL/DATAFILE/los_ws_err_log_idx.325.1171176119';
+SET NEWNAME FOR DATAFILE 89 TO '/DATACL/TESTCL/DATAFILE/lea_ws_req_resp_dtl_data.321.1171176009';
+SET NEWNAME FOR DATAFILE 90 TO '/DATACL/TESTCL/DATAFILE/lea_ws_req_resp_dtl_idx.263.1171175859';
+SET NEWNAME FOR DATAFILE 91 TO '/DATACL/TESTCL/DATAFILE/los_ws_req_res_log_data.337.1171176241';
+SET NEWNAME FOR DATAFILE 92 TO '/DATACL/TESTCL/DATAFILE/los_ws_req_res_log_idx.311.1171176007';
+SET NEWNAME FOR DATAFILE 93 TO '/DATACL/TESTCL/DATAFILE/los_app_loan_stat_inquiry_data.301.1171176003';
+SET NEWNAME FOR DATAFILE 94 TO '/DATACL/TESTCL/DATAFILE/los_app_loan_stat_inquiry_idx.314.1171176007';
+SET NEWNAME FOR DATAFILE 95 TO '/DATACL/TESTCL/DATAFILE/cl_log_data.270.1171175875';
+SET NEWNAME FOR DATAFILE 96 TO '/DATACL/TESTCL/DATAFILE/cl_log_idx.334.1171176225';
+SET NEWNAME FOR DATAFILE 97 TO '/DATACL/TESTCL/DATAFILE/los_ws_err_log_data.275.1171175877';
+SET NEWNAME FOR DATAFILE 98 TO '/DATACL/TESTCL/DATAFILE/lea_ws_req_resp_dtl_data.322.1171176119';
+SET NEWNAME FOR DATAFILE 99 TO '/DATACL/TESTCL/DATAFILE/drmt_db_data.276.1171175877';
+restore database;
+switch datafile all;
+release channel c1;
+release channel c2;
+release channel c3;
+release channel c4;
+release channel c5;
+release channel c6;
+release channel c7;
+release channel c8;
+release channel c9;
+release channel c10;
+release channel c11;
+release channel c12;
+release channel c13;
+release channel c14;
+release channel c15;
+release channel c16;
+release channel c17;
+release channel c18;
+release channel c19;
+release channel c20;
+release channel c21;
+release channel c22;
+release channel c23;
+release channel c24;
+release channel c25;
+}
+EXIT;
+EOF
+
+
+-------==============================================
+
+10. CHECK STATUS 
+
+
+ select SID,INPUT_BYTES/1024/1024/1024 ,OUTPUT_BYTES/1024/1024/1024 from v$rman_status where OPERATION like '%RESTORE%' and status='RUNNING';
+ 
+-------==============================================
+
+11. VERIFY LOGFILE (NO ERROR SHOULD BE IN LOGFILE)
+
+
+col member for a79
+select * from v$logfile;
+
+
+select name from v$tempfile;
+
+
+select value from v$diag_info;
+
+-------==============================================
+
+12. CHECK THE CONTROLFILE TYPE
+
+select CONTROLFILE_TYPE from v$database;
+
+
+------------(NOTE:IF THE CONTROLFILE IS STANDBY JUST DO THIS)------------
+
+ALTER DATABASE ACTIVATE PHYSICAL STANDBY DATABASE;
+
+-------==============================================
+
+13. MAKE DATABASE IN NOARCHIVELOG MODE 
+
+ALTER DATABASE NOARCHIVELOG ;
+
+-------==============================================
+
+14. DROP STANDBY REDOLOG FILES  ( WE GOT ERROR IN ALERT LOG FOR STANDBY SO NEED TO DROP )
+
+
+SELECT DISTINCT 'ALTER DATABASE DROP STANDBY LOGFILE GROUP '||GROUP#||';' from v$logfile where type='STANDBY';
+
+
+-------==============================================
+15.  OPEN THE DATABASE 
+
+ALTER DATABASE OPEN;
+
+CHECK ALERT LOG SIMULTANOUSLY
+
+
+
+
+apps-fileview.texmex_20241010.01_p2
+POA_TORESTORE_NEWNDR by devidas.txt
+Displaying POA_TORESTORE_NEWNDR by devidas.txt.

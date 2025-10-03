@@ -1,0 +1,234 @@
+
+CONFIGURE ORACLE ASM
+
+We will perform the following: 
+1. CREATE A SERVER VIA VM 
+1.1 OR ASK OS TEAM TO PROVIDE A SERVER WITH COMPLETE ORACLE 19C PER-REQUISITES. 
+2. CREATE VIRTUAL HARDISKS (TO BE USED BY ASM) 
+3. CONFIGURE PUTTY TO CONNECT TO SRV1 
+4. SET UP THE ENVIRONMENT VARIABLES FOR THE OS ACCOUNTS: GRID AND ORACLE 5. INSTALL ASM PACKAGES AND CREATE ASM DISK VOLUMES 
+5.1 OR ASK OS TEAM INSTALL REQUIRE PACKAGES. 
+6. CHANGE THE KERNEL PARAMETER VALUES TO THE RECOMMENDED VALUES 7. INSTALL ORACLE GRID INFRASTRUCTURE SOFTWARE (ORACLE RESTART) 
+8. CREATE ASM DISK GROUPS 
+9. INSTALL ORACLE DATABASE SOFTWARE AND CREATE THE SAMPLE DATABASE Required Resources 
+● A PC with a free 8GB memory. This means the RAM memory in PC should be at least 12GB. ● At least 50GB free disk space. 
+● The PC is connected to the Internet 
+Download the Oracle Grid infrastructure 19c and oracle daatbase software from below link https://www.oracle.com/database/technologies/oracle19c-linux-downloads.html 
+Note : Download zip file not rpm. 
+✧ Prerequisites 
+In the following steps, We will configure the OS variables for the software owner accounts. ● oracle is the software owner of the database software. 
+● grid is the software owner of the Grid Clusterware. 
+1. SETUP PROFILE FOR oracle USER . 
+In the Putty session, switch current user to oracle and make a backup copy of the current bash profile file: 
+su - oracle 
+mv .bash_profile ~/.bash_profile_bkp 
+Open the .bash_profile file with the vi editor 
+vi .bash_profile
+2 
+ADD THE FOLLOWING TO IT. 
+# .bash_profile 
+# OS User: oracle 
+# Application: Oracle Database Software Owner 
+# Version: Oracle 19c 
+# --------------------------------------------------- 
+# Get the aliases and functions 
+if [ -f ~/.bashrc ]; then 
+. ~/.bashrc 
+fi 
+ORACLE_BASE=/oracle/app/oracle; export ORACLE_BASE 
+ORACLE_SID=oradb; export ORACLE_SID 
+ORACLE_HOME=$ORACLE_BASE/product/19.3.0/db_1; export ORACLE_HOME NLS_DATE_FORMAT="DD-MON-YYYY HH24:MI:SS"; export NLS_DATE_FORMAT TNS_ADMIN=$ORACLE_HOME/network/admin; export TNS_ADMIN PATH=$PATH:$HOME/.local/bin:$HOME/bin 
+PATH=${PATH}:/usr/bin:/bin:/usr/local/bin 
+PATH=.:${PATH}:$ORACLE_HOME/bin 
+export PATH 
+LD_LIBRARY_PATH=$ORACLE_HOME/lib 
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$ORACLE_HOME/oracm/lib LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/lib:/usr/lib:/usr/local/lib export LD_LIBRARY_PATH 
+CLASSPATH=$ORACLE_HOME/JRE 
+CLASSPATH=${CLASSPATH}:$ORACLE_HOME/jlib 
+CLASSPATH=${CLASSPATH}:$ORACLE_HOME/rdbms/jlib 
+CLASSPATH=${CLASSPATH}:$ORACLE_HOME/network/jlib 
+export CLASSPATH 
+export TEMP=/tmp 
+export TMPDIR=/tmp 
+umask 022 
+2. GRID USER SETUP :: 
+Switch current user back to root then run the following code to create required groups, grid user andmodify the accounts. 
+su - 
+groupadd asmadmin 
+groupadd oinstall 
+groupadd asmdba 
+usermod -g oinstall oracle 
+usermod -a -G asmdba oracle 
+useradd -u 54323 -g oinstall -G asmadmin,asmdba grid 
+passwd grid 
+Add oracle and grid accounts to vboxsf group. 
+The vboxsf group was created by VirtualBox Guest Additions and it allows its members to access
+3 
+the shared folder (staging folder) in the hosting machine. 
+usermod -a -G vboxsf oracle 
+usermod -a -G vboxsf grid 
+CREATE ORACLE CLUSTERWARE HOME DIRECTORIES: 
+mkdir -p /u01/app/oracle/product/19.0.0/db_1 
+mkdir -p /grid/19.3.0/base 
+mkdir -p /grid/19.3.0/product 
+chown -R grid:oinstall /grid/ 
+chown -R oracle:oinstall /oracle/app/oracle 
+chmod -R 775 /grid/ 
+SWITCH TO GRID USER AND MODIFY ITS BASH PROFILE AS FOLLOWS: su - grid 
+mv .bash_profile .bash_profile_bkp 
+vi .bash_profile 
+# .bash_profile 
+# Get the aliases and functions 
+if [ -f ~/.bashrc ]; then 
+. ~/.bashrc 
+fi 
+ORACLE_SID=+ASM; export ORACLE_SID 
+ORACLE_BASE=/grid/19.3.0/base; export ORACLE_BASE 
+ORACLE_HOME=/grid/19.3.0/product; export ORACLE_HOME ORACLE_TERM=xterm; export ORACLE_TERM TNS_ADMIN=$ORACLE_HOME/network/admin; export TNS_ADMIN PATH=.:${JAVA_HOME}/bin:${PATH}:$HOME/bin:$ORACLE_HOME/bin PATH=${PATH}:/usr/bin:/bin:/usr/local/bin 
+export PATH 
+export TEMP=/tmp 
+export TMPDIR=/tmp 
+umask 022 
+SET THE PROFILE 
+. .bash_profile
+4 
+3. INSTALLING ASM PACKAGES AND CREATING ASM DISK VOLUMES In the following steps, we will install ASM packages then create ASM disk volumes. Change the current user to root user 
+su - 
+Install Oracle ASMLib package 
+yum install oracleasm-support 
+# the following command will take a few minutes to finish: 
+yum install kmod-oracleasm 
+CONFIGURE AND LOAD THE ASM KERNEL MODULE. RESPOND TO THE COMMAND AS ILLUSTRATEDBY THE CODE IN RED COLOR. 
+oracleasm configure -i 
+Configuring the Oracle ASM library driver. 
+This will configure the on-boot properties of the Oracle ASM library driver. The following questions will determine whether the driver is 
+loaded on boot and what permissions it will have. The current values 
+will be shown in brackets ('[]'). Hitting <ENTER> without typing an 
+answer will keep that current value. Ctrl-C will abort. 
+Default user to own the driver interface []: grid 
+Default group to own the driver interface []: oinstall 
+Start Oracle ASM library driver on boot (y/n) [n]: y 
+Scan for Oracle ASM disks on boot (y/n) [y]: y 
+Writing Oracle ASM library driver configuration: done 
+Load the oracleasm kernel module: 
+/usr/sbin/oracleasm init 
+LIST THE DISKS AS SEEN BY THE OS. YOU SHOULD SEE THE DISKS CREATED IN THE VIRTUALBOX ANDATTACHED TO THE APPLIANCE. 
+fdisk -l | grep "Disk /dev/sd" 
+Use fdisk to create partitions in the disk. 
+Do the following for the disks sdb and sdc 
+fdisk <device file> 
+then press: n, p, 1, ENTER, ENTER, w – to apply changes 
+Following is the output done on sdb:
+5 
+[root@SERVER ~]# fdisk /dev/sdb 
+Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel Building a new DOS disklabel with disk identifier 0xd2973f79. 
+Changes will remain in memory only, until you decide to write them. 
+After that, of course, the previous content won't be recoverable. sectors (command 'u'). Command (m for help): n 
+Command action 
+e extended 
+p primary partition (1-4) : p 
+Partition number (1-4): 1 
+First cylinder (1-261, default 1): 
+Using default value 1 
+Last cylinder, +cylinders or +size{K,M,G} (1-261, default 261): 
+Using default value 261 
+Command (m for help): w 
+The partition table has been altered! 
+Calling ioctl() to re-read partition table. 
+Syncing disks. 
+REPEAT THE ABOVE PROCESS TO FORMAT THE OTHER DISKS 
+VERIFY THAT THE PARTITIONS ARE CREATED. 
+fdisk -l | grep "/dev/s" 
+CREATE THE ASM DISKS 
+oracleasm createdisk DG_GRID /dev/sdb1 
+oracleasm createdisk DG_DATA /dev/sdc1 
+oracleasm scandisks 
+oracleasm listdisks 
+CHANGING KERNEL PARAMETER VALUES 
+In the following step, we will change the kernel parameter values to the values recommended by Oracle.Create the following file then add the code that follows to it. 
+vi /etc/sysctl.d/97-oracle-database-sysctl.conf 
+fs.aio-max-nr = 1048576 
+fs.file-max = 6815744 
+kernel.shmall = 2097152 
+kernel.shmmax = 4294967295 
+kernel.shmmni = 4096 
+kernel.sem = 250 32000 100 128 
+net.ipv4.ip_local_port_range = 9000 65500 
+net.core.rmem_default = 262144 
+net.core.rmem_max = 4194304 
+net.core.wmem_default = 262144 
+net.core.wmem_max = 1048576 
+CHANGE THE CURRENT VALUES OF THE KERNEL PARAMETERS: 
+/sbin/sysctl --system
+6 
+4. INSTALL MORE PACKAGES 
+In the following step, we will install further packages in SERVER that are required by Oracle Grid Infrastructure and database software. 
+Open Putty and login to SERVER as root 
+Run the following code to install further packages required by Oracle software. 
+1. yum install ksh 
+2. yum install libaio-devel.x86_64 
+INSTALLING ORACLE GRID INFRASTRUCTURE SOFTWARE (ORACLE RESTART) 
+In the following steps, we will install Oracle Grid Infrastructure software in SERVER. The installation procedure automatically creates and start the Clusterware services. 
+Copy the Oracle Grid Infrastructure software installation file to the staging folder. 
+At the time of this writing, the installation file name downloaded from Oracle site is LINUX.X64_193000_grid_home.zip 
+EXTRACT THE INSTALLATION FILE INTO THE ORACLE GRID INFRASTRUCTURE SOFTWARE HOME DIRECTORY 
+su - grid 
+unzip /media/sf_staging/LINUX.X64_193000_grid_home.zip -d $ORACLE_HOME INSTALL THE CVUQDISK IN SERVER AS ROOT 
+The package cvuqdisk must be installed before installing the Clusterware software return back to the root shell: 
+cd /grid/19.3.0/product/cv/rpm/ 
+CVUQDISK_GRP=oinstall; 
+export CVUQDISK_GRP 
+rpm -iv cvuqdisk-1.0.10-1.rpm
+7 
+INSTALLATION :: 
+Login to the VirtualBox window of SERVER as grid. 
+Open a terminal window, change the current directory to the Grid Infrastructure software home directory and run the gridSetup.sh script. 
+cd $ORACLE_HOME 
+./gridSetup.sh 
+1. Click on Configure Oracle Grid Infrastructure for a standalone server and click onmNext
+8 
+2. Select disk for grid
+
+9 
+3. SET PASSWORD ACCORDING TO ORGANIZATION NORMS
+10
+
+11 
+4. MOST OF REAL TIME ENVIRONMENT USE oinstall as group so choose as per your norms. 5. ENETER ORACLE GRID BASE AND INVENTORY LOCATION
+12
+
+13 
+For automatic root scripts install, set the Linux user root password or sudoers user. Here : We are proceeding with manual script execution
+
+14 
+6. WE CAN IGNORE THE BELOW CHECKS
+15 
+7. CLICK ON Install
+16
+
+17 
+
+8. Run the above script via root user :: 
+[root@SERVER ~]# /grid/19.3.0/oraInventory/orainstRoot.sh [root@SERVER ~]# /grid/19.3.0/product/root.sh
+18
+
+19 
+VERIFY THE STATUS 
+su - grid 
+crsctl status resource -t 
+✧ CREATE ASM DISK FOR ORACLE DATABASE. 
+create the Diskgroup that will be used by Oracle database to store its datafiles. 
+Note: In real life scenario, we might create more than one disk group. For example Two for the data files and one for the FRA. 
+From grid home 
+cd $grid_home/bin 
+asmca 
+Create diskgroup as follows ::
+20 
+Disk Groups -> Create -- > Enter Disk Group Name --> Redundancy --> Select Disk /Path --> Click on Ok
+
+21
+
+
+22 
+
+While creating oracle database with ASM we can select above created diskgroups for datafiles, redo log files and archive log files.

@@ -1,0 +1,147 @@
+ADD DISK TO DISKGROUP
+
+
+Get disk from storage team.
+     
+Drop a mail to storage team for new disk with required size.
+
+
+Hello Team,
+
+
+Please provide disk  with below details.
+
+
+Server :-
+Size     :- 200 GB
+
+
+Hostname :-
+
+
+after getting disk from storage team
+
+(perform only on one node)
+lsblk                             ==============>>from root user
+
+
+fdisk -l  ---> List all the disk and partition
+
+
+fdisk /dev/sdb
+
+
+fdisk -l                               ==========list 
+
+2] CREATE ASM DISK (root user)
+ Mostly this part done by OS/Storage team.
+
+oracleasm listdisks            ======================>>from root user
+
+
+oracleasm createdisk <disk_name>   <partition_name>             ==========>>from root user
+
+
+
+
+oracleasm scandisks                           ==========>>from root users all 3 node if prod only 
+oracleasm listdisks
+
+
+oracleasm querydisk <partition_name>
+
+
+(perform on other nodes :  on node 2,node 3)
+
+oracleasm scandisks
+oracleasm listdisks
+
+
+Now we have created disk
+
+
+
+
+
+
+3]  Check cluster status
+
+      crsctl check crs
+      
+      crsctl stat res -t    
+
+
+      ps -ef|grep d.bin
+ 
+
+
+4]  Check How many disks are present ?
+
+select name,group_number,disk_number,path,header_status,total_mb/1024,free_mb/1024 from v$asm_disk;
+
+
+----> here we can see header_status is PROVISIONED
+
+NOTE :
+Adding/Dropping the Disk from a disk group triggers re-balance operation which is a performance overhead. You can check the re-balance operation status from  V$ASM_OPERATION 
+ 
+ What is REBALANCE POWER ?
+
+ASM_POWER_LIMIT specifies the disk re-balancing speed of the ASM instance. 
+
+
+1) Higher the limit, the faster re-balancing operation, but consume lot of CPU.
+2) Lower values will take longer, but consume fewer processing and I/O resources.
+
+
+Re-balancing happens when we add or drop a disk from a disk-group.
+
+
+4) Background process ARBx performs the re-balance activity (where x is a number).
+     If the POWER clause of a re-balance operation is not specified, then the default power will        
+be the value of ASM_POWER_LIMIT.
+
+
+Show parameter asm_power_limit
+
+
+5) The range of asm_power_limit is from 0 to 1024. Default is one.
+
+5]  Add Disk
+
+asmcmd
+
+
+lsdsk --candidate
+
+
+sqlplus / as sysasm
+select name,group_number,disk_number,path,header_status,total_mb/1024,free_mb/1024 from v$asm_disk;
+
+
+-----> here we can see header_status is PROVISIONED
+
+
+
+
+alter diskgroup DATA add disk '<path>' NAME DATA3 rebalance power 6;
+
+
+NOTE :
+Each disk is assigned to its own failure group if no failure group name specified while adding the disk or creating a diskgroup
+
+6]  Check Status 
+
+select * from v$asm_operation;
+
+
+after completion it will give no rows selected
+
+
+select name,group_number,disk_number,path,header_status,total_mb/1024,free_mb/1024 from v$asm_disk;
+
+
+----> here we can see header_status is MEMBER
+
+
+If we drop the disk then header_status changed to FORMER

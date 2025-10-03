@@ -1,0 +1,58 @@
+SCHEDULE AN SCRIPT TO MONITOR DB AND LOG PURGING SCRIPT
+
+
+Schedule an script to monitor DB
+
+Step1: create .sql file
+
+Filename: db.sql
+
+set lines 234
+spool /home/oracle/sldba/log/db_$ORACLE_SID.log
+set heading off;
+set echo off;
+select name,open_mode,log_mode,database_role, switchover_status from v$database;
+
+Step2: create .sh file
+
+Filename: neocoll1_db_status.sh
+
+echo "exit" | sqlplus -S / as sysdba @/home/oracle/sldba/db.sql
+echo $TO
+cat /home/oracle/sldba/log/db_$ORACLE_SID.log | grep -i 'READ WRITE'
+if [ $? -eq 0 ]; then
+    echo "DB IS OK"
+else
+        echo "<b>Hello Team</b><br>`cat /home/oracle/sldba/log/db_$ORACLE_SID.log`" | mailx -s "$(echo -e "$ORACLE_SID DB is down on `hostname -i` \nContent-Type: text/html")" $TO
+fi
+
+Step3: Schedule the script on crontab
+
+
+
+
+Schedule an script log purging
+
+Step1: create .sql file
+
+Filename: trace_purge.sh
+
+find /oracle19chome/app/oracle/diag/rdbms/neocoll/NEOCOLL/trace/ -name "*.trc" -type f -mtime +30 -exec rm -f {} \;
+find /oracle19chome/app/oracle/diag/rdbms/neocoll/NEOCOLL/trace/ -name "*.trm" -type f -mtime +30 -exec rm -f {} \;
+find /oracle19chome/app/oracle/diag/rdbms/neocoll/NEOCOLL/alert/ -name "*.xml" -type f -mtime +30 -exec rm -f {} \;
+find /oracle19chome/app/oracle/admin/NEOCOLL/adump/ -name "*.aud" -type f -mtime +30 -exec rm -f {} \;
+
+find /oracle19chome/app/oracle/diag/rdbms/neocoll1/NEOCOLL1/trace/ -name "*.trc" -type f -mtime +30 -exec rm -f {} \;
+find /oracle19chome/app/oracle/diag/rdbms/neocoll1/NEOCOLL1/trace/ -name "*.trm" -type f -mtime +30 -exec rm -f {} \;
+find /oracle19chome/app/oracle/diag/rdbms/neocoll1/NEOCOLL1/alert/ -name "*.xml" -type f -mtime +30 -exec rm -f {} \;
+find /oracle19chome/app/oracle/admin/NEOCOLL1/adump/ -name "*.aud" -type f -mtime +30 -exec rm -f {} \;
+
+
+Step3: Schedule the script on crontab
+
+>> now on OS level type  
+$ crontab -e
+
+
+
+$ crontab -l

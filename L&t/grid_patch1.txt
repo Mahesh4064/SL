@@ -1,0 +1,164 @@
+
+/oracle19c/app/product/19.0.0/dbhome_1
+/grid/app/19.0.0/grid
+
+
+blkid |grep oracle  =========take disk details 
+pre requisute
+
+increase the version according readme file if patching on grid so increase version on both grid/oracle
+
+1)CHECK SUPPORT PATCH VERSION IT SHOULD BE supportable read readme file 
+
+
+PATH=$ORACLE_HOME/OPatch:$PATH:$HOME/bin:$ORACLE_HOME/bin =========================>>we can set in bash_profile then run ..bash_profile so we can call patch utility 
+
+spool pre_APR_2023_patch_check.out
+set time on timing on echo on verify on feed on lines 200 pages 5000 long 50000 longchunksize 9999
+select INSTALL_ID||'|'||PATCH_ID||'|'||ACTION||'|'||STATUS||'|'||ACTION_TIME||'|'||DESCRIPTION from dba_registry_sqlpatch order by action_time;
+select comp_id||'|'||comp_name||'|'||version||'|'||status from dba_registry;
+select owner, count(*) from dba_objects where status='INVALID' group by owner order by 1;
+select owner||'|'||object_name||'|'||object_type||'|'||status from dba_objects where status='INVALID' and owner in ('SYS','SYSTEM');
+spool off
+
+
+please find the POA for grid patching 
+
+down the database if has service so Please stop then take backup ===========>>
+2)GRID HOME TAR Backup
+
+nohup tar -zcvf /Backup/July_24/grid_home_bkp_10082024.tar.gz /grid/app/19.0.0/grid > /Backup/July_24/grid_home_bkp_10082024.log &     =====take backup from root users
+
+nohup tar -zcvf /Backup/July_24/db_home_bkp_10082024_new.tar.gz /oracle19c/app/product/19.0.0/dbhome_1 > /Backup/July_24/db_home_07082024_new_bkp.log &   =====take backup from oracle users
+
+
+
+3)opatch lspatches 
+
+
+4) Lsinventory output
+
+/grid/app/19.0.0/grid/OPatch/opatch lsinventory 
+/oracle19c/app/product/19.0.0/dbhome_1/OPatch/opatch lsinventory 
+
+5)check d.bin session sholud not be there from root user=============  ps -ef|grep d.bin
+
+
+6) Prepatch
+
+nohup sh /grid/app/19.0.0/grid/crs/install/roothas.sh -prepatch &              ========>>>check if has service there so you can continue (from root user)
+
+7)Prerequisite check for conflict for grid user 
+
+  ================>>except35050331]$ opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir ./
+  
+
+/grid/app/19.0.0/grid/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /Backup/July_24/36582629/36582781
+/grid/app/19.0.0/grid/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /Backup/July_24/36582629/36587798
+/grid/app/19.0.0/grid/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /Backup/July_24/36582629/36590554
+/grid/app/19.0.0/grid/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /Backup/July_24/36582629/36648174
+/grid/app/19.0.0/grid/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /Backup/July_24/36582629/36758186
+
+
+
+
+vi /Backup/July_24/grid_patch_list.txt
+
+/Backup/July_24/36582629/36582781
+/Backup/July_24/36582629/36587798
+/Backup/July_24/36582629/36590554
+/Backup/July_24/36582629/36648174
+/Backup/July_24/36582629/36758186
+
+
+8) /grid/app/19.0.0/grid/OPatch/opatch prereq CheckSystemSpace -phBaseFile  /Backup/July_24/grid_patch_list.txt  ============>>  check space in grid user
+
+9) [grid@POVSLTFLINEODB 35042068]$ opatch prereq CheckActiveFilesAndExecutables -ph ./        =======================activefile check all patch inside patch number 
+
+10) oracle check space ===============>>
+
+/oracle19c/app/product/19.0.0/dbhome_1/OPatch/opatch prereq CheckSystemSpace -ph /Backup/July_24/36582629/36582781 ==========oracle space check 
+
+
+
+
+
+11)check oracle conflict========>>from oracle user
+
+/oracle19c/app/product/19.0.0/dbhome_1/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /Backup/July_24/36582629/36582781
+
+/oracle19c/app/product/19.0.0/dbhome_1/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /Backup/July_24/36582629/36587798    ==
+
+
+
+
+================>>except35050331]$ opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir ./
+
+
+
+12) [oracle@POVSLTFLINEODB 35042068]$opatch prereq CheckActiveFilesAndExecutables -ph ./            =================================activefile check 
+
+or 
+
+/oracle/app/product/19.0.0/dbhome1/OPatch prereq CheckConflictAgainstOHWithDetail -ph ./
+
+/oracle/app/product/19.0.0/dbhome1/OPatch prereq CheckActiveFilesAndExecutables -ph ./
+
+13)Apply Patch from grid user 
+/grid/app/19.0.0/grid
+
+nohup /grid/app/19.0.0/grid/OPatch/opatch apply -oh /grid/app/19.0.0/grid -local  /Backup/July_24/36582629/36582781 -silent &
+nohup /grid/app/19.0.0/grid/OPatch/opatch apply -oh /grid/app/19.0.0/grid -local  /Backup/July_24/36582629/36587798 -silent &
+nohup /grid/app/19.0.0/grid/OPatch/opatch apply -oh /grid/app/19.0.0/grid -local  /Backup/July_24/36582629/36590554 -silent &
+nohup /grid/app/19.0.0/grid/OPatch/opatch apply -oh /grid/app/19.0.0/grid -local  /Backup/July_24/36582629/36648174 -silent &
+nohup /grid/app/19.0.0/grid/OPatch/opatch apply -oh /grid/app/19.0.0/grid -local  /Backup/July_24/36582629/36758186 -silent &
+
+
+
+
+
+
+14)ORACLE DB aptch apply ======================================================================================================>>>   
+
+cd 89075486        =======>>just go to the directory 
+
+[oracle@POVSLTFLINEODB 35042068]$ opatch apply -silent 
+
+
+                                       OR 
+
+nohup /oracle19c/app/product/19.0.0/dbhome_1/OPatch/opatch apply -oh /oracle19c/app/product/19.0.0/dbhome_1 -local /Backup/July_24/36582629/36582781 -silent &
+
+nohup /oracle19c/app/product/19.0.0/dbhome_1/OPatch/opatch apply -oh /oracle19c/app/product/19.0.0/dbhome_1 -local /Backup/July_24/36582629/36587798 -silent &
+
+
+=========================================================================================================================================================================
+
+15) /grid/app/19.0.0/grid/rdbms/install/rootadd_rdbms.sh           ==================from root user
+
+16)Post Patching                                           
+nohup  sh /grid/app/19.0.0/grid/crs/install/roothas.sh -postpatch &  ================from root user===========>>check if has service there so you can continue 
+
+17) Outout of lsinventory after patching
+$ORACLE_HOME/OPatch/opatch lsinventory
+
+nohup ./datapatch -verbose &     =======================execute on this location============>>>/oracle/app/product/19.0.0/dbhome1/OPatch
+
+18) Check the DBA_REGISTRY_SQLPATCH
+
+select PATCH_ID,STATUS,ACTION,ACTION_TIME from DBA_REGISTRY_SQLPATCH;
+
+
+opatch util ListOrderedInactivePatches    ===================before start patching we can delete inative patch 
+
+
+opatch util DeleteInactivePatches     ========================>>before start patching we can delete inative patch 
+
+ps -fu oracle  ============check active or not 
+
+kfod op=patches
+kfod op=patchlvl   
+
+apps-fileview.texmex_20241010.01_p2
+Grid Patch LTFS.txt
+Displaying Grid Patch LTFS.txt.

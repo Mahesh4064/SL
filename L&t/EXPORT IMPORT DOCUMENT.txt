@@ -1,0 +1,73 @@
+EXPORT IMPORT DOCUMENT
+
+
+
+Create a directory at OS level ==>> mkdir /directory_name/export
+
+Create a directory database level 
+> create directory directory_name as ‘directory_location’;
+> grant read,write on directory directory_name to schema;
+> grant datapump_exp_full_database to schema;
+> grant datapump_imp_full_database to schema;
+
+
+Table level export and import 
+
+At OS level 
+
+expdp username/password directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log  tables=table_name
+
+# / as sysdba -->> to run the export command
+
+impdp username/password directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log  tables=table_name
+
+# / as sysdba -->> to run the export command
+
+
+Schema level export and import
+
+ expdp username/password directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log  schemas=schema_name
+
+# / as sysdba -->> to run the export command
+
+impdp username/password directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log  schemas=schema_name
+
+# / as sysdba -->> to run the export command
+
+
+Full export and import 
+
+expdp  sysdba directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log full=y
+
+# / as sysdba -->> to run the export command
+
+impdp directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log  full=y
+
+Include=db_links export and import 
+
+col OWNER for a30
+col db_link for a45
+col username for a30
+set lines 333 pages 333
+col HOST for a30
+select OWNER,DB_LINK,USERNAME,HOST,CREATED from dba_db_links;
+
+expdp directory=EXPORT dumpfile=onelms_db_link_new.dmp logfile=onelms_db_link_new.log include=DB_LINK  full=y
+
+# / as sysdba -->> to run the export command
+
+Impdp directory=EXPORT dumpfile=onelms_db_link_new.dmp logfile=onelms_db_link_new.log include=DB_LINK full=y
+
+# / as sysdba -->> to run the export command
+
+
+Content = metadata_only export and import 
+
+expdp directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log  content=metadata_only
+
+# / as sysdba -->> to run the export command
+
+impdp directory=directory_name  dumpfile=dumpfile_name.dmp  logfile=logfile_name.log  content=metadata_only
+
+# / as sysdba -->> to run the export command
+

@@ -1,0 +1,85 @@
+SESSION KILL
+
+Why we kill the session ?
+
+REASON 1 : 
+Some developers or users may have a process "hanging" in the database, or taking much longer than usual,
+So they ask the DBA Team to kill the session in Oracle
+So as a DBA,We have to verify that it is a user process and not the background process of the database.
+
+REASON 2 :
+There is a high volume of resource consumption in the database,
+so killing the inactive user sessions will be necessary.
+However, it is essential to note that no background database processes should be killed
+because there is a high risk of corrupting the instance.
+
+PRE - CHECKS :
+
+Before killing a session :
+We have to perfectly identify the session that the user or developer asks to kill.
+For this, it is a good practice to ask them about the session like session id.
+
+SELECT sid, serial#, schema_name, program FROM V$SESSION WHERE schema_name != 'SYS';
+
+Take approval on mail or on call, And all the details should be in mail 
+
+
+Command :
+
+ALTER SYSTEM KILL SESSION '<sid, serial#>' IMMEDIATE;
+
+In case of being in a RAC environment, we can specify the INST_ID.
+
+ALTER SYSTEM KILL SESSION '<sid, serial#, @inst_id>' IMMEDIATE;
+
+This command tells the specified session to rollback any un-committed changes
+and release any acquired resources before terminating cleanly.
+
+In some situations, this cleanup processing may take a considerable amount of time,
+in which case the session status is set to "marked for kill" until the process is complete.
+
+
+We have to take permission from the Application owners to kill the inactive sessions.
+
+SELECT sid, serial#, status, username FROM v$session where status='INACTIVE';
+
+SCRIPT :
+SELECT 'alter system kill session '''||sid||','||serial#||',@'||inst_id||''' immediate ;'
+FROM gv$session where username is not null and username!='SYS' and status='INACTIVE';
+
+
+
+
+
+
+
+
+To identify the session,
+ We can use this SQL query:
+
+SELECT sid, serial#, username FROM V$SESSION;
+
+For more information,
+We can use this other SQL query to identify the program and schema name excluding the SYS schema:
+
+SELECT sid, serial#, schemaname, program FROM V$SESSION WHERE schemaname != 'SYS';
+
+
+
+
+SET LINESIZE 100
+COLUMN spid FORMAT A10
+COLUMN username FORMAT A10
+COLUMN program FORMAT A45
+
+
+SELECT s.inst_id,
+s.sid,
+s.serial#,
+--s.sql_id,
+p.spid,
+s.username,
+s.program
+FROM   gv$session s
+JOIN gv$process p ON p.addr = s.paddr AND p.inst_id = s.inst_id
+WHERE  s.type != 'BACKGROUND';

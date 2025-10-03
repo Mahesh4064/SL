@@ -1,0 +1,81 @@
+DB STOP AND START FOR SERVER REBOOT 
+
+
+Necessary all prerequisite;-
+
+At OS Level check all detail regarding down the server.
+
+$ ps -ef|grep pmon
+export ORACLE_SID=service_name
+
+$ ps-ef|grep tns
+
+$ df -h
+
+$ lsnrctl status LISTENER
+
+Check the  alert log location…..
+
+At database level ==>>>   SQL> Select value from v$diag_info;
+At OS level ==>>   $ cd $ORACLE_BASE/diag/rdbms/sid/sid/trace/
+
+If the database is DR then before shutdown to check database is in sync or not.
+
+
+At database level 
+
+set lines 200 pages 2000
+col host_name for a20
+select name,open_mode,log_mode,database_role,instance_name,host_name from v$database,v$instance;
+
+select value from v$diag_info;
+
+Check database is in archivelog mode or not.
+
+Archive log list;
+
+===========================================================================================
+First step to down the database is stop the listener:- 
+
+$ lsnrctl stop
+
+And check is stop or not ==>> lsnrctl status
+
+To stop the recovery process ( MRP) 
+
+Alter database recover managed standby database cancel;
+
+And check mrp is stop or not
+
+select inst_id,process,STATUS,CLIENT_PROCESS,sequence# from gv$managed_standby;
+
+>> open the alert log to check the further process is working properly or not.
+
+Check database in which mode.
+
+select name,open_mode,log_mode,database_role,instance_name,host_name from v$database,v$instance;
+
+ Stop  the  database.
+Shut immediate;
+
+Startup the database
+
+	SQL> startup;
+
+Or if the database is DR then start it in mount mode.
+
+SQL> startup mount;
+SQL> alter database open read only;
+
+Start listener and register it if not started properly.
+
+ 	$ Lsnrctl start
+ 	SQL> alter system register;
+
+Start recovery process (MRP) 
+
+SQL> Alter database recover managed standby database disconnect from session.
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

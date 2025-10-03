@@ -1,0 +1,261 @@
+DR DRILL
+
+Pre-Checks :
+
+On Primary : 
+
+Check Database status.
+
+Verify whether it is possible to perform a switchover
+
+Command : 
+
+
+select name,open_mode,database_role,switchover_status,controlfile_type,instance_name from v$database,v$instance;
+	
+ Take Backup Before start the activity
+
+    Take RMAN full backup of primary/production database 
+	
+ Verify all "log_archive_dest_n" parameter values are specified correctly
+     
+	log_archive_dest_state_n this parameter should be in DEFER state.
+	
+	If not then defer it first
+	
+Command :     
+show parameter log_archive_dest_state_
+	          alter system set log_archive_dest_state_n='DEFER' sid='*' scope=both;
+	
+Check that there is no active users connected to the databases.
+ 
+    Verify that there is no active sessions on the database.
+	
+Command : 
+
+
+col status for a9
+               col event for a30
+               col username for a10
+               col module for a25
+               col machine for a15
+               col osuser for a10
+               set lines 200 pages 50000
+               select  inst_id,sid, serial#,p1, sql_id,osuser, username, row_wait_obj#, event, module,machine,
+               round(last_call_et) LCE from gv$session s where  username is not null
+               and status='ACTIVE'
+               order by inst_id, event, sql_id
+               /
+
+
+
+
+
+
+
+
+Switch Log Files 
+Switch the current online redo log file on primary database and verify that it has been applied
+	
+ Command :  alter system switch all logfile;           
+
+
+--> Perform this 2-3 times.
+	 
+	         select thread#,max(sequence#) from gv$archived_log group by thread#; 
+
+
+     -->Note this and verify same should be on Standby/DR
+	
+
+		   
+ On Standby/DR :
+ 
+Check DR database status.
+ 
+Verify whether it is possible to perform a switchover
+
+Command : 
+
+
+select name,open_mode,database_role,switchover_status,controlfile_type,instance_name from v$database,v$instance;
+	 
+Check SYNC Status 
+   
+Since we have switch some log files from primary/production database verify that the same sequence# are applied on Standby/DR database.
+	
+	Method 1 :
+	
+select thread#,max(sequence#) from gv$archived_log group by thread#;    
+	
+	Method 2:
+	
+select name,open_mode,database_role,log_mode from v$database;
+
+
+ select thread#,process,status,block#,CLIENT_PROCESS,sequence# from v$managed_standby;
+
+
+SELECT ARCH.THREAD# "THREAD", ARCH.SEQUENCE# "LAST SEQUENCE RECEIVED", APPL.SEQUENCE# "LAST SEQUENCE APPLIED", (ARCH.SEQUENCE#-APPL.SEQUENCE#) "DIFFERENCE" FROM (SELECT THREAD#,SEQUENCE# FROM V$ARCHIVED_LOG WHERE (THREAD#,FIRST_TIME) IN (SELECT THREAD#,MAX(FIRST_TIME) FROM V$ARCHIVED_LOG GROUP BY THREAD#)) ARCH, (SELECT THREAD#,SEQUENCE# FROM V$LOG_HISTORY WHERE (THREAD#,FIRST_TIME) IN (SELECT THREAD#,MAX(FIRST_TIME) FROM V$LOG_HISTORY GROUP BY THREAD#)) APPL WHERE ARCH.THREAD# = APPL.THREAD# ORDER BY 1;
+
+	
+	
+ 
+
+
+
+
+
+
+
+
+ 
+Main Activity :
+    
+	We are performing the DR DRILL ACTIVITY,
+	So we have to be make sure that all the Pre-Checks and necessary approvals has been taken.
+	
+   On Primary :
+   
+Perform below command to convert the primary database into Standby/DR.
+	 
+ Command : 
+select name,open_mode,database_role,switchover_status,controlfile_type,instance_name 
+from v$database,v$instance;
+
+
+alter database commit to switchover to standby with session shutdown;
+	  
+ The above statement first terminates all active sessions by closing the primary database.
+ Then any non-archived redo log files are transmitted and applied to standby database.
+ Apart from that an end-of-redo marker is added to the header of the last log file that was archived.
+ A backup of current control file is created and the current control file is converted into a standb control file.
+	  
+Shut down and restart the current primary instance :
+	
+   Command :
+	  shut immediate
+	  
+	  exit
+	  
+	  sqlplus / as sysdba
+	  
+	  startup mount
+	  
+Verify the  status of the database.
+
+Command : 
+
+
+select name,open_mode,database_role,switchover_status,controlfile_type,instance_name from v$database,v$instance;
+		
+      Now the database is a Standby/DR 
+	  
+	  
+	  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ON Standby/DR :
+  
+ Perform below command to convert the current Standby/DR database into Primary.
+	 
+Command : 
+select name,open_mode,database_role,switchover_status,controlfile_type,instance_name from v$database,v$instance;
+		
+alter database commit to switchover to primary ;
+				  
+ Shut down and restart the current Standby/DR instance :
+	 
+   shut immediate
+	   
+   exit
+	   
+   sqlplus / as sysdba
+	   
+   startup
+	   
+ Verify the  status of the database.
+
+Command : 
+select name,open_mode,database_role,switchover_status,controlfile_type,instance_name from v$database,v$instance;	
+     
+ Now the database is a Primary.
+	  
+	  
+
+
+Post-Checks :
+ 
+  On New Primary :
+  
+Verify all "log_archive_dest_n" parameter values are specified correctly
+	 
+	    Now enable the log_archive_dest_n parameter from new primary database.
+		
+		
+	   Command : show parameter log_archive_dest_state_
+                 alter system set log_archive_dest_state_n='ENABLE' sid='*' scope=both;
+				 
+ Switch 2-3 log files on the new primary database
+	 
+ Command : 
+alter system switch all logfile;    
+
+
+  --> Perform this 2-3 times.
+	   
+select thread#,max(sequence#) from v$archived_log group by thread#;   
+
+
+--> Note this and check from new Standby/DR, It should be same on both the databases.
+				 
+				 
+
+
+
+
+
+ On New Standby/DR :
+ 
+ 
+Start the Recovery
+	 
+	   Now we have to start the MRP process from new Standby/DR database
+	   
+Command : 
+select thread#,process,status,block#,CLIENT_PROCESS,sequence# from v$managed_standby;
+	   
+alter database recover managed standby database disconnect from session;    
+				 
+Check SYNC Status
+
+        Verify the sequence# are applied on the new Standby/DR database.
+
+     Method 1 :
+	
+select thread#,max(sequence#) from gv$archived_log group by thread#;    
+	
+ Method 2:
+	
+select name,open_mode,database_role,log_mode from v$database;
+
+
+select thread#,process,status,block#,CLIENT_PROCESS,sequence# from v$managed_standby;
+
+
+ SELECT ARCH.THREAD# "THREAD", ARCH.SEQUENCE# "LAST SEQUENCE RECEIVED", APPL.SEQUENCE# "LAST SEQUENCE APPLIED", (ARCH.SEQUENCE#-APPL.SEQUENCE#) "DIFFERENCE" FROM (SELECT THREAD#,SEQUENCE# FROM V$ARCHIVED_LOG WHERE (THREAD#,FIRST_TIME) IN (SELECT THREAD#,MAX(FIRST_TIME) FROM V$ARCHIVED_LOG GROUP BY THREAD#)) ARCH, (SELECT THREAD#,SEQUENCE# FROM V$LOG_HISTORY WHERE (THREAD#,FIRST_TIME) IN (SELECT THREAD#,MAX(FIRST_TIME) FROM V$LOG_HISTORY GROUP BY THREAD#)) APPL WHERE ARCH.THREAD# = APPL.THREAD# ORDER BY 1;
+
+	
+      		
+				 

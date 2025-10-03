@@ -1,0 +1,403 @@
+RESTORE DATABASE USING RMAN
+
+
+PRECHECKS :
+
+1] Transfer the backup
+
+Transfer the proper full  backup from Source database to the UAT server.
+Command : 
+nohup scp -rp <backup_dir> oracle@<ip.of.uat.db>:<uat_bkp_path> nohup.out 2>&1 (Hit Enter)
+
+
+Enter Password For the server : <password>
+
+
+Press : CTRL + Z
+
+(During backup being transferred to UAT server check the basic requirements for restoration)
+
+2] GET THE DB_LINKS DDL OF THAT DATABASE:
+
+COMMAND : 
+
+SET LINESIZE 150
+COLUMN owner FORMAT A30
+COLUMN db_link FORMAT A30
+COLUMN username FORMAT A30
+COLUMN host FORMAT A30
+SELECT owner,db_link,username,host FROM dba_db_links ORDER BY owner, db_link;
+
+
+Set long 1000
+SELECT DBMS_METADATA.GET_DDL('DB_LINK',db.db_link,db.owner) from dba_db_links db;
+
+3] GET ALL THE APPLICATIONS USERS DETAILS
+ ( WE HAVE TO RESET THE PASSWORDS FOR USERS)
+
+select username,account_status,expiry_date,profile from dba_users where oracle_maintained ='N' order by created;
+
+4] GET THE METADATA BACKUP 
+(OPTIONAL IF WE DON'T WANT TO CREATE DB_LINKS MANUALLY)  
+create  directory first on OS level then database level: USE EXISTING IF PRESENT
+Command : 
+create directory <dir_name> as ‘<dir_path_on_os>’;
+grant read,write on directory <dir_name> to <user>;
+
+expdp \'sys/sys as sysdba\' directory=<directory_name> dumpfile=<dumpfile_name> logfile=<logfile_name> content=metadata_only 
+--- ON SOURCE DATABASE
+
+
+
+
+5] Check Free Space on UAT 
+     For Filesystem : df -h
+     For ASM : 
+        set lines 333 pages 334
+        select name,total_mb/1024,free_mb/1024 from v$asm_diskgroup order by name;
+
+
+# RESTORATION STARTS HERE
+
+SET THE SID OF GIVEN DATABASE 
+Command :
+export ORACLE_SID=ONELMSMLUAT
+
+1)TAKE THE CURRENT DB PFILE IN BACKUP LOCATION
+
+CREATE PFILE = '<backup_path>init<db_name>.ora' FROM SPFILE;
+
+**********************************************************
+2)GET THE DATAFILE, LOGFILE,CONTROLFILE AND TEMPFILE LOCATION
+Commands :
+select file_name from v$dba_data_files;
+select * from v$logfile;
+show parameter control_files;
+
+**********************************************************
+
+3)DROP THE DATABASE
+
+Before dropping the database,Database should be in MOUNT RESTRICT mode.
+
+Commands :
+shutdown immediate;
+startup mount exclusive restrict;  --- TO RESTRICT THE USERS LOGINS
+drop database;
+
+OPEN THE PFILE AND REMOVE ABOVE CODES IN WHITE AND SAVE IT
+
+remove  hidden parameters from parameter file (pfile)
+
+PFILE CHANGES :::
+
+a] IF pfile is of production environment and restoration to be held on UAT then change below parameters in pfile.
+
+SGA_TARGET , SGA_MAX_SIZE
+ALTER SYSTEM SET SGA_MAX_SIZE=100G SCOPE=SPFILE;
+ALTER SYSTEM SET SGA_TARGET=100G SCOPE=SPFILE;
+
+b] IF RAC UAT SETUP then hashed the below parameters, after restoration set the same parameters
+
+remote listener, local_listener for other node, instance name and number for other node, UNDO tbs
+
+
+5)FROM BACKUP LOCATION TAKE THE PATH oF PFILE(PWD) AND START THE DATABASE:
+
+e<backup_path>init<db_name>.ora';
+
+
+6)EXIT THE CONSOLE
+exit
+
+
+
+7) Verify the database instance 
+echo $ORACLE_SID
+env |grep ORA
+
+
+FORM BACKUP LOCATION GO TO RMAN CONSOLE
+
+Commands :
+rman target /
+restore controlfile from '<uat_bkp_path>/controlfile_bkp_file_name>';
+
+
+AFTER RESTORE IS SUCCESSFULL MOUNT THE DATABASE FROM RMAN PROMPT
+
+Command :
+ALTER DATABASE MOUNT;
+
+NOW CHECK THE DATAFILES COUNT SHOULD BE SAME AS PER SOURCE DATABASE.
+
+exit the console
+sqlplus / as sysdba
+
+
+select name from v$datafile;
+select count(*) from v$datafile
+
+
+--- FILE SYSTEM ---
+
+
+select 'SET NEWNAME FOR DATAFILE ' || FILE# || ' TO ''' || '/ltfp02_mig/LTFP02_MIG/DATAFILE/' || substr(name,instr(name,'/',-1)+1) || ''';' from v$datafile;
+
+
+--- ASM ---
+
+
+select 'SET NEWNAME FOR DATAFILE ' || FILE# || ' TO ''' || '+DATACL' ||  ''';' from v$datafile;
+
+
+
+CATALOG THE BACKUP_LOCATION
+
+catalog start with '<uat_bkp_path/';              
+  
+then start with restoration
+CREATE RMAN RESTORE FILE TO SET NEW NAME AND PUT IT BACKUP LOCATION
+
+CHOOSE CHANNEL ACCORDING TO CPUS lscpu
+create a sh file with the name <resotre_filename>.sh file.
+
+Command : 
+ vi <resotre_filename>.sh
+
+Copy the the following command
+(make command as per requirement)
+
+rman target=/ nocatalog log="<logfile_name.log>" <<EOF
+RUN {
+allocate channel c1 device type disk;
+allocate channel c2 device type disk;
+allocate channel c3 device type disk;
+allocate channel c4 device type disk;
+allocate channel c5 device type disk;
+allocate channel c6 device type disk;
+allocate channel c7 device type disk;
+allocate channel c8 device type disk;
+SET NEWNAME FOR DATAFILE 1 TO '<uat_datafile_path>/system.507.1126052319';
+
+
+
+
+SET NEWNAME FOR DATAFILE 1 TO '+DATACL;.  — IF ASM
+.
+.
+restore database;
+switch datafile all;
+release channel c1;
+release channel c2;
+release channel c3;
+release channel c4;
+release channel c5;
+release channel c6;
+release channel c7;
+release channel c8;
+}
+EXIT;
+EOF
+
+save the file :wq
+
+ command : 
+nohup sh <resotre_filename>.sh &
+ 
+Check restore  Status using command
+
+SELECT SID,INPUT_BYTES/1024/1024/1024,OUTPUT_BYTES/1024/1024/1024 FROM V$RMAN_STATUS WHERE OPERATION  LIKE '%RESTORE%' AND STATUS='RUNNING';
+
+AFTER SUCCESSFUL RESTORE CHECK THE REDO LOG INFO
+
+col member for a79
+SELECT member FROM V$LOGFILE;
+
+
+SELECT * FROM V$LOG;
+
+
+IF THERE ARE STANDBY FILE DROP THEM FIRST
+
+TO DROP REDO LOG FILE :
+SELECT 'ALTER DATABASE DROP LOGFILE GROUP '||GROUP#||';' from v$logfile;
+
+alter database drop logfile group 11;
+alter database drop logfile group 12;
+
+(IF THEY DONT DROP USE BELOW METHOD THEN TRY AGAIN TO DROP)
+alter database clear unarchived logfile group 11;
+alter database clear unarchived logfile group 12;
+
+(AFTER DROP CHECK AGAIN IF NO STNDBY REDOLOG IS THERE)
+
+TO DROP STANDBY REDO ::
+SELECT 'ALTER DATABASE DROP STANDBY LOGFILE GROUP '||GROUP#||';' from v$logfile where type='STANDBY'; 
+
+alter database drop standby logfile group 11;
+alter database drop standby logfile group 12;
+
+
+TO ADD REDO LOGS ::
+ --- ASM ---
+ 
+ALTER DATABASE ADD LOGFILE THREAD 1
+GROUP 1 ('+REDO3','+REDO4') SIZE 512M,
+GROUP 2 ('+REDO3','+REDO4') SIZE 512M;
+
+ALTER DATABASE ADD LOGFILE THREAD 2
+GROUP 3 ('+REDO3','+REDO4') SIZE 512M,
+GROUP 4 ('+REDO3','+REDO4') SIZE 512M;
+
+ALTER DATABASE ADD LOGFILE THREAD 3
+GROUP 5 ('+REDO3','+REDO4') SIZE 512M,
+GROUP 6 ('+REDO3','+REDO4') SIZE 512M;
+
+—- FILE SYSTEM —
+alter database add logfile group 5 '/redo1/LTFNEW/redo5a.log';
+alter database add logfile member '/redo2/LTFNEW/redo5B.log' to group 5;
+
+
+RENAME THE REDLOG FILES
+
+JUST REPLACE OLD LOCATION WITH NEW LOCATION DONT TOUCH ANYHTING ELSE
+ 
+ALTER DATABASE RENAME FILE '' TO '';
+ 
+ ALTER DATABASE RENAME FILE '<old_path>/group_2.258.1041707055' to '<new_path>/group_2.258.1041707055';
+ALTER DATABASE RENAME FILE '<old_path>/group_2.258.1041707055' to '<new_path>/group_2.258.1041707055';
+ALTER DATABASE RENAME FILE '<old_path>/group_1.257.1041707055' to '<new_path>/group_1.257.1041707055';
+
+
+
+
+
+
+
+
+
+
+
+CHECK THE CONTROLFILE TYPE
+
+Command : select CONTROLFILE_TYPE from v$database;
+
+
+(NOTE:IF THE CONTROLFILE IS STANDBY JUST DO THIS)
+
+ALTER DATABASE ACTIVATE PHYSICAL STANDBY DATABASE;
+
+THEN OPEN THE DATABASE
+
+ALTER DATABASE OPEN;
+
+(NOTE:IF THE CONTROLFILE IS CURRENT JUST DO THIS)
+ALTER DATABASE RECOVER DATABASE;
+
+ALTER DATABASE OPEN RESETLOGS;
+AFTER SUCCESSFUL ACTIVITY MAKE THE DB IN NO ARCHIVELOG MODE
+
+CREATE SPFILE FROM PFILE='BACKUP_LOCATION/INIT_DBNAME.ORA';
+SHUT IMMEDIATE;
+STARTUP MOUNT;
+Alter database noarchivelog;
+ALTER DATABASE OPEN;
+
+CHECK ARCHIVE LOG MODE 
+
+ARCHIVE LOG LIST;
+
+CREATE TEMPFILE BUT DROP THE OLDER TEMPFILE FIRST
+
+SELECT PROPERTY_VALUE
+FROM DATABASE_PROPERTIES
+WHERE PROPERTY_NAME = 'DEFAULT_TEMP_TABLESPACE';
+
+
+SELECT 'ALTER DATABASE TEMPFILE '''||NAME||''' DROP;' FROM V$TEMPFILE;
+ALTER DATABASE TEMPFILE '/onelmsFR_data01/ONELMSFRDR/datafile/temp01.dbf' DROP;
+
+
+ALTER TABLESPACE TEMP ADD TEMPFILE '+DATAFR' SIZE 1G AUTOEXTEND ON;
+ALTER TABLESPACE TEMP ADD TEMPFILE '<tempfile_path>/temp01.dbf' SIZE 100M AUTOEXTEND ON;
+
+POSTCHECKS :
+Perform STATS GATHER
+
+export ORACLE_SID=
+export ORACLE_HOME=
+export PATH=$ORACLE_HOME/bin:$PATH
+export tdt=`date "+%d%m%Y"`
+ $ORACLE_HOME/bin/sqlplus -s  /nolog << END
+connect / as sysdba
+
+
+SET HEAD ON
+SET ARRAY 1
+SET LINESIZE 1000
+SET PAGESIZE 50000
+SET LONG 10000
+SET ECHO ON
+SET TRIMSPOOL ON
+set serveroutput on;
+set colsep '|'
+set pages 5000
+set echo on
+set time on
+set timing on
+set define off
+spool /home/oracle/sldba/log/Database_statsgather_ONELMS__$tdt.log
+show user;
+ select to_char(sysdate,'DD-MON-YY:HH24:MI') START_TIME from dual;
+exec dbms_stats.gather_database_stats(degree => 4, cascade => TRUE,estimate_percent=>dbms_stats.auto_sample_size);
+EXEC DBMS_STATS.gather_dictionary_stats;
+EXEC DBMS_STATS.gather_system_stats;
+EXEC DBMS_STATS.gather_fixed_objects_stats;
+ select to_char(sysdate,'DD-MON-YY:HH24:MI') END_TIME from dual;
+spool off;
+exit;
+END
+Peform below command
+ 
+nohup sh DB_STATS_GATHER.sh &
+
+
+
+ RESET THE APPLICATION USERS PASSWORDS
+ (SINCE IT IS UAT SAME AS USERNAME BUT CONFIRM ONCE WITH TEAM) 
+
+Command : 
+select 'alter user '||username||' identified by '||username||';' from dba_users where oracle_maintained ='N' order by created;
+
+ MASKING
+ (RUN THE MASKING SCRIPT PROVIDED BY CLIENT)
+
+   Create sql and sh files to run the masking script.
+   Run the script in nohup utility only ---> BECAUSE IT TAKES LONGER TIME TO EXECUTE
+   Command : nohup sh <SH_FILE> &
+   
+ CREATE OR IMPORT DB_LINKS
+ (IMPORT IF EXPORT OF METADATA WAS TAKEN)
+
+SELECT 'DROP PUBLIC DATABASE LINK '||DB_LINK||';' from DBA_DB_LINKS where OWNER='PUBLIC';
+
+SELECT 'DROP DATABASE LINK '||DB_LINK||';' from DBA_DB_LINKS where OWNER='&OWNER';
+
+ COMMAND :  --- ON UAT DATABASE
+
+ impdp \'sys/sys as sysdba\' directory=<DIRECTORY_NAME>   dumpfile=<DUMPFILE_NAME>      logfile=<LOGFILE_NAME> include=db_links
+
+CHECK ALL THE PARAMETERS
+
+DATABASE STATUS, STORAGE,ARCHIVELOG MODE OF NEWLY CREATED  DATABASE
+
+select  name,open_mode,log_mode,controlfile_type from v$database;
+
+
+
+
+
+
+
+

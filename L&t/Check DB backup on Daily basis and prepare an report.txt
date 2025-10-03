@@ -1,0 +1,63 @@
+Check DB backup on Daily basis and prepare an report
+
+
+
+Step 1:- 
+Connect to database 
+Sqlplus / as sysdba
+
+Step 2:- check the start time and time below command
+
+set lines 200 pages 2000
+col START_TIME format a30
+col STATUS format a9
+col hrs format 999.99
+select
+SESSION_KEY, INPUT_TYPE, STATUS,to_char(START_TIME,'mm/dd/yy hh24:mi') start_time,
+to_char(END_TIME,'mm/dd/yy hh24:mi') end_time, elapsed_seconds/3600 hrs
+from V$RMAN_BACKUP_JOB_DETAILS
+order by 4;
+
+If it not completed then check how much % is remaining and how much time it will take to complete the backup 
+
+SET LINE 132
+SELECT opname, round(sofar/totalwork*100) "% Complete"
+  FROM gv$session_longops
+ WHERE opname LIKE '%RMAN%'
+   AND totalwork != 0
+   AND sofar <> totalwork
+ ORDER BY 1;
+
+
+
+
+Oracle
+Incremental
+Completed
+
+
+
+
+
+
+Done
+
+
+Step 3 :- check which is it done (full or incremental backup) with the help set command….
+
+Step 4 :- Accordingly we have to fill the detail of backup in below sheet…..
+
+Step 5 :- if it is failed. Check why is failed and again retrigger.
+Application/DB Name
+
+
+DB Service
+Full/Schema
+Status
+Start Time
+End Time
+Backup path
+Comments
+
+
+E.g :- 

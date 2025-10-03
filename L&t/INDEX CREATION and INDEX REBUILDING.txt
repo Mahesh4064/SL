@@ -1,0 +1,35 @@
+INDEX CREATION and INDEX REBUILDING
+
+Index creation:- 
+
+
+Create index index_name on table_name (coloumn_1,coloumn_2,….…);
+
+select OWNER,INDEX_NAME,TABLE_NAME,BLEVEL,STATUS from dba_indexes where table_name=’&tab_name’ and index_name=’&index_name’;
+
+Index rebuilding;
+
+alter index schema.index_name rebuild online parallel (integer);
+
+Or
+
+alter index schema.index_name rebuild online noparallel (integer);
+
+e.g :- 
+
+create index.sql
+
+ALTER INDEX  LTF_LEA_MIL.SYS_C0064899 REBUILD online parallel 10;
+ALTER INDEX  LTF_LEA_MIL.SYS_C0064899 REBUILD noparallel;
+ALTER INDEX  LTF_LEA_MIL.LRBH_USERID_UPLOADDATE_IDX REBUILD online parallel 10;
+ALTER INDEX  LTF_LEA_MIL.LRBH_USERID_UPLOADDATE_IDX REBUILD noparallel;
+
+Create index.sh 
+
+export ORACLE_HOME=/oracle19chome/app/oracle/product/19.0.0/dbhome_1
+export ORACLE_SID=service_name
+export PATH=$ORACLE_HOME/bin:$PATH
+dd=`date "+%d%m%Y"`
+
+echo "exit" | sqlplus / as sysdba @/home/oracle/dbscripts/index.sql
+

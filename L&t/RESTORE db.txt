@@ -1,0 +1,400 @@
+
+select * from dba_db_links;  take backup of this also
+
+https://duplicateword.com/
+
+show parameter recovery 
+reset two value after controlfile restore ======================>>
+alter system reset db_recovery_file_dest scope=both;
+alter system reset db_recovery_file_dest_size  scope=both;       
+
+crosscheck archivelog all;
+
+delete expired archivelog all;
+
+CROSSCHECK BACKUP;
+delete expired BACKUP;
+delete expired backup;
+
+===================================================================================check datafile addition time .
+col file_name for a55
+col tablespace_name for a20
+set lines 130
+set pages 500
+select d.file_id,d.tablespace_name,d.file_name,to_char(v.CREATION_TIME, 'dd-mm-yyyy hh24:mi:ss'),v.bytes/1024/1024/1024
+from dba_data_Files d , v$datafile v
+where tablespace_name=upper('&tablespace_name')
+and file_id=file#
+order by v.CREATION_TIME desc;
+===========================================================================================check datafile addition time .
+ps -ef|grep -i alert.log tablespace===========================>> 
+cat alert.log -i alter ===================================================>>use this 
+
+expdp directory=exp_meta dumpfile=XEUAT_metedata_%U.dmp logfile=XEUAT_metedata_24022024.log  CONTENT=METADATA_ONLY  full=y
+ 
+vi new.par
+expdp parfile=new.par 
+ 
+expdp directory=exp_meta dumpfile=FR_MIG_dblink_%U.dmp logfile=dblink24022024.log  include=db_link parallel=4  full=y
+
+impdp directory=expd dumpfile=onelmsML_metadata_13022024_%U.dmp logfile=dblink15022024_ml_imp.log  include=db_link parallel=4 
+
+select FILE_ID,BYTES/1024/1024/1024 from dba_data_files order by file_id
+
+**********************************************************STEPS TO RESTORE DATABASE**********************************************************
+
+BEFORE THIS GET THE DB_LINKS DDL OF THAT UAT DATABASE:
+
+Set long 1000
+SELECT DBMS_METADATA.GET_DDL('DB_LINK',db.db_link,db.owner) from dba_db_links db;
+
+
+SET LINESIZE 150
+
+COLUMN owner FORMAT A30
+COLUMN db_link FORMAT A30
+COLUMN username FORMAT A30
+COLUMN host FORMAT A30
+SELECT owner,db_link,username,host FROM dba_db_links ORDER BY owner, db_link;
+
+**********************************************************
+
+(SET THE SID OF GIVEN DATABASE)IMP
+
+1)TAKE THE CURRENT DB PFILE IN BACKUP LOCATION
+
+CREATE PFILE = '/Backup/RMANBKP/04072024_ONELMSCL/initONELMSCL1.ora' FROM SPFILE;
+
+**********************************************************
+2)GET THE DATAFILE, LOGFILE,CONTROLFILE AND TEMPFILE LOCATION
+
+select file_name from dba_data_files;
+select * from v$logfile;
+show parameter control_files;
+
+**********************************************************
+
+3)SHUTDOWN THE DATABASE
+
+1-shutdown immediate;
+2-startup mount exclusive restrict;
+3-startup mount restrict;
+4-drop database;                                =======>Please ensure that it is UAT Database.
+--------------------------------------------------------------------------------------------------------------------------------------------------
+startup nomount restrict pfile='/Backup/RMANBKP/04072024_ONELMSCL/initONELMSCL1.ora';      if restore fail any error so you can drop by this method 
+alter database mount;
+drop database;
+check space in @asm it should be release from the disk 
+-----------------------------------------------------------------------------------------------------------------------------------------------
+**********************************************************
+
+4)OPEN THE PFILE AND REMOVE ABOVE CODES IN WHITE AND SAVE IT
+
+**********************************************************
+
+5)FROM BACKUP LOCATION TAKE THE PATH (PWD) AND START THE DATABASE:
+
+startup nomount pfile='/Backup_Tmp/restore_lms/initONELMS1.ora';
+
+**********************************************************
+
+6)EXIT THE CONSOLE
+
+**********************************************************
+
+7) CHECK THE SID echo $ORACLE_SID
+
+**********************************************************
+
+8)FORM BACKUP LOCATION GO TO RMAN CONSOLE
+
+rman target /
+
+restore controlfile from '/ONELMS_NEW_DATA/RMAN_BKP/JUNE_EOM_ONELMS/ONELMS_backup_CURRENT_CONTROL_4f2uqmv6_112783_1_1_20240701';   ======>>in AMS give path in spfile after restore 
+
+
+restore primary controlfile from '/backup/ONELMSCL/RMAN_BACKUP/ONELMSCL_backup_control_vd2hrrnr_61421_1_1_20240130';    ====>>if we have standby database controlfile then we can restore controlfile command as primary controlfile
+restore standby controlfile from '/backup2/INCR_LVL_ZERO/ONELMSFR/ONELMSFR_backup_CURRENT_CONTROL_ls2sqppn_58044_1_1_20240608'; 
+recover standby database using backup controlfile until cancel;
+**********************************************************
+
+9)AFTER RESTORE IS SUCCESSFULL MOUNT THE DATABASE FROM RMAN PROMPT
+
+ALTER DATABASE MOUNT;
+
+**********************************************************
+------CATALOG THE BACKUP_LOCATION------
+
+catalog start with '/ONELMS_NEW_DATA/RMAN_BKP/JUNE_EOM_ONELMS/';          then start with restoration;
+
+**********************************************************
+GO TO PROD DB USE BELOW CMD
+
+
+DESC v$datafile;
+
+SELECT 'SET NEWNAME FOR DATAFILE '||FILE#||' TO '''||NAME||';' TEXT FROM v$datafile order by FILE#;
+
+THEN REPLACE THE OLD LOCATION WITH NEW LOCATION
+
+10)CREATE RMAN RESTORE FILE TO SET NEW NAME AND PUT IT BACKUP LOCATION(CHOOSE CHANNEL ACCORDING TO CPUS lscpu)
+
+(save it with LTFNEW_resotre.sh file.)
+
+rman target=/ nocatalog log="/Backup/LTFP02/apr_23/LTFNEW_full_Restore_7_APRIL2023_logfile.log" <<EOF
+RUN {
+allocate channel c1 device type disk;
+allocate channel c2 device type disk;
+allocate channel c3 device type disk;
+allocate channel c4 device type disk;
+allocate channel c5 device type disk;
+allocate channel c6 device type disk;
+allocate channel c7 device type disk;
+allocate channel c8 device type disk;
+allocate channel c9 device type disk;
+SET NEWNAME FOR DATAFILE 1 TO '/NEW_LOCATION/system01.dbf';
+.
+.
+.
+.
+.
+
+restore database;
+switch datafile all;
+release channel c1;
+release channel c2;
+release channel c3;
+release channel c4;
+release channel c5;
+}
+
+EXIT;
+EOF
+
+ select SID,INPUT_BYTES/1024/1024/1024 ,OUTPUT_BYTES/1024/1024/1024 from v$rman_status where OPERATION like '%RESTORE%';
+
+11)AFTER SUCCESSFULL RESTORE CHECK THE REDOLOG INFO
+
+SELECT * FROM V$LOGFILE;
+
+**********************************************************
+
+12)IF THERE ARE STANDBY FILE DROP THEM FIRST
+
+alter database drop standby logfile group 1;
+alter database drop standby logfile group 2;
+alter database drop standby logfile group 3;
+alter database drop standby logfile group 4;
+alter database drop standby logfile group 5;
+alter database drop standby logfile group 6;
+alter database drop standby logfile group 22;
+
+(IF THEY DONT DROP USE BELOW METHOD THEN TRY AGAIN TO DROP)
+alter database clear unarchived logfile group 16;
+alter database clear unarchived logfile group 17;
+alter database clear unarchived logfile group 18;
+alter database clear unarchived logfile group 19;
+alter database clear unarchived logfile group 20;
+alter database clear unarchived logfile group 21;
+
+(AFTER DROP CHECK AGAIN IF NO STND_BY REDOLOG IS THERE)
+
+SELECT * FROM V$LOGFILE;
+**********************************************************
+		 
+13)RENAME THE REDLOG FILES(JUST REPLACE OLD LOCATION WITH NEW LOCATION DONT TOUCH ANYHTING ELSE) 
+ 
+ALTER DATABASE RENAME FILE '' TO '';
+ 
+ 
+ALTER DATABASE RENAME FILE '/OLD_LOCATION/ONELMSCL/onlinelog/group_2.258.1041707055' to '/NEW_LOCATION/ONELMSCL/group_2.258.1041707055';
+ALTER DATABASE RENAME FILE '/lms_redo04/ONELMSCL/onlinelog/group_2.258.1041707055' to '/redo1/ONELMSCL/group_2.258.1041707055';
+ALTER DATABASE RENAME FILE '/lms_redo03/ONELMSCL/onlinelog/group_1.257.1041707055' to '/redo2/ONELMSCL/group_1.257.1041707055';
+
+alter database add logfile THREAD 3 group 7  '/onelmsfr_mig/REDOLOG/redo00009.log' size 512M;
+
+alter database add logfile member '/onelmsfr_mig/REDOLOG/redo000010.log' to group 7;
+
+**********************************************************
+
+14)CHECK THE CONTROLFILE TYPE
+
+select CONTROLFILE_TYPE from v$database;
+
+------------(NOTE:IF THE CONTROLFILE IS STANDBY JUST DO THIS)------------
+
+ALTER DATABASE ACTIVATE PHYSICAL STANDBY DATABASE;
+
+THEN OPEN THE DATABASE
+
+ALTER DATABASE OPEN;
+
+------------(NOTE:IF THE CONTROLFILE IS CURRENT or BACKUP JUST DO THIS)------------
+
+CONNECT TO RMAN :
+
+RMAN TARGET /
+RECOVER DATABASE;
+
+(YOU WILL GET ERROR WATING FOR MISSING LOG ,JUST EXIT THE RMAN  AND CONNECT TO SQL CHECK DB NAME AND RUN BELOW CMD)
+(RMAN-06054: media recovery requesting unknown archived log for thread 1 with sequence)
+
+ALTER DATABASE OPEN RESETLOGS;
+
+**********************************************************check database up with spfile 
+
+15)AFTER SUCCESSFULL ACTIVITY MAKE THE DB IN NO ARCHIVELOG MODE
+
+CREATE SPFILE FROM PFILE='/Backup/ONELMS/pfile_bkp/initONELMSMGR.ora';
+SHUT IMMEDIATE;
+STARTUP MOUNT;
+Alter database noarchivelog;
+ALTER DATABASE OPEN;
+
+CHECK ARCHIVE LOG MODE 
+
+ARCHIVE LOG LIST;
+**********************************************************
+
+16)CREATE TEMPFILE BUT DROP THE OLDER TEMPFILE FIRST
+
+SELECT PROPERTY_VALUE
+FROM DATABASE_PROPERTIES
+WHERE PROPERTY_NAME = 'DEFAULT_TEMP_TABLESPACE';     (TEMP)
+                       col NAME for a50
+GET TEMPFILE LOCATION: select BYTES/1024/1024/1024,NAME from V$TEMPFILE;
+
+ALTER DATABASE TEMPFILE '/onelms_data01/datafile/temp04.dbf' DROP;
+
+ALTER DATABASE TEMPFILE '/onelmsFR_data02/datafile/TEMP_02.dbf' DROP;
+
+THEN ADD BELOW TEMPFILE
+/onelmsmgr_data/ONELMSMGR/temp
+ALTER TABLESPACE TEMP ADD TEMPFILE '+DATACL' SIZE 1G AUTOEXTEND ON unlimited;
+ALTER TABLESPACE TEMP ADD TEMPFILE '+DATACL' SIZE 1G AUTOEXTEND ON;
+============================================================================we need to reset the pasword 
+
+select 'alter user ' || username || ' identified by  ' || username || ';' FROM dba_users where   ORACLE_MAINTAINED='N';  
+
+
+
+After clonning of onelms and onelmsfr need to run below update from mentioned users
+
+LTF_LEA and LTF_LEA_FRL
+UPDATE NBFC_CONTROL_PARAMETER SET PATH_NAME='http://10.3.2411.147:140111/finnone-integration/app/restservice/bod/executeBOD' WHERE PARAMETER ='NEO_BOD_EXECUTE';
+
+
+dba_registery schema colum 
+
+xml componant 
+
+
+crosscheck archivelog all;
+
+delete expired archivelog all;
+
+CROSSCHECK BACKUP;
+delete expired BACKUP;
+delete expired backup;
+
+========================================================================================================================
+
+
+
+NOARCHIVE LOGMODE  
+
+
+1) shu immediate;
+
+2) startup mount pfile='intiONELMSML1.ora';
+
+3) alter database noarchivelog;
+
+4) archive log list;
+
+5) cp intiONELMS1.ora intiONELMS1bkp.ora
+
+6) go to pfile and vi it ===>> $ vi intiONELMSML1.ora
+add four parameter in pfile
+
+*.cluster_database= TRUE
+ONELMSFR1.instance_number=1
+ONELMSFR2.instance_number=2
+ONELMSFR3.instance_number=3
+
+7) change the parameter in pfile and startup mount pfile='intiONELMSML1.ora';
+
+8) sho parameter cluster;
+
+9) from OS LEVEL check config
+
+srvctl config database -d ONELMS
+
+10) SQL> 
+create spfile from pfile;
+
+
+11) shu immediate;
+
+12) go to grid user ==>> asmcmd 
+> ls
+> cd +DATAML/
+
+> ls -lt
+
+spfile ==> spfile location  (cp the location )
+
+13) go to oracle user
+
+
+
+srvctl modify database -d ONELMSCL -spfile  +DATACL/ONELMSCLFDR/PARAMETERFILE/spfile.306.1137428037
+
+srvctl config database -d ONELMS
+
+
+14) go to root user
+ps -ef|grep d.bin
+
+cd bin==>> location
+
+# crsctl start crs
+
+
+15) go to oracle user 
+now start the database 
+
+srvctl start database -d ONELMSML -i ONELMSML1
+
+16) connected to database 
+SQL> show parameter spfile
+
+===============================================================
+show parameter instance
+show parameter thread
+show parameter cluster
+
+
+srvctl modify database -d orclcdb -spfile +DATA/ORCLCDB/spfile
+
+
+
+
+===========================================================================================================manoj sir by after restore 
+srvctl add database -d ONELMSCL -o /oraclehome/app/oracle/product/19.0.0/dbhome_1 -p +DATACL/ONELMSCL/PARAMETERFILE/spfile.361.1152974791
+
+
+srvctl add instance -d ONELMSCL -i ONELMSCL1 -n ltpol3plmsdbo01
+srvctl add instance -d ONELMSCL -i ONELMSCL2 -n ltpol3plmsdbo02
+
+Manoj Vakkayil, Wed 3:34 PM
+local_listener                       string       (ADDRESS=(PROTOCOL=TCP)(HOST=
+                                                 10.32.11.124)(PORT=1535))
+remote_listener                      string      ltpol3plmsdbo-scan.lntfinsvcs.
+                                                 com:1535
+
+===================================================================================================
+SELECT CURRENTDATE FROM LTF_MAS.NBFC_PARAMETER_M==============after restoration check date
+apps-fileview.texmex_20241010.01_p2
+FULL_DB_RESTORE_POA_frmig.txt
+Displaying DB_PATCH.txt.
