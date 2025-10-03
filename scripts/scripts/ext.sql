@@ -1,0 +1,2 @@
+set line 200 pages 200;
+select OWNER,SEGMENT_NAME,SEGMENT_TYPE,TABLESPACE_NAME,BYTES/1024 "SIZE KB",BLOCKS from dba_extents where OWNER='&owner';
